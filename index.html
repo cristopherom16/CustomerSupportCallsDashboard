@@ -453,7 +453,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Paste data below from Excel or CSV. The process button unlocks when all 4 textareas have content.
+              Paste data below from Excel or CSV. You can process even with 1 table ready.
             </p>
           </div>
 
@@ -506,7 +506,7 @@
             </div>
             <span id="badge-check-t1" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t1" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Hour table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t1" onkeyup="checkAllFourTablesReady()" onpaste="setTimeout(checkAllFourTablesReady,100)" rows="7" placeholder="Paste Calls Per Hour table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
@@ -517,7 +517,7 @@
             </div>
             <span id="badge-check-t2" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t2" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Queue table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t2" onkeyup="checkAllFourTablesReady()" onpaste="setTimeout(checkAllFourTablesReady,100)" rows="7" placeholder="Paste Calls Per Queue table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
@@ -528,7 +528,7 @@
             </div>
             <span id="badge-check-t3" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agents table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t3" onkeyup="checkAllFourTablesReady()" onpaste="setTimeout(checkAllFourTablesReady,100)" rows="7" placeholder="Paste Calls Per Agents table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
@@ -539,7 +539,7 @@
             </div>
             <span id="badge-check-t4" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t4" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Overflow table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t4" onkeyup="checkAllFourTablesReady()" onpaste="setTimeout(checkAllFourTablesReady,100)" rows="7" placeholder="Paste Calls Overflow table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
       </div>
     </div>
@@ -623,7 +623,6 @@
       const app = initializeApp(firebaseConfig);
       db = getDatabase(app);
 
-      // Sincronización en tiempo real de los datos semanales
       const weeksRef = ref(db, 'dashboard_weeks_data');
       onValue(weeksRef, (snapshot) => {
         firebaseWeeksStore = snapshot.val() || {};
@@ -631,25 +630,22 @@
         window.loadWeeksIntoAppData(firebaseWeeksStore);
       });
     } catch (e) {
-      console.warn("Firebase inicialization failed, falling back to LocalStorage:", e);
+      console.warn("Firebase falló, usando almacenamiento local:", e);
     }
 
-    // Exponer funciones globales para Firebase y respaldo local
     window.saveWeekToFirebase = function(storageKey, weekPayload) {
-      // 1. Guardado de respaldo en LocalStorage
       const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
       localStore[storageKey] = weekPayload;
       localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
 
-      // 2. Intento de guardado en Firebase
       if (db) {
         set(ref(db, 'dashboard_weeks_data/' + storageKey), weekPayload)
           .then(() => {
             window.showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Guardado en la nube: <strong>${storageKey}</strong>!`);
           })
           .catch((error) => {
-            console.error("Error guardando en Firebase: ", error);
-            window.showToast(`<i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Guardado localmente (error en Firebase).`);
+            console.error("Firebase err:", error);
+            window.showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Guardado localmente: <strong>${storageKey}</strong>!`);
           });
       } else {
         window.loadWeeksIntoAppData(localStore);
@@ -664,9 +660,8 @@
 
       if (db) {
         remove(ref(db, 'dashboard_weeks_data/' + storageKey));
-      } else {
-        window.loadWeeksIntoAppData(localStore);
       }
+      window.loadWeeksIntoAppData(localStore);
     };
 
     window.getFirebaseWeeksStore = function() {
@@ -699,6 +694,7 @@
       updateScopeLabels();
       renderSavedWeeksBadges();
       renderWeekDaysPills();
+      checkAllFourTablesReady();
     };
 
     function loadFallbackLocalStorage() {
@@ -1195,6 +1191,7 @@
       return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     }
 
+    // MODIFICADO: Permite desbloquear con al menos 1 tabla que tenga contenido
     function checkAllFourTablesReady() {
       const t1 = (document.getElementById('paste-input-t1')?.value || '').trim();
       const t2 = (document.getElementById('paste-input-t2')?.value || '').trim();
@@ -1218,11 +1215,11 @@
       updateBadge('badge-check-t3', t3.length > 0);
       updateBadge('badge-check-t4', t4.length > 0);
 
-      const allReady = t1.length > 0 && t2.length > 0 && t3.length > 0 && t4.length > 0;
+      const anyReady = t1.length > 0 || t2.length > 0 || t3.length > 0 || t4.length > 0;
       const btn = document.getElementById('btn-process-save-week');
       if (btn) {
-        btn.disabled = !allReady;
-        if (allReady) {
+        btn.disabled = !anyReady;
+        if (anyReady) {
           btn.className = 'px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105';
           btn.innerHTML = '<i class="fa-solid fa-bolt text-xs"></i> Process & Save Week';
         } else {
@@ -1247,11 +1244,6 @@
       const t2Rows = parseDelimitedTable(document.getElementById('paste-input-t2')?.value || '');
       const t3Rows = parseDelimitedTable(document.getElementById('paste-input-t3')?.value || '');
       const t4Rows = parseDelimitedTable(document.getElementById('paste-input-t4')?.value || '');
-
-      if (t1Rows.length === 0 || t2Rows.length === 0 || t3Rows.length === 0 || t4Rows.length === 0) {
-        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Please paste data into all 4 tables.');
-        return;
-      }
 
       const targetWeek = document.getElementById('target-week-select').value;
       const targetMonthIdx = parseInt(document.getElementById('target-month-select')?.value ?? selectedMonthIndex, 10);
