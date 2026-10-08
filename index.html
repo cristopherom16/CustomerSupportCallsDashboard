@@ -453,7 +453,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables (Cloud Storage)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Paste data below from Excel or CSV. Complete the tables to process.
+              Paste data below from Excel or CSV.
             </p>
           </div>
 
@@ -483,7 +483,6 @@
               </select>
             </div>
 
-            <!-- Botón activo directo sin bloqueos -->
             <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95">
               <i class="fa-solid fa-bolt text-xs"></i> Process & Save Week
             </button>
@@ -604,7 +603,7 @@
   </main>
 
   <script>
-    // CONFIGURACIÓN DE FIREBASE
+    // CONFIGURACIÓN FIREBASE REALTIME DATABASE
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -619,7 +618,7 @@
     try {
       firebase.initializeApp(firebaseConfig);
     } catch (e) {
-      console.error("Error al inicializar Firebase:", e);
+      console.error("Firebase init error:", e);
     }
     
     const db = firebase.database();
@@ -1064,6 +1063,7 @@
       return parsedRows;
     }
 
+    // Limpiador estricto para evitar ceros corruptos o NaN en Firebase
     function cleanNum(val) {
       if (val === null || val === undefined || val === '') return 0;
       if (typeof val === 'number') return isNaN(val) ? 0 : val;
@@ -1163,7 +1163,7 @@
       return `${yr}-${m}-${d}`;
     }
 
-    // FUNCIÓN DE PROCESAMIENTO
+    // PROCESAMIENTO Y GUARDADO TOTALMENTE SANITIZADO
     function processAndSaveUnifiedWeek() {
       try {
         const t1Raw = document.getElementById('paste-input-t1')?.value || '';
@@ -1177,7 +1177,7 @@
         const t4Rows = parseDelimitedTable(t4Raw);
 
         if (t1Rows.length === 0 && t2Rows.length === 0 && t3Rows.length === 0 && t4Rows.length === 0) {
-          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>No hay datos en los cuadros. Pega tu tabla de Excel.');
+          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Por favor pega información en los cuadros antes de procesar.');
           return;
         }
 
@@ -1197,7 +1197,7 @@
         let dayStepT1 = 0;
         let lastHourT1 = -1;
 
-        // TABLA 1
+        // TABLA 1 (Campos sanitizados para Firebase)
         t1Rows.forEach((rowVals) => {
           const dateHourStr = rowVals[0] || '';
           let dPart = extractDatePart(dateHourStr);
@@ -1220,11 +1220,11 @@
 
           newT1.push({
             'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-            'ABND. IN ROUTING': cleanNum(rowVals[1]),
+            'ABND IN ROUTING': cleanNum(rowVals[1]),
             'ANSWERED': cleanNum(rowVals[2]),
-            'ABND. IN CSAT RATING': cleanNum(rowVals[3]),
-            'ABND. IN QUEUE': cleanNum(rowVals[4]),
-            'ANBD. ON HOLD': cleanNum(rowVals[5]),
+            'ABND IN CSAT RATING': cleanNum(rowVals[3]),
+            'ABND IN QUEUE': cleanNum(rowVals[4]),
+            'ANBD ON HOLD': cleanNum(rowVals[5]),
             '_week': targetWeek,
             '_monthIndex': targetMonthIdx,
             '_monthLabel': targetMonthLabel,
@@ -1238,9 +1238,9 @@
           newT2.push({
             'TEAM': String(rowVals[0] || 'Team').trim(),
             'ANSWERED': cleanNum(rowVals[1]),
-            'ABND. IN CSAT RATING': cleanNum(rowVals[2]),
-            'ABND. IN QUEUE': cleanNum(rowVals[3]),
-            'ABND. ON HOLD': cleanNum(rowVals[4]),
+            'ABND IN CSAT RATING': cleanNum(rowVals[2]),
+            'ABND IN QUEUE': cleanNum(rowVals[3]),
+            'ABND ON HOLD': cleanNum(rowVals[4]),
             '_week': targetWeek,
             '_monthIndex': targetMonthIdx,
             '_monthLabel': targetMonthLabel
@@ -1253,12 +1253,12 @@
             'TEAMMATE': String(rowVals[0] || 'Agent').trim(),
             'INBOUND CALLS': cleanNum(rowVals[1]),
             'OUTBOUND CALLS': cleanNum(rowVals[2]),
-            'ABND. INBOUND CALLS': cleanNum(rowVals[3]),
+            'ABND INBOUND CALLS': cleanNum(rowVals[3]),
             'ANSWER TIME': rowVals[4] || '00:15',
             'TALK TIME': rowVals[5] || '03:30',
             'CALL DURATION': rowVals[6] || '04:15',
             'AVERAGE HOLD TIME': rowVals[7] || '00:25',
-            'DAYS ATTENDED (OUT OF 5)': cleanNum(rowVals[8]) || 5,
+            'DAYS ATTENDED OUT OF 5': cleanNum(rowVals[8]) || 5,
             '_week': targetWeek,
             '_monthIndex': targetMonthIdx,
             '_monthLabel': targetMonthLabel
@@ -1313,51 +1313,41 @@
           savedAt: new Date().toISOString()
         };
 
-        // Guardado local directo
+        // 1. Guardar en memoria local e inmediatamente enviar a Firebase Realtime Database
         rawWeeksStore[storageKey] = weekPayload;
-        
-        appData.table1 = [];
-        appData.table2 = [];
-        appData.table3 = [];
-        appData.table4 = [];
 
-        Object.keys(rawWeeksStore).forEach((key) => {
-          const entry = rawWeeksStore[key];
-          if (entry.table1) appData.table1.push(...entry.table1);
-          if (entry.table2) appData.table2.push(...entry.table2);
-          if (entry.table3) appData.table3.push(...entry.table3);
-          if (entry.table4) appData.table4.push(...entry.table4);
-        });
+        db.ref("weeks_data/" + storageKey).set(weekPayload)
+          .then(() => {
+            selectedFilterWeek = targetWeek;
+            selectedMonthIndex = targetMonthIdx;
 
-        selectedFilterWeek = targetWeek;
-        selectedMonthIndex = targetMonthIdx;
+            if (detectedFirstDate) {
+              currentSelectedDate = detectedFirstDate;
+              const picker = document.getElementById('date-picker');
+              if (picker) picker.value = currentSelectedDate;
+            }
 
-        if (detectedFirstDate) {
-          currentSelectedDate = detectedFirstDate;
-          const picker = document.getElementById('date-picker');
-          if (picker) picker.value = currentSelectedDate;
-        }
+            // Limpiar cajas
+            ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+            });
 
-        // Limpieza de cajas de entrada
-        ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.value = '';
-        });
+            syncCurrentDateToSelectedWeek();
+            handleDateNavigationUpdate();
+            renderSavedWeeksBadges();
+            checkAllFourTablesReady();
 
-        // Actualización síncrona
-        syncCurrentDateToSelectedWeek();
-        handleDateNavigationUpdate();
-        renderSavedWeeksBadges();
-        checkAllFourTablesReady();
-
-        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información cargada exitosamente para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
-        switchTab('overview');
-
-        // Persistir en Firebase Realtime Database
-        db.ref("weeks_data/" + storageKey).set(weekPayload).catch(e => console.error("Error Firebase:", e));
+            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+            switchTab('overview');
+          })
+          .catch((error) => {
+            console.error("Error al enviar a Firebase:", error);
+            showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar en Firebase: ' + error.message);
+          });
 
       } catch (err) {
-        console.error("Error general:", err);
+        console.error("Error en processAndSaveUnifiedWeek:", err);
         showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al procesar: ' + err.message);
       }
     }
@@ -1456,11 +1446,11 @@
         tb1.innerHTML = t1Data.map(r => `
           <tr class="hover:bg-slate-800/40">
             <td class="p-2.5 text-amber-300">${r['DATE & HOUR'] || '--'}</td>
-            <td class="p-2.5">${r['ABND. IN ROUTING'] ?? 0}</td>
+            <td class="p-2.5">${r['ABND IN ROUTING'] ?? 0}</td>
             <td class="p-2.5 text-emerald-400 font-bold">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300">${r['ABND. IN CSAT RATING'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold">${r['ABND. IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400">${r['ANBD. ON HOLD'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300">${r['ABND IN CSAT RATING'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="p-2.5 text-orange-400">${r['ANBD ON HOLD'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -1473,9 +1463,9 @@
           <tr class="hover:bg-slate-800/40">
             <td class="p-2.5 font-bold text-amber-300 font-sans">${r['TEAM'] || '--'}</td>
             <td class="p-2.5 text-emerald-400 font-bold">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300">${r['ABND. IN CSAT RATING'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold">${r['ABND. IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400">${r['ABND. ON HOLD'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300">${r['ABND IN CSAT RATING'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="p-2.5 text-orange-400">${r['ABND ON HOLD'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -1489,12 +1479,12 @@
             <td class="p-2.5 font-bold text-slate-200 font-sans">${r['TEAMMATE'] || '--'}</td>
             <td class="p-2.5 text-sky-400">${r['INBOUND CALLS'] ?? 0}</td>
             <td class="p-2.5">${r['OUTBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold">${r['ABND. INBOUND CALLS'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold">${r['ABND INBOUND CALLS'] ?? 0}</td>
             <td class="p-2.5 text-amber-300">${r['ANSWER TIME'] || '--'}</td>
             <td class="p-2.5">${r['TALK TIME'] || '--'}</td>
             <td class="p-2.5 text-emerald-400">${r['CALL DURATION'] || '--'}</td>
             <td class="p-2.5 text-orange-400">${r['AVERAGE HOLD TIME'] || '--'}</td>
-            <td class="p-2.5 font-sans">${r['DAYS ATTENDED (OUT OF 5)'] ?? 5}</td>
+            <td class="p-2.5 font-sans">${r['DAYS ATTENDED OUT OF 5'] ?? 5}</td>
           </tr>
         `).join('');
       }
@@ -1513,9 +1503,9 @@
       }
 
       const sumAnswered = t1Data.reduce((acc, r) => acc + cleanNum(r['ANSWERED']), 0);
-      const sumAbndQueue = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND. IN QUEUE']), 0);
-      const sumAbndCsat = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND. IN CSAT RATING']), 0);
-      const sumAbndHold = t1Data.reduce((acc, r) => acc + cleanNum(r['ANBD. ON HOLD']), 0);
+      const sumAbndQueue = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND IN QUEUE']), 0);
+      const sumAbndCsat = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND IN CSAT RATING']), 0);
+      const sumAbndHold = t1Data.reduce((acc, r) => acc + cleanNum(r['ANBD ON HOLD']), 0);
       const sumInbound = t3Data.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0) + t4Data.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0);
       const sumTagged = t4Data.reduce((acc, r) => acc + cleanNum(r['TAGGED CONVERSATIONS']), 0);
 
@@ -1576,9 +1566,9 @@
         const h = r._hour >= 0 && r._hour < 24 ? r._hour : extractHourNumber(r['DATE & HOUR']);
         if (h >= 0 && h < 24) {
           answeredByHour[h] += cleanNum(r['ANSWERED']);
-          csatByHour[h] += cleanNum(r['ABND. IN CSAT RATING']);
-          queueByHour[h] += cleanNum(r['ABND. IN QUEUE']);
-          holdByHour[h] += cleanNum(r['ANBD. ON HOLD']);
+          csatByHour[h] += cleanNum(r['ABND IN CSAT RATING']);
+          queueByHour[h] += cleanNum(r['ABND IN QUEUE']);
+          holdByHour[h] += cleanNum(r['ANBD ON HOLD']);
         }
       });
 
@@ -1635,13 +1625,13 @@
       const teamLabels = t2Weekly.map(r => r['TEAM'] || 'Team');
       makeChart('chart-c5', 'bar', teamLabels, [
         { label: 'Answered', data: t2Weekly.map(r => cleanNum(r['ANSWERED'])), backgroundColor: '#10b981' },
-        { label: 'Abnd CSAT', data: t2Weekly.map(r => cleanNum(r['ABND. IN CSAT RATING'])), backgroundColor: '#facc15' },
-        { label: 'Abnd Queue', data: t2Weekly.map(r => cleanNum(r['ABND. IN QUEUE'])), backgroundColor: '#f43f5e' },
-        { label: 'Abnd Hold', data: t2Weekly.map(r => cleanNum(r['ABND. ON HOLD'])), backgroundColor: '#fb923c' }
+        { label: 'Abnd CSAT', data: t2Weekly.map(r => cleanNum(r['ABND IN CSAT RATING'])), backgroundColor: '#facc15' },
+        { label: 'Abnd Queue', data: t2Weekly.map(r => cleanNum(r['ABND IN QUEUE'])), backgroundColor: '#f43f5e' },
+        { label: 'Abnd Hold', data: t2Weekly.map(r => cleanNum(r['ABND ON HOLD'])), backgroundColor: '#fb923c' }
       ]);
 
       const agentLabels = t3Weekly.map(r => r['TEAMMATE'] || 'Agent');
-      makeChart('chart-c6', 'bar', agentLabels, [{ label: 'Abnd. Inbound Calls', data: t3Weekly.map(r => cleanNum(r['ABND. INBOUND CALLS'])), backgroundColor: '#f43f5e' }]);
+      makeChart('chart-c6', 'bar', agentLabels, [{ label: 'Abnd. Inbound Calls', data: t3Weekly.map(r => cleanNum(r['ABND INBOUND CALLS'])), backgroundColor: '#f43f5e' }]);
       makeChart('chart-c7', 'bar', agentLabels, [{ label: 'Answer Time (Sec)', data: t3Weekly.map(r => parseTimeSeconds(r['ANSWER TIME'])), backgroundColor: '#eab308' }]);
       makeChart('chart-c8', 'bar', agentLabels, [{ label: 'Talk Time (Min)', data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))), backgroundColor: '#06b6d4' }]);
       makeChart('chart-c9', 'bar', agentLabels, [{ label: 'Call Duration (Min)', data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
