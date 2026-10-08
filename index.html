@@ -490,7 +490,7 @@
         </div>
 
         <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
-          <span class="text-xs font-semibold text-slate-400">Stored Weeks in Firebase:</span>
+          <span class="text-xs font-semibold text-slate-400">Stored Weeks in Storage:</span>
           <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
             <span class="text-xs text-slate-600 italic">None saved yet</span>
           </div>
@@ -605,9 +605,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // ----------------------------------------------------
-    // REEMPLAZA ESTE OBJETO CON LAS CREDENCIALES DE TU PROYECTO DE FIREBASE
-    // ----------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -615,60 +612,65 @@
       projectId: "customersupportcallsdashboard",
       storageBucket: "customersupportcallsdashboard.firebasestorage.app",
       messagingSenderId: "778304348059",
-      appId: "1:778304348059:web:77ac60b41f287668ac0b3e"
+      appId: "1:778304348059:web:77ac60b41f287668ac0b3e",
       measurementId: "G-1ZP68P7BB1"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
+    let db = null;
     let firebaseWeeksStore = {};
 
-    // Sincronización en tiempo real de los datos semanales
-    const weeksRef = ref(db, 'dashboard_weeks_data');
-    onValue(weeksRef, (snapshot) => {
-      firebaseWeeksStore = snapshot.val() || {};
-      window.appData.table1 = [];
-      window.appData.table2 = [];
-      window.appData.table3 = [];
-      window.appData.table4 = [];
+    try {
+      const app = initializeApp(firebaseConfig);
+      db = getDatabase(app);
 
-      Object.keys(firebaseWeeksStore).forEach(key => {
-        const entry = firebaseWeeksStore[key];
-        if (entry.table1) window.appData.table1.push(...entry.table1);
-        if (entry.table2) window.appData.table2.push(...entry.table2);
-        if (entry.table3) window.appData.table3.push(...entry.table3);
-        if (entry.table4) window.appData.table4.push(...entry.table4);
+      // Sincronización en tiempo real de los datos semanales
+      const weeksRef = ref(db, 'dashboard_weeks_data');
+      onValue(weeksRef, (snapshot) => {
+        firebaseWeeksStore = snapshot.val() || {};
+        window.activeStoreData = firebaseWeeksStore;
+        window.loadWeeksIntoAppData(firebaseWeeksStore);
       });
+    } catch (e) {
+      console.warn("Firebase inicialization failed, falling back to LocalStorage:", e);
+    }
 
-      window.renderSavedWeeksBadges();
-      window.handleDateNavigationUpdate();
-    });
-
-    // Exponer funciones globales para Firebase
+    // Exponer funciones globales para Firebase y respaldo local
     window.saveWeekToFirebase = function(storageKey, weekPayload) {
-      set(ref(db, 'dashboard_weeks_data/' + storageKey), weekPayload)
-        .then(() => {
-          window.showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Guardado en la nube para todos: <strong>${storageKey}</strong>!`);
-        })
-        .catch((error) => {
-          console.error("Error guardando en Firebase: ", error);
-          window.showToast(`<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar en Firebase.`);
-        });
+      // 1. Guardado de respaldo en LocalStorage
+      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+      localStore[storageKey] = weekPayload;
+      localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
+
+      // 2. Intento de guardado en Firebase
+      if (db) {
+        set(ref(db, 'dashboard_weeks_data/' + storageKey), weekPayload)
+          .then(() => {
+            window.showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Guardado en la nube: <strong>${storageKey}</strong>!`);
+          })
+          .catch((error) => {
+            console.error("Error guardando en Firebase: ", error);
+            window.showToast(`<i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Guardado localmente (error en Firebase).`);
+          });
+      } else {
+        window.loadWeeksIntoAppData(localStore);
+        window.showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Guardado localmente: <strong>${storageKey}</strong>!`);
+      }
     };
 
     window.deleteWeekFromFirebase = function(storageKey) {
-      remove(ref(db, 'dashboard_weeks_data/' + storageKey))
-        .then(() => {
-          window.showToast(`Eliminado ${storageKey} de Firebase.`);
-        })
-        .catch((error) => {
-          console.error("Error al eliminar de Firebase: ", error);
-        });
+      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+      delete localStore[storageKey];
+      localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
+
+      if (db) {
+        remove(ref(db, 'dashboard_weeks_data/' + storageKey));
+      } else {
+        window.loadWeeksIntoAppData(localStore);
+      }
     };
 
     window.getFirebaseWeeksStore = function() {
-      return firebaseWeeksStore;
+      return window.activeStoreData || JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
     };
   </script>
 
@@ -688,6 +690,7 @@
 
     window.onload = function () {
       initDateControls();
+      loadFallbackLocalStorage();
       syncCurrentDateToSelectedWeek();
       renderAllTables();
       initUnifiedHourlyGrid();
@@ -697,6 +700,31 @@
       renderSavedWeeksBadges();
       renderWeekDaysPills();
     };
+
+    function loadFallbackLocalStorage() {
+      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+      if (Object.keys(localStore).length > 0) {
+        loadWeeksIntoAppData(localStore);
+      }
+    }
+
+    function loadWeeksIntoAppData(storeObj) {
+      window.appData.table1 = [];
+      window.appData.table2 = [];
+      window.appData.table3 = [];
+      window.appData.table4 = [];
+
+      Object.keys(storeObj).forEach(key => {
+        const entry = storeObj[key];
+        if (entry.table1) window.appData.table1.push(...entry.table1);
+        if (entry.table2) window.appData.table2.push(...entry.table2);
+        if (entry.table3) window.appData.table3.push(...entry.table3);
+        if (entry.table4) window.appData.table4.push(...entry.table4);
+      });
+
+      renderSavedWeeksBadges();
+      handleDateNavigationUpdate();
+    }
 
     function showToast(msg) {
       const banner = document.getElementById('toast-banner');
