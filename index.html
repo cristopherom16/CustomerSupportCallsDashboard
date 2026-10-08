@@ -153,7 +153,7 @@
           Week 1
         </span>
         <span id="scope-day-badge" class="text-xs font-bold text-amber-300 bg-slate-950 px-3 py-1.5 rounded-xl border border-gold-600/30 hidden md:inline-block">
-          Day: 2026-10-07
+          Day: 2026-10-01
         </span>
       </div>
     </div>
@@ -200,7 +200,6 @@
       
       <!-- Section: Metric Highlights -->
       <div>
-        <!-- Subtitle added for Metrics -->
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
           <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
         </h2>
@@ -243,7 +242,6 @@
       <div>
         <div class="flex items-center justify-between mb-4">
           <div>
-            <!-- Renamed Title: Performance Visualizations -->
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
@@ -340,7 +338,6 @@
 
       <!-- Section: Core Tables -->
       <div class="space-y-6 pt-4">
-        <!-- Renamed Title: Operational Data Tables -->
         <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
           <i class="fa-solid fa-table-cells text-amber-500"></i> Operational Data Tables
         </h2>
@@ -603,19 +600,16 @@
           </div>
 
           <div class="space-y-4">
-            <!-- Renamed Box 1: Missing Members During the Week -->
             <div>
               <label class="block text-xs font-bold text-slate-300 mb-1">Missing Members During the Week</label>
               <textarea id="insights-achievements" rows="3" placeholder="Absent team members, leave notes, coverage impacts..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
             </div>
 
-            <!-- Renamed Box 2: Unexpected Events & Challenges -->
             <div>
               <label class="block text-xs font-bold text-slate-300 mb-1">Unexpected Events & Challenges</label>
               <textarea id="insights-blockers" rows="3" placeholder="System outages, unexpected call spikes, technical issues..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
             </div>
 
-            <!-- Renamed Box 3: System Recommendations -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-xs font-bold text-amber-400">System Recommendations</label>
@@ -634,6 +628,39 @@
   </main>
 
   <script>
+    // =========================================================================
+    // DATASET POR DEFECTO EMBEBIDO
+    // Permite que cualquier usuario que abra el link vea datos cargados inmediatamente.
+    // =========================================================================
+    const DEFAULT_INITIAL_DATA = {
+      "Oct_Week 1": {
+        monthIndex: 9,
+        monthLabel: "Oct",
+        week: "Week 1",
+        savedAt: new Date().toISOString(),
+        table1: [
+          { "DATE & HOUR": "2026-10-01 08:00", "ABND. IN ROUTING": 0, "ANSWERED": 42, "ABND. IN CSAT RATING": 1, "ABND. IN QUEUE": 2, "ANBD. ON HOLD": 1, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct", "_date": "2026-10-01", "_hour": 8 },
+          { "DATE & HOUR": "2026-10-01 09:00", "ABND. IN ROUTING": 1, "ANSWERED": 68, "ABND. IN CSAT RATING": 2, "ABND. IN QUEUE": 5, "ANBD. ON HOLD": 2, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct", "_date": "2026-10-01", "_hour": 9 },
+          { "DATE & HOUR": "2026-10-01 10:00", "ABND. IN ROUTING": 2, "ANSWERED": 95, "ABND. IN CSAT RATING": 3, "ABND. IN QUEUE": 12, "ANBD. ON HOLD": 4, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct", "_date": "2026-10-01", "_hour": 10 },
+          { "DATE & HOUR": "2026-10-01 11:00", "ABND. IN ROUTING": 1, "ANSWERED": 88, "ABND. IN CSAT RATING": 2, "ABND. IN QUEUE": 8, "ANBD. ON HOLD": 3, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct", "_date": "2026-10-01", "_hour": 11 },
+          { "DATE & HOUR": "2026-10-01 12:00", "ABND. IN ROUTING": 0, "ANSWERED": 74, "ABND. IN CSAT RATING": 1, "ABND. IN QUEUE": 4, "ANBD. ON HOLD": 1, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct", "_date": "2026-10-01", "_hour": 12 }
+        ],
+        table2: [
+          { "TEAM": "Support Tier 1", "ANSWERED": 240, "ABND. IN CSAT RATING": 6, "ABND. IN QUEUE": 22, "ABND. ON HOLD": 8, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct" },
+          { "TEAM": "Support Tier 2", "ANSWERED": 127, "ABND. IN CSAT RATING": 3, "ABND. IN QUEUE": 9, "ABND. ON HOLD": 3, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct" }
+        ],
+        table3: [
+          { "TEAMMATE": "Alex Morgan", "INBOUND CALLS": 110, "OUTBOUND CALLS": 15, "ABND. INBOUND CALLS": 4, "ANSWER TIME": "00:18", "TALK TIME": "03:45", "CALL DURATION": "04:20", "AVERAGE HOLD TIME": "00:30", "DAYS ATTENDED (OUT OF 5)": 5, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct" },
+          { "TEAMMATE": "Jordan Lee", "INBOUND CALLS": 135, "OUTBOUND CALLS": 8, "ABND. INBOUND CALLS": 7, "ANSWER TIME": "00:25", "TALK TIME": "04:10", "CALL DURATION": "05:00", "AVERAGE HOLD TIME": "00:45", "DAYS ATTENDED (OUT OF 5)": 5, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct" },
+          { "TEAMMATE": "Chris Taylor", "INBOUND CALLS": 122, "OUTBOUND CALLS": 20, "ABND. INBOUND CALLS": 3, "ANSWER TIME": "00:14", "TALK TIME": "03:20", "CALL DURATION": "03:50", "AVERAGE HOLD TIME": "00:20", "DAYS ATTENDED (OUT OF 5)": 5, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct" }
+        ],
+        table4: [
+          { "DATE & HOUR": "2026-10-01 08:00", "INBOUND CALLS": 45, "TAGGED CONVERSATIONS": 40, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct", "_date": "2026-10-01", "_hour": 8 },
+          { "DATE & HOUR": "2026-10-01 10:00", "INBOUND CALLS": 112, "TAGGED CONVERSATIONS": 95, "_week": "Week 1", "_monthIndex": 9, "_monthLabel": "Oct", "_date": "2026-10-01", "_hour": 10 }
+        ]
+      }
+    };
+
     let appData = {
       table1: [],
       table2: [],
@@ -642,13 +669,13 @@
     };
 
     let selectedFilterWeek = 'Week 1';
-    let currentSelectedDate = new Date().toISOString().split('T')[0];
-    let selectedMonthIndex = new Date().getMonth();
+    let currentSelectedDate = '2026-10-01';
+    let selectedMonthIndex = 9; // October
     let chartInstances = {};
 
     window.onload = function () {
-      initDateControls();
       loadAllWeeksFromStorage();
+      initDateControls();
       syncCurrentDateToSelectedWeek();
       renderAllTables();
       initUnifiedHourlyGrid();
@@ -910,7 +937,6 @@
       showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved for date <strong>${currentSelectedDate}</strong>!`);
     }
 
-    /* Automated SLA Recommendations Engine */
     function generateAutomatedSlaRecommendations() {
       const t1Weekly = appData.table1.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
       const t2Weekly = appData.table2.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
@@ -921,7 +947,6 @@
         return "No operational data imported for this week yet. Please import weekly tables to generate dynamic SLA recommendations.";
       }
 
-      // Calculations
       const totalAnswered = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANSWERED']), 0);
       const totalAbndQueue = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND. IN QUEUE']), 0);
       const totalAbndCsat = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND. IN CSAT RATING']), 0);
@@ -929,7 +954,6 @@
       const totalCallsReceived = totalAnswered + totalAbndQueue + totalAbndCsat + totalAbndHold;
       const abandonRate = totalCallsReceived > 0 ? ((totalAbndQueue + totalAbndCsat) / totalCallsReceived) * 100 : 0;
 
-      // Peak Hours identification
       const hourlyVolumeMap = {};
       t1Weekly.forEach(r => {
         const h = r._hour >= 0 ? r._hour : extractHourNumber(r['DATE & HOUR']);
@@ -948,7 +972,6 @@
       });
       const peakHourLabel = peakHour >= 0 ? `${String(peakHour).padStart(2, '0')}:00 - ${String((peakHour + 1) % 24).padStart(2, '0')}:00` : "10:00 - 14:00";
 
-      // Agent performance parsing
       let highestHoldAgent = null;
       let maxHoldSec = -1;
       let slowAnswerAgent = null;
@@ -969,14 +992,12 @@
 
       const recs = [];
 
-      // Recommendation 1: Shift & Staffing Allocation
       if (abandonRate > 5 || totalAbndQueue > 15) {
         recs.push(`1. Shift Optimization: Reallocate 2-3 agents to peak interval (${peakHourLabel}) to mitigate high abandonment rate (${abandonRate.toFixed(1)}%) and reach target SLA.`);
       } else {
         recs.push(`1. Workforce Balance: Maintain present staffing levels during peak hours (${peakHourLabel}), but schedule breaks during low-volume windows to maximize overall occupancy.`);
       }
 
-      // Recommendation 2: Queue & Overflow Routing
       const totalOverflowInbound = t4Weekly.reduce((sum, r) => sum + cleanNum(r['INBOUND CALLS']), 0);
       if (totalOverflowInbound > 20) {
         recs.push(`2. Overflow Management: Activate automated callback routing for overflow queues (detected ${totalOverflowInbound} overflow calls) to stabilize queue response time.`);
@@ -986,7 +1007,6 @@
         recs.push(`2. Routing Efficiency: Refine queue pre-routing options to direct specialized queries faster and maintain average speed of answer below threshold.`);
       }
 
-      // Recommendation 3: Agent Coaching & Process Speed
       if (maxAnsSec > 30 && slowAnswerAgent) {
         recs.push(`3. Speed of Answer Coaching: Conduct targeted coaching with ${slowAnswerAgent} (avg answer time: ${maxAnsSec}s) to improve initial call pickup speed.`);
       } else if (maxHoldSec > 60 && highestHoldAgent) {
@@ -1011,7 +1031,6 @@
       if (ach) ach.value = saved.achievements || '';
       if (blk) blk.value = saved.blockers || '';
 
-      // Auto Generate SLA Recommendations
       const autoRecommendations = generateAutomatedSlaRecommendations();
       if (act) act.value = autoRecommendations;
     }
@@ -1366,7 +1385,15 @@
 
     function loadAllWeeksFromStorage() {
       try {
-        const store = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+        let store = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+
+        // Si el localStorage está vacío en el navegador del usuario visitante,
+        // cargamos automáticamente el DEFAULT_INITIAL_DATA
+        if (Object.keys(store).length === 0) {
+          store = DEFAULT_INITIAL_DATA;
+          localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(store));
+        }
+
         appData.table1 = [];
         appData.table2 = [];
         appData.table3 = [];
