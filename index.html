@@ -13,7 +13,7 @@
   <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Firebase SDKs Compat (Realtime Database) -->
+  <!-- Firebase SDKs Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -175,7 +175,7 @@
   <div class="bg-slate-900/60 border-b border-slate-800 px-4 lg:px-8 py-3">
     <div class="max-w-[1700px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
       
-      <!-- Tabs: Overview & Charts, Notes & Insights -->
+      <!-- Tabs -->
       <div class="flex flex-col gap-2 w-full md:w-64">
         <button id="tab-btn-overview" onclick="switchTab('overview')" class="w-full px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition">
           <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
@@ -187,7 +187,6 @@
 
       <!-- Quick Day Nav Pills -->
       <div id="week-days-pills" class="flex flex-wrap items-center gap-1.5 py-1 self-start md:self-center">
-        <!-- Injected via JavaScript -->
       </div>
     </div>
   </div>
@@ -465,7 +464,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables (Cloud Storage)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Paste data below from Excel or CSV. Complete all 4 tables to enable processing.
+              Paste data below from Excel or CSV. Complete at least 1 table to enable processing.
             </p>
           </div>
 
@@ -495,7 +494,6 @@
               </select>
             </div>
 
-            <!-- Botón de procesamiento bloqueado dinámicamente -->
             <button id="btn-process-save-week" disabled onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 transition-all">
               <i class="fa-solid fa-bolt text-xs"></i> Process & Save Week
             </button>
@@ -616,7 +614,7 @@
   </main>
 
   <script>
-    // CONFIGURACIÓN DE FIREBASE
+    // CONFIGURACIÓN FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -631,7 +629,7 @@
     try {
       firebase.initializeApp(firebaseConfig);
     } catch (e) {
-      console.error("Error al inicializar Firebase:", e);
+      console.error("Firebase init error:", e);
     }
     
     const db = firebase.database();
@@ -675,7 +673,7 @@
         handleDateNavigationUpdate();
         renderSavedWeeksBadges();
       }, (error) => {
-        console.error("Firebase read error:", error);
+        console.error("Firebase error:", error);
         showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al leer la nube: ' + error.message);
       });
     }
@@ -1051,17 +1049,18 @@
         });
     }
 
-    // Parser robusto universal para Excel (TSV), CSV o listas delimitadas
+    // Parser robusto por filas y celdas puras
     function parseDelimitedTable(rawText) {
       if (!rawText || !rawText.trim()) return [];
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length < 1) return [];
 
       const delimiter = rawText.includes('\t') ? '\t' : (rawText.includes(',') ? ',' : ';');
-      const firstLineTokens = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
       
+      // Evaluar la primera fila
+      const firstLineTokens = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
       const isHeaderRow = isNaN(parseFloat(firstLineTokens[1])) && isNaN(parseFloat(firstLineTokens[firstLineTokens.length - 1]));
-      const headers = isHeaderRow ? firstLineTokens : firstLineTokens.map((_, i) => `col_${i}`);
+      
       const startIndex = isHeaderRow ? 1 : 0;
       const parsedRows = [];
 
@@ -1070,28 +1069,11 @@
         if (!lineStr) continue;
 
         const vals = lineStr.split(delimiter).map(v => v.trim().replace(/^"|"$/g, ''));
-        if (!vals.some(v => v.length > 0)) continue;
-
-        const row = { _rawValues: vals };
-        headers.forEach((h, idx) => {
-          row[h] = vals[idx] !== undefined ? vals[idx] : '';
-        });
-        parsedRows.push(row);
-      }
-      return parsedRows;
-    }
-
-    function getNormalizedValue(row, cleanMap, aliases, fallbackIdx) {
-      for (const alias of aliases) {
-        const cleaned = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (cleanMap[cleaned] !== undefined && cleanMap[cleaned] !== '') {
-          return cleanMap[cleaned];
+        if (vals.length > 0 && vals.some(v => v !== '')) {
+          parsedRows.push(vals);
         }
       }
-      if (row._rawValues && row._rawValues[fallbackIdx] !== undefined) {
-        return row._rawValues[fallbackIdx];
-      }
-      return undefined;
+      return parsedRows;
     }
 
     function cleanNum(val) {
@@ -1119,9 +1101,9 @@
 
     function extractDatePart(str) {
       if (!str) return null;
-      const isoMatch = str.match(/\b\d{4}-\d{2}-\d{2}\b/);
+      const isoMatch = String(str).match(/\b\d{4}-\d{2}-\d{2}\b/);
       if (isoMatch) return isoMatch[0];
-      const slashMatch = str.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
+      const slashMatch = String(str).match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
       if (slashMatch) {
         const yr = slashMatch[3].length === 2 ? `20${slashMatch[3]}` : slashMatch[3];
         const m = slashMatch[1].padStart(2, '0');
@@ -1159,7 +1141,7 @@
       return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     }
 
-    // Verificar el estado de las 4 tablas y bloquear/habilitar el botón
+    // Activa o deshabilita el botón si hay al menos contenido básico ingresado
     function checkAllFourTablesReady() {
       const t1 = (document.getElementById('paste-input-t1')?.value || '').trim();
       const t2 = (document.getElementById('paste-input-t2')?.value || '').trim();
@@ -1178,19 +1160,16 @@
         }
       };
 
-      const readyT1 = t1.length > 0;
-      const readyT2 = t2.length > 0;
-      const readyT3 = t3.length > 0;
-      const readyT4 = t4.length > 0;
+      const hasAnyContent = t1.length > 0 || t2.length > 0 || t3.length > 0 || t4.length > 0;
 
-      updateBadge('badge-check-t1', readyT1);
-      updateBadge('badge-check-t2', readyT2);
-      updateBadge('badge-check-t3', readyT3);
-      updateBadge('badge-check-t4', readyT4);
+      updateBadge('badge-check-t1', t1.length > 0);
+      updateBadge('badge-check-t2', t2.length > 0);
+      updateBadge('badge-check-t3', t3.length > 0);
+      updateBadge('badge-check-t4', t4.length > 0);
 
       const btn = document.getElementById('btn-process-save-week');
       if (btn) {
-        if (readyT1 && readyT2 && readyT3 && readyT4) {
+        if (hasAnyContent) {
           btn.removeAttribute('disabled');
         } else {
           btn.setAttribute('disabled', 'true');
@@ -1208,22 +1187,22 @@
       return `${yr}-${m}-${d}`;
     }
 
-    // PROCESAR Y GUARDAR TABLAS A FIREBASE
+    // PROCESAMIENTO Y GENERACIÓN DIRECTA DE TABLAS Y GRÁFICAS
     function processAndSaveUnifiedWeek() {
       const t1Raw = document.getElementById('paste-input-t1')?.value || '';
       const t2Raw = document.getElementById('paste-input-t2')?.value || '';
       const t3Raw = document.getElementById('paste-input-t3')?.value || '';
       const t4Raw = document.getElementById('paste-input-t4')?.value || '';
 
-      if (!t1Raw.trim() || !t2Raw.trim() || !t3Raw.trim() || !t4Raw.trim()) {
-        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Debes ingresar las 4 tablas para procesar.');
-        return;
-      }
-
       const t1Rows = parseDelimitedTable(t1Raw);
       const t2Rows = parseDelimitedTable(t2Raw);
       const t3Rows = parseDelimitedTable(t3Raw);
       const t4Rows = parseDelimitedTable(t4Raw);
+
+      if (t1Rows.length === 0 && t2Rows.length === 0 && t3Rows.length === 0 && t4Rows.length === 0) {
+        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>No se pudieron reconocer datos. Pega una tabla válida.');
+        return;
+      }
 
       const targetWeek = document.getElementById('target-week-select').value;
       const targetMonthIdx = parseInt(document.getElementById('target-month-select')?.value ?? selectedMonthIndex, 10);
@@ -1241,19 +1220,16 @@
       let dayStepT1 = 0;
       let lastHourT1 = -1;
 
-      // TABLA 1
-      t1Rows.forEach((rawRow) => {
-        const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
-
-        const dateHourStr = getNormalizedValue(rawRow, cleanMap, ['datehour', 'dateandhour', 'date', 'datetime', 'hour', 'interval', 'fecha', 'fechayhora'], 0) || '';
+      // PROCESAR TABLA 1 (Por posición de columna)
+      t1Rows.forEach((rowVals) => {
+        const dateHourStr = rowVals[0] || '';
         let dPart = extractDatePart(dateHourStr);
         const hourNum = extractHourNumber(dateHourStr);
 
         if (hourNum >= 0 && lastHourT1 >= 18 && hourNum <= 2 && !dPart) {
           dayStepT1++;
         }
-        lastHourT1 = hourNum;
+        if (hourNum >= 0) lastHourT1 = hourNum;
 
         if (dPart) {
           lastKnownDateT1 = dPart;
@@ -1267,76 +1243,65 @@
 
         newT1.push({
           'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-          'ABND. IN ROUTING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinrouting', 'abandonedinrouting', 'routing'], 1)),
-          'ANSWERED': cleanNum(getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas', 'atendidas'], 2)),
-          'ABND. IN CSAT RATING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 3)),
-          'ABND. IN QUEUE': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queue', 'cola'], 4)),
-          'ANBD. ON HOLD': cleanNum(getNormalizedValue(rawRow, cleanMap, ['anbdonhold', 'abndonhold', 'hold', 'espera'], 5)),
+          'ABND. IN ROUTING': cleanNum(rowVals[1]),
+          'ANSWERED': cleanNum(rowVals[2]),
+          'ABND. IN CSAT RATING': cleanNum(rowVals[3]),
+          'ABND. IN QUEUE': cleanNum(rowVals[4]),
+          'ANBD. ON HOLD': cleanNum(rowVals[5]),
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel,
           '_date': dPart,
-          '_hour': hourNum
+          '_hour': hourNum >= 0 ? hourNum : 0
         });
       });
 
-      // TABLA 2
-      t2Rows.forEach(rawRow => {
-        const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
-
-        const teamName = getNormalizedValue(rawRow, cleanMap, ['team', 'queuename', 'queue', 'group', 'cola', 'equipo'], 0) || 'Team';
+      // PROCESAR TABLA 2
+      t2Rows.forEach(rowVals => {
         newT2.push({
-          'TEAM': String(teamName).trim(),
-          'ANSWERED': cleanNum(getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas'], 1)),
-          'ABND. IN CSAT RATING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 2)),
-          'ABND. IN QUEUE': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queueabnd'], 3)),
-          'ABND. ON HOLD': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndonhold', 'anbdonhold', 'hold'], 4)),
+          'TEAM': String(rowVals[0] || 'Team').trim(),
+          'ANSWERED': cleanNum(rowVals[1]),
+          'ABND. IN CSAT RATING': cleanNum(rowVals[2]),
+          'ABND. IN QUEUE': cleanNum(rowVals[3]),
+          'ABND. ON HOLD': cleanNum(rowVals[4]),
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel
         });
       });
 
-      // TABLA 3
-      t3Rows.forEach(rawRow => {
-        const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
-
-        const agentName = getNormalizedValue(rawRow, cleanMap, ['teammate', 'agent', 'agentname', 'name', 'employee', 'agente'], 0) || 'Agent';
+      // PROCESAR TABLA 3
+      t3Rows.forEach(rowVals => {
         newT3.push({
-          'TEAMMATE': String(agentName).trim(),
-          'INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1)),
-          'OUTBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['outboundcalls', 'outbound', 'salientes'], 2)),
-          'ABND. INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinboundcalls', 'abandonedinbound', 'abndinbound'], 3)),
-          'ANSWER TIME': getNormalizedValue(rawRow, cleanMap, ['answertime', 'avganswertime', 'ansspeed'], 4) || '00:15',
-          'TALK TIME': getNormalizedValue(rawRow, cleanMap, ['talktime', 'avgtalktime'], 5) || '03:30',
-          'CALL DURATION': getNormalizedValue(rawRow, cleanMap, ['callduration', 'duration'], 6) || '04:15',
-          'AVERAGE HOLD TIME': getNormalizedValue(rawRow, cleanMap, ['averageholdtime', 'avgtime', 'holdtime'], 7) || '00:25',
-          'DAYS ATTENDED (OUT OF 5)': cleanNum(getNormalizedValue(rawRow, cleanMap, ['daysattendedoutof5', 'daysattended', 'days', 'dias'], 8)) || 5,
+          'TEAMMATE': String(rowVals[0] || 'Agent').trim(),
+          'INBOUND CALLS': cleanNum(rowVals[1]),
+          'OUTBOUND CALLS': cleanNum(rowVals[2]),
+          'ABND. INBOUND CALLS': cleanNum(rowVals[3]),
+          'ANSWER TIME': rowVals[4] || '00:15',
+          'TALK TIME': rowVals[5] || '03:30',
+          'CALL DURATION': rowVals[6] || '04:15',
+          'AVERAGE HOLD TIME': rowVals[7] || '00:25',
+          'DAYS ATTENDED (OUT OF 5)': cleanNum(rowVals[8]) || 5,
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel
         });
       });
 
-      // TABLA 4
+      // PROCESAR TABLA 4
       let lastKnownDateT4 = detectedFirstDate || '';
       let dayStepT4 = 0;
       let lastHourT4 = -1;
 
-      t4Rows.forEach(rawRow => {
-        const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
-
-        const dateHourStr = getNormalizedValue(rawRow, cleanMap, ['datehour', 'dateandhour', 'date', 'datetime', 'hour', 'interval', 'fecha'], 0) || '';
+      t4Rows.forEach(rowVals => {
+        const dateHourStr = rowVals[0] || '';
         let dPart = extractDatePart(dateHourStr);
         const hourNum = extractHourNumber(dateHourStr);
 
         if (hourNum >= 0 && lastHourT4 >= 18 && hourNum <= 2 && !dPart) {
           dayStepT4++;
         }
-        lastHourT4 = hourNum;
+        if (hourNum >= 0) lastHourT4 = hourNum;
 
         if (dPart) {
           lastKnownDateT4 = dPart;
@@ -1350,13 +1315,13 @@
 
         newT4.push({
           'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-          'INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1)),
-          'TAGGED CONVERSATIONS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['taggedconversations', 'tagged', 'conversations', 'etiquetadas'], 2)),
+          'INBOUND CALLS': cleanNum(rowVals[1]),
+          'TAGGED CONVERSATIONS': cleanNum(rowVals[2]),
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel,
           '_date': dPart,
-          '_hour': hourNum
+          '_hour': hourNum >= 0 ? hourNum : 0
         });
       });
 
@@ -1371,9 +1336,25 @@
         savedAt: new Date().toISOString()
       };
 
-      // Guardar directamente en la base de datos de Firebase
+      // 1. Guardar en la Nube (Firebase)
       db.ref("weeks_data/" + storageKey).set(weekPayload)
         .then(() => {
+          // 2. Cargar en memoria local inmediatamente para renderizar sin esperar respuesta externa
+          rawWeeksStore[storageKey] = weekPayload;
+          
+          appData.table1 = [];
+          appData.table2 = [];
+          appData.table3 = [];
+          appData.table4 = [];
+
+          Object.keys(rawWeeksStore).forEach((key) => {
+            const entry = rawWeeksStore[key];
+            if (entry.table1) appData.table1.push(...entry.table1);
+            if (entry.table2) appData.table2.push(...entry.table2);
+            if (entry.table3) appData.table3.push(...entry.table3);
+            if (entry.table4) appData.table4.push(...entry.table4);
+          });
+
           selectedFilterWeek = targetWeek;
           selectedMonthIndex = targetMonthIdx;
 
@@ -1383,18 +1364,26 @@
             if (picker) picker.value = currentSelectedDate;
           }
 
+          // Limpiar áreas de texto
           ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
           });
 
+          // 3. Forzar actualización inmediata de tablas y gráficas en pantalla
+          syncCurrentDateToSelectedWeek();
+          handleDateNavigationUpdate();
+          renderSavedWeeksBadges();
           checkAllFourTablesReady();
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información cargada exitosamente para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+          
+          // Cambiar a la pestaña de vista general para ver el resultado
           switchTab('overview');
         })
         .catch((error) => {
           console.error("Error al guardar en Firebase:", error);
-          showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar los datos en la Nube: ' + error.message);
+          showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error de conexión: ' + error.message);
         });
     }
 
