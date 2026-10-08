@@ -607,7 +607,7 @@
   </main>
 
   <script>
-    // CREDENCIALES CONFIGURADAS
+    // CREDENCIALES DE FIREBASE REALTIME DATABASE
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -619,7 +619,12 @@
       measurementId: "G-1ZP68P7BB1"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+      console.error("Error al inicializar Firebase:", e);
+    }
+    
     const db = firebase.database();
 
     let appData = {
@@ -641,7 +646,6 @@
       checkAllFourTablesReady();
     };
 
-    // Sincronización en tiempo real desde Firebase Realtime Database
     function listenToFirebaseCloudData() {
       db.ref("weeks_data").on("value", (snapshot) => {
         rawWeeksStore = snapshot.val() || {};
@@ -663,7 +667,7 @@
         renderSavedWeeksBadges();
       }, (error) => {
         console.error("Firebase read error:", error);
-        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error de lectura en la nube. Revisa las reglas.');
+        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al leer la nube: ' + error.message);
       });
     }
 
@@ -1038,7 +1042,6 @@
         });
     }
 
-    // Parser robusto para CSV, TSV y filas copiadas de Excel
     function parseDelimitedTable(rawText) {
       if (!rawText || !rawText.trim()) return [];
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
@@ -1068,6 +1071,7 @@
       return parsedRows;
     }
 
+    // Extracción posicional si los nombres de columna en Excel no coinciden exactamente
     function getNormalizedValue(row, cleanMap, aliases, fallbackIdx) {
       for (const alias of aliases) {
         const cleaned = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -1180,7 +1184,7 @@
       return `${yr}-${m}-${d}`;
     }
 
-    // Guardar y procesar tablas
+    // PROCESAR Y GUARDAR TABLAS
     function processAndSaveUnifiedWeek() {
       const t1Raw = document.getElementById('paste-input-t1')?.value || '';
       const t2Raw = document.getElementById('paste-input-t2')?.value || '';
@@ -1343,7 +1347,7 @@
         savedAt: new Date().toISOString()
       };
 
-      // Guardar directamente en la base de datos de Firebase
+      // Guardar directamente en Firebase
       db.ref("weeks_data/" + storageKey).set(weekPayload)
         .then(() => {
           selectedFilterWeek = targetWeek;
