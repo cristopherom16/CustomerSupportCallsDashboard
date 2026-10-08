@@ -4,13 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Customer Support - Calls Dashboard</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script>
@@ -69,11 +65,9 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
-  <!-- Top Navigation Bar -->
   <header class="bg-slate-900/90 border-b border-gold-600/30 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3 transition-all">
     <div class="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-4">
       
-      <!-- Brand & Custom Logo -->
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-gold-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -90,9 +84,7 @@
         </div>
       </div>
 
-      <!-- Center Calendar & Scope Navigation -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
-        <!-- Date Navigator -->
         <div class="flex items-center gap-1">
           <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition">
             <i class="fa-solid fa-chevron-left text-xs"></i>
@@ -109,7 +101,6 @@
 
         <div class="h-4 w-px bg-slate-800 my-auto hidden sm:block"></div>
 
-        <!-- 12-Month Selector -->
         <div class="flex items-center gap-1.5 pl-1">
           <span class="text-[10px] uppercase font-bold text-slate-400">Month:</span>
           <select id="header-month-select" onchange="onHeaderMonthChanged(this.value)" class="bg-slate-900 text-amber-400 text-xs font-bold px-2 py-1 rounded-lg border border-gold-600/30 focus:outline-none focus:border-amber-400">
@@ -130,7 +121,6 @@
 
         <div class="h-4 w-px bg-slate-800 my-auto hidden sm:block"></div>
 
-        <!-- 5-Week Filter Selector -->
         <div class="flex items-center gap-1.5 pl-1">
           <span class="text-[10px] uppercase font-bold text-slate-400">Week:</span>
           <select id="header-week-select" onchange="onHeaderWeekChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2 py-1 rounded-lg border border-gold-600/30 focus:outline-none focus:border-amber-400">
@@ -144,7 +134,6 @@
         </div>
       </div>
 
-      <!-- Scope Display Badges -->
       <div class="flex items-center gap-2">
         <span id="scope-month-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-gold-600/30">
           Month: October
@@ -159,11 +148,9 @@
     </div>
   </header>
 
-  <!-- Main View Navigation & Quick Days Pills -->
   <div class="bg-slate-900/60 border-b border-slate-800 px-4 lg:px-8 py-3">
     <div class="max-w-[1700px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
       
-      <!-- Reordered Tabs: 1. Overview & Charts, 2. Notes & Insights -->
       <div class="flex flex-col gap-2 w-full md:w-64">
         <button id="tab-btn-overview" onclick="switchTab('overview')" class="w-full px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition">
           <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
@@ -173,19 +160,15 @@
         </button>
       </div>
 
-      <!-- Quick Day Nav Pills -->
       <div id="week-days-pills" class="flex flex-wrap items-center gap-1.5 py-1 self-start md:self-center">
-        <!-- Injected via JavaScript -->
-      </div>
+        </div>
     </div>
   </div>
 
-  <!-- Bottom Right Fixed/Floating Button for Import Information -->
   <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all">
     <i class="fa-solid fa-file-import text-sm"></i> Import Information
   </button>
 
-  <!-- Notification Banner -->
   <div id="toast-banner" class="hidden fixed bottom-20 right-6 z-50 bg-slate-900 border border-gold-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300">
     <span id="toast-message" class="text-xs font-medium">Notification message</span>
     <button onclick="document.getElementById('toast-banner').classList.add('hidden')" class="text-slate-400 hover:text-white ml-2 text-sm">&times;</button>
@@ -193,51 +176,52 @@
 
   <main class="flex-1 max-w-[1700px] w-full mx-auto p-4 lg:p-8 space-y-8 pb-24">
 
-    <!-- ========================================== -->
-    <!-- TAB 1: OVERVIEW & CHARTS                   -->
-    <!-- ========================================== -->
     <div id="view-overview" class="space-y-8">
       
-      <!-- Metric Highlights Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
-          <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Filtered scope</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. Queue</span>
-          <div id="kpi-abnd-queue" class="text-xl font-extrabold text-rose-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Filtered scope</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. CSAT</span>
-          <div id="kpi-abnd-csat" class="text-xl font-extrabold text-amber-300 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Filtered scope</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. On Hold</span>
-          <div id="kpi-abnd-hold" class="text-xl font-extrabold text-orange-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Filtered scope</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Inbound Calls</span>
-          <div id="kpi-inbound" class="text-xl font-extrabold text-sky-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Agents + Overflow</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Tagged Convs</span>
-          <div id="kpi-tagged" class="text-xl font-extrabold text-emerald-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Overflow count</span>
+      <div>
+        <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
+        </h2>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
+            <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. Queue</span>
+            <div id="kpi-abnd-queue" class="text-xl font-extrabold text-rose-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. CSAT</span>
+            <div id="kpi-abnd-csat" class="text-xl font-extrabold text-amber-300 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. On Hold</span>
+            <div id="kpi-abnd-hold" class="text-xl font-extrabold text-orange-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Inbound Calls</span>
+            <div id="kpi-inbound" class="text-xl font-extrabold text-sky-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Agents + Overflow</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Tagged Convs</span>
+            <div id="kpi-tagged" class="text-xl font-extrabold text-emerald-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Overflow count</span>
+          </div>
         </div>
       </div>
 
-      <!-- Section: Visualizations -->
       <div>
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-              <i class="fa-solid fa-chart-line text-amber-500"></i> Executive Performance Visualizations
+              <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
             <p class="text-xs text-slate-400">Charts 1-4 & 10 update daily. Charts 5-9 update weekly.</p>
           </div>
@@ -330,13 +314,11 @@
         </div>
       </div>
 
-      <!-- Section: Core Tables -->
       <div class="space-y-6 pt-4">
         <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-          <i class="fa-solid fa-table-cells text-amber-500"></i> Core Operational Data Tables
+          <i class="fa-solid fa-table-cells text-amber-500"></i> Operational Data Tables
         </h2>
 
-        <!-- Table 1: Calls Per Hour -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -364,7 +346,6 @@
           </div>
         </div>
 
-        <!-- Table 2: Calls Per Queue -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -391,7 +372,6 @@
           </div>
         </div>
 
-        <!-- Table 3: Calls Per Agents -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -422,7 +402,6 @@
           </div>
         </div>
 
-        <!-- Table 4: Calls Overflow -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -451,9 +430,6 @@
 
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 2: IMPORT INFORMATION                  -->
-    <!-- ========================================== -->
     <div id="view-import" class="hidden space-y-6">
       <div class="bg-slate-900 border border-gold-600/30 rounded-2xl p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -553,13 +529,9 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 3: NOTES & INSIGHTS                    -->
-    <!-- ========================================== -->
     <div id="view-notes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Left: Hourly Notes for Selected Day -->
         <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
           <div class="flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
@@ -573,13 +545,10 @@
             </button>
           </div>
 
-          <!-- 24-Hour Input Grid -->
           <div id="unified-hourly-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[580px] overflow-y-auto pr-1">
-            <!-- Dynamically populated -->
-          </div>
+            </div>
         </div>
 
-        <!-- Right: Weekly Insights -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
           <div class="flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
@@ -594,19 +563,16 @@
           </div>
 
           <div class="space-y-4">
-            <!-- Renamed Box 1: Missing Members During the Week -->
             <div>
               <label class="block text-xs font-bold text-slate-300 mb-1">Missing Members During the Week</label>
               <textarea id="insights-achievements" rows="3" placeholder="Absent team members, leave notes, coverage impacts..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
             </div>
 
-            <!-- Renamed Box 2: Unexpected Events & Challenges -->
             <div>
               <label class="block text-xs font-bold text-slate-300 mb-1">Unexpected Events & Challenges</label>
               <textarea id="insights-blockers" rows="3" placeholder="System outages, unexpected call spikes, technical issues..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
             </div>
 
-            <!-- Renamed Box 3: System Recommendations (AI Generated SLA Optimizations) -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-xs font-bold text-amber-400">System Recommendations</label>
@@ -625,6 +591,24 @@
   </main>
 
   <script>
+    // ==========================================
+    // INCRUSTA AQUÍ TUS DATOS POR DEFECTO
+    // ==========================================
+    const defaultData = {
+      table1: [
+        // Pega aquí el arreglo de objetos correspondientes a la Tabla 1 si deseas precargarlos
+      ],
+      table2: [
+        // Pega aquí el arreglo de objetos correspondientes a la Tabla 2
+      ],
+      table3: [
+        // Pega aquí el arreglo de objetos correspondientes a la Tabla 3
+      ],
+      table4: [
+        // Pega aquí el arreglo de objetos correspondientes a la Tabla 4
+      ]
+    };
+
     let appData = {
       table1: [],
       table2: [],
@@ -901,7 +885,6 @@
       showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved for date <strong>${currentSelectedDate}</strong>!`);
     }
 
-    /* Automated SLA Recommendations Engine */
     function generateAutomatedSlaRecommendations() {
       const t1Weekly = appData.table1.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
       const t2Weekly = appData.table2.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
@@ -912,7 +895,6 @@
         return "No operational data imported for this week yet. Please import weekly tables to generate dynamic SLA recommendations.";
       }
 
-      // Calculations
       const totalAnswered = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANSWERED']), 0);
       const totalAbndQueue = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND. IN QUEUE']), 0);
       const totalAbndCsat = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND. IN CSAT RATING']), 0);
@@ -920,7 +902,6 @@
       const totalCallsReceived = totalAnswered + totalAbndQueue + totalAbndCsat + totalAbndHold;
       const abandonRate = totalCallsReceived > 0 ? ((totalAbndQueue + totalAbndCsat) / totalCallsReceived) * 100 : 0;
 
-      // Peak Hours identification
       const hourlyVolumeMap = {};
       t1Weekly.forEach(r => {
         const h = r._hour >= 0 ? r._hour : extractHourNumber(r['DATE & HOUR']);
@@ -939,7 +920,6 @@
       });
       const peakHourLabel = peakHour >= 0 ? `${String(peakHour).padStart(2, '0')}:00 - ${String((peakHour + 1) % 24).padStart(2, '0')}:00` : "10:00 - 14:00";
 
-      // Agent performance parsing
       let highestHoldAgent = null;
       let maxHoldSec = -1;
       let slowAnswerAgent = null;
@@ -960,14 +940,12 @@
 
       const recs = [];
 
-      // Recommendation 1: Shift & Staffing Allocation
       if (abandonRate > 5 || totalAbndQueue > 15) {
         recs.push(`1. Shift Optimization: Reallocate 2-3 agents to peak interval (${peakHourLabel}) to mitigate high abandonment rate (${abandonRate.toFixed(1)}%) and reach target SLA.`);
       } else {
         recs.push(`1. Workforce Balance: Maintain present staffing levels during peak hours (${peakHourLabel}), but schedule breaks during low-volume windows to maximize overall occupancy.`);
       }
 
-      // Recommendation 2: Queue & Overflow Routing
       const totalOverflowInbound = t4Weekly.reduce((sum, r) => sum + cleanNum(r['INBOUND CALLS']), 0);
       if (totalOverflowInbound > 20) {
         recs.push(`2. Overflow Management: Activate automated callback routing for overflow queues (detected ${totalOverflowInbound} overflow calls) to stabilize queue response time.`);
@@ -977,7 +955,6 @@
         recs.push(`2. Routing Efficiency: Refine queue pre-routing options to direct specialized queries faster and maintain average speed of answer below threshold.`);
       }
 
-      // Recommendation 3: Agent Coaching & Process Speed
       if (maxAnsSec > 30 && slowAnswerAgent) {
         recs.push(`3. Speed of Answer Coaching: Conduct targeted coaching with ${slowAnswerAgent} (avg answer time: ${maxAnsSec}s) to improve initial call pickup speed.`);
       } else if (maxHoldSec > 60 && highestHoldAgent) {
@@ -1002,7 +979,6 @@
       if (ach) ach.value = saved.achievements || '';
       if (blk) blk.value = saved.blockers || '';
 
-      // Auto Generate SLA Recommendations for Box 3
       const autoRecommendations = generateAutomatedSlaRecommendations();
       if (act) act.value = autoRecommendations;
     }
@@ -1355,6 +1331,9 @@
       switchTab('overview');
     }
 
+    // ==========================================
+    // FUNCIÓN DE CARGA MODIFICADA
+    // ==========================================
     function loadAllWeeksFromStorage() {
       try {
         const store = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
@@ -1363,13 +1342,22 @@
         appData.table3 = [];
         appData.table4 = [];
 
-        Object.keys(store).forEach(key => {
-          const entry = store[key];
-          if (entry.table1) appData.table1.push(...entry.table1);
-          if (entry.table2) appData.table2.push(...entry.table2);
-          if (entry.table3) appData.table3.push(...entry.table3);
-          if (entry.table4) appData.table4.push(...entry.table4);
-        });
+        // Si el usuario tiene datos en su localStorage local, los carga
+        if (Object.keys(store).length > 0) {
+          Object.keys(store).forEach(key => {
+            const entry = store[key];
+            if (entry.table1) appData.table1.push(...entry.table1);
+            if (entry.table2) appData.table2.push(...entry.table2);
+            if (entry.table3) appData.table3.push(...entry.table3);
+            if (entry.table4) appData.table4.push(...entry.table4);
+          });
+        } else {
+          // Si el localStorage está vacío (para usuarios nuevos con el enlace), carga los datos incrustados en defaultData
+          appData.table1 = [...(defaultData.table1 || [])];
+          appData.table2 = [...(defaultData.table2 || [])];
+          appData.table3 = [...(defaultData.table3 || [])];
+          appData.table4 = [...(defaultData.table4 || [])];
+        }
       } catch (e) {
         console.error("Storage loading error:", e);
       }
