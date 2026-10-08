@@ -453,7 +453,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Paste data below from Excel or CSV. You can process even with 1 table ready.
+              Paste data below from Excel or CSV. Button enables as soon as data is detected.
             </p>
           </div>
 
@@ -483,8 +483,8 @@
               </select>
             </div>
 
-            <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" disabled class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-400 bg-slate-800 border border-slate-700 cursor-not-allowed opacity-60 transition-all">
-              <i class="fa-solid fa-lock text-xs"></i> Process & Save Week
+            <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105">
+              <i class="fa-solid fa-bolt text-xs"></i> Process & Save Week
             </button>
           </div>
         </div>
@@ -506,7 +506,7 @@
             </div>
             <span id="badge-check-t1" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t1" onkeyup="checkAllFourTablesReady()" onpaste="setTimeout(checkAllFourTablesReady,100)" rows="7" placeholder="Paste Calls Per Hour table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t1" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Hour table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
@@ -517,7 +517,7 @@
             </div>
             <span id="badge-check-t2" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t2" onkeyup="checkAllFourTablesReady()" onpaste="setTimeout(checkAllFourTablesReady,100)" rows="7" placeholder="Paste Calls Per Queue table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t2" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Queue table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
@@ -528,7 +528,7 @@
             </div>
             <span id="badge-check-t3" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t3" onkeyup="checkAllFourTablesReady()" onpaste="setTimeout(checkAllFourTablesReady,100)" rows="7" placeholder="Paste Calls Per Agents table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agents table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
@@ -539,7 +539,7 @@
             </div>
             <span id="badge-check-t4" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t4" onkeyup="checkAllFourTablesReady()" onpaste="setTimeout(checkAllFourTablesReady,100)" rows="7" placeholder="Paste Calls Overflow table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t4" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Overflow table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
       </div>
     </div>
@@ -600,7 +600,7 @@
     </div>
   </main>
 
-  <!-- Firebase App & Realtime Database SDK (Modular Script) -->
+  <!-- Firebase Integration -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -617,7 +617,6 @@
     };
 
     let db = null;
-    let firebaseWeeksStore = {};
 
     try {
       const app = initializeApp(firebaseConfig);
@@ -625,51 +624,36 @@
 
       const weeksRef = ref(db, 'dashboard_weeks_data');
       onValue(weeksRef, (snapshot) => {
-        firebaseWeeksStore = snapshot.val() || {};
-        window.activeStoreData = firebaseWeeksStore;
-        window.loadWeeksIntoAppData(firebaseWeeksStore);
+        const val = snapshot.val();
+        if (val) {
+          window.firebaseStore = val;
+          window.loadWeeksIntoAppData(val);
+        }
       });
     } catch (e) {
-      console.warn("Firebase falló, usando almacenamiento local:", e);
+      console.warn("Firebase offline or error:", e);
     }
 
-    window.saveWeekToFirebase = function(storageKey, weekPayload) {
-      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
-      localStore[storageKey] = weekPayload;
-      localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
-
+    window.syncPayloadToCloud = function(key, payload) {
       if (db) {
-        set(ref(db, 'dashboard_weeks_data/' + storageKey), weekPayload)
+        set(ref(db, 'dashboard_weeks_data/' + key), payload)
           .then(() => {
-            window.showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Guardado en la nube: <strong>${storageKey}</strong>!`);
+            window.showToast(`<i class="fa-solid fa-cloud-check text-emerald-400 mr-2"></i>Saved to Cloud: <strong>${key}</strong>!`);
           })
-          .catch((error) => {
-            console.error("Firebase err:", error);
-            window.showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Guardado localmente: <strong>${storageKey}</strong>!`);
+          .catch((err) => {
+            console.error("Cloud save err:", err);
           });
-      } else {
-        window.loadWeeksIntoAppData(localStore);
-        window.showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Guardado localmente: <strong>${storageKey}</strong>!`);
       }
     };
 
-    window.deleteWeekFromFirebase = function(storageKey) {
-      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
-      delete localStore[storageKey];
-      localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
-
+    window.removePayloadFromCloud = function(key) {
       if (db) {
-        remove(ref(db, 'dashboard_weeks_data/' + storageKey));
+        remove(ref(db, 'dashboard_weeks_data/' + key));
       }
-      window.loadWeeksIntoAppData(localStore);
-    };
-
-    window.getFirebaseWeeksStore = function() {
-      return window.activeStoreData || JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
     };
   </script>
 
-  <!-- Main Logic Script -->
+  <!-- Core Dashboard Application Script -->
   <script>
     window.appData = {
       table1: [],
@@ -685,7 +669,7 @@
 
     window.onload = function () {
       initDateControls();
-      loadFallbackLocalStorage();
+      loadStoredData();
       syncCurrentDateToSelectedWeek();
       renderAllTables();
       initUnifiedHourlyGrid();
@@ -697,11 +681,11 @@
       checkAllFourTablesReady();
     };
 
-    function loadFallbackLocalStorage() {
-      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
-      if (Object.keys(localStore).length > 0) {
-        loadWeeksIntoAppData(localStore);
-      }
+    function loadStoredData() {
+      const local = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+      const cloud = window.firebaseStore || {};
+      const combined = { ...local, ...cloud };
+      loadWeeksIntoAppData(combined);
     }
 
     function loadWeeksIntoAppData(storeObj) {
@@ -1191,7 +1175,6 @@
       return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     }
 
-    // MODIFICADO: Permite desbloquear con al menos 1 tabla que tenga contenido
     function checkAllFourTablesReady() {
       const t1 = (document.getElementById('paste-input-t1')?.value || '').trim();
       const t2 = (document.getElementById('paste-input-t2')?.value || '').trim();
@@ -1218,14 +1201,9 @@
       const anyReady = t1.length > 0 || t2.length > 0 || t3.length > 0 || t4.length > 0;
       const btn = document.getElementById('btn-process-save-week');
       if (btn) {
-        btn.disabled = !anyReady;
-        if (anyReady) {
-          btn.className = 'px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105';
-          btn.innerHTML = '<i class="fa-solid fa-bolt text-xs"></i> Process & Save Week';
-        } else {
-          btn.className = 'px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-400 bg-slate-800 border border-slate-700 cursor-not-allowed opacity-60 transition-all';
-          btn.innerHTML = '<i class="fa-solid fa-lock text-xs"></i> Process & Save Week';
-        }
+        btn.removeAttribute('disabled');
+        btn.className = 'px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105';
+        btn.innerHTML = '<i class="fa-solid fa-bolt text-xs"></i> Process & Save Week';
       }
     }
 
@@ -1240,10 +1218,20 @@
     }
 
     function processAndSaveUnifiedWeek() {
-      const t1Rows = parseDelimitedTable(document.getElementById('paste-input-t1')?.value || '');
-      const t2Rows = parseDelimitedTable(document.getElementById('paste-input-t2')?.value || '');
-      const t3Rows = parseDelimitedTable(document.getElementById('paste-input-t3')?.value || '');
-      const t4Rows = parseDelimitedTable(document.getElementById('paste-input-t4')?.value || '');
+      const t1Raw = document.getElementById('paste-input-t1')?.value || '';
+      const t2Raw = document.getElementById('paste-input-t2')?.value || '';
+      const t3Raw = document.getElementById('paste-input-t3')?.value || '';
+      const t4Raw = document.getElementById('paste-input-t4')?.value || '';
+
+      if (!t1Raw.trim() && !t2Raw.trim() && !t3Raw.trim() && !t4Raw.trim()) {
+        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Please paste data in at least one table.');
+        return;
+      }
+
+      const t1Rows = parseDelimitedTable(t1Raw);
+      const t2Rows = parseDelimitedTable(t2Raw);
+      const t3Rows = parseDelimitedTable(t3Raw);
+      const t4Rows = parseDelimitedTable(t4Raw);
 
       const targetWeek = document.getElementById('target-week-select').value;
       const targetMonthIdx = parseInt(document.getElementById('target-month-select')?.value ?? selectedMonthIndex, 10);
@@ -1391,9 +1379,15 @@
         savedAt: new Date().toISOString()
       };
 
-      if (window.saveWeekToFirebase) {
-        window.saveWeekToFirebase(storageKey, weekPayload);
+      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+      localStore[storageKey] = weekPayload;
+      localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
+
+      if (window.syncPayloadToCloud) {
+        window.syncPayloadToCloud(storageKey, weekPayload);
       }
+
+      loadWeeksIntoAppData(localStore);
 
       selectedFilterWeek = targetWeek;
       selectedMonthIndex = targetMonthIdx;
@@ -1408,14 +1402,19 @@
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
-      checkAllFourTablesReady();
+
+      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Successfully saved <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
       switchTab('overview');
     }
 
     function renderSavedWeeksBadges() {
       const container = document.getElementById('saved-weeks-badges');
       if (!container) return;
-      const store = window.getFirebaseWeeksStore ? window.getFirebaseWeeksStore() : {};
+      
+      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+      const cloudStore = window.firebaseStore || {};
+      const store = { ...localStore, ...cloudStore };
+      
       const keys = Object.keys(store).sort();
 
       if (keys.length === 0) {
@@ -1451,13 +1450,24 @@
 
         badge.querySelector('button').onclick = (e) => {
           e.stopPropagation();
-          if (window.deleteWeekFromFirebase) {
-            window.deleteWeekFromFirebase(k);
-          }
+          deleteWeekData(k);
         };
 
         container.appendChild(badge);
       });
+    }
+
+    function deleteWeekData(storageKey) {
+      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+      delete localStore[storageKey];
+      localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
+
+      if (window.removePayloadFromCloud) {
+        window.removePayloadFromCloud(storageKey);
+      }
+
+      loadWeeksIntoAppData(localStore);
+      showToast(`Deleted ${storageKey} from storage.`);
     }
 
     function renderAllTables() {
