@@ -45,7 +45,6 @@
       background-color: #0b0f19;
       color: #e2e8f0;
     }
-    /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -60,9 +59,6 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #eab308;
     }
-    .gold-glow {
-      box-shadow: 0 0 15px rgba(234, 179, 8, 0.15);
-    }
     .gold-gradient-btn {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
@@ -71,7 +67,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black">
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
   <!-- Top Navigation Bar -->
   <header class="bg-slate-900/90 border-b border-gold-600/30 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3 transition-all">
@@ -81,7 +77,6 @@
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-gold-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <!-- Authentic Highway "H" geometric path -->
             <path d="M 15 82 L 29 18 L 43 18 L 40.3 43 L 59.7 43 L 57 18 L 71 18 L 85 82 L 64 82 L 61.3 57 L 38.7 57 L 36 82 Z" fill="#FAC815" />
           </svg>
         </div>
@@ -164,83 +159,95 @@
     </div>
   </header>
 
-  <!-- Main View Navigation Bar -->
-  <div class="bg-slate-900/60 border-b border-slate-800 px-4 lg:px-8 py-2">
-    <div class="max-w-[1700px] mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition">
-          <i class="fa-solid fa-chart-pie"></i> Overview & Charts
+  <!-- Main View Navigation & Quick Days Pills -->
+  <div class="bg-slate-900/60 border-b border-slate-800 px-4 lg:px-8 py-3">
+    <div class="max-w-[1700px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      <!-- Tabs: Overview & Charts, Notes & Insights -->
+      <div class="flex flex-col gap-2 w-full md:w-64">
+        <button id="tab-btn-overview" onclick="switchTab('overview')" class="w-full px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition">
+          <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
         </button>
-        <button id="tab-btn-import" onclick="switchTab('import')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition">
-          <i class="fa-solid fa-file-import"></i> Import Information
-        </button>
-        <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition">
-          <i class="fa-solid fa-book-open"></i> Notes & Insights
+        <button id="tab-btn-notes" onclick="switchTab('notes')" class="w-full px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition">
+          <i class="fa-solid fa-book-open text-sm"></i> Notes & Insights
         </button>
       </div>
 
       <!-- Quick Day Nav Pills -->
-      <div id="week-days-pills" class="hidden sm:flex items-center gap-1.5 overflow-x-auto py-1">
+      <div id="week-days-pills" class="flex flex-wrap items-center gap-1.5 py-1 self-start md:self-center">
         <!-- Injected via JavaScript -->
       </div>
     </div>
   </div>
 
+  <!-- Bottom Right Fixed/Floating Button for Import Information -->
+  <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all">
+    <i class="fa-solid fa-file-import text-sm"></i> Import Information
+  </button>
+
   <!-- Notification Banner -->
-  <div id="toast-banner" class="hidden fixed bottom-6 right-6 z-50 bg-slate-900 border border-gold-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300">
+  <div id="toast-banner" class="hidden fixed bottom-20 right-6 z-50 bg-slate-900 border border-gold-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300">
     <span id="toast-message" class="text-xs font-medium">Notification message</span>
     <button onclick="document.getElementById('toast-banner').classList.add('hidden')" class="text-slate-400 hover:text-white ml-2 text-sm">&times;</button>
   </div>
 
-  <main class="flex-1 max-w-[1700px] w-full mx-auto p-4 lg:p-8 space-y-8">
+  <main class="flex-1 max-w-[1700px] w-full mx-auto p-4 lg:p-8 space-y-8 pb-24">
 
     <!-- ========================================== -->
     <!-- TAB 1: OVERVIEW & CHARTS                   -->
     <!-- ========================================== -->
     <div id="view-overview" class="space-y-8">
       
-      <!-- Metric Highlights Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
-          <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Filtered scope</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. Queue</span>
-          <div id="kpi-abnd-queue" class="text-xl font-extrabold text-rose-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Filtered scope</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. CSAT</span>
-          <div id="kpi-abnd-csat" class="text-xl font-extrabold text-amber-300 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Filtered scope</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. On Hold</span>
-          <div id="kpi-abnd-hold" class="text-xl font-extrabold text-orange-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Filtered scope</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Inbound Calls</span>
-          <div id="kpi-inbound" class="text-xl font-extrabold text-sky-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Agents + Overflow</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Tagged Convs</span>
-          <div id="kpi-tagged" class="text-xl font-extrabold text-emerald-400 mt-1">0</div>
-          <span class="text-[10px] text-slate-500">Overflow count</span>
+      <!-- Section: Metric Highlights -->
+      <div>
+        <!-- Subtitle added for Metrics -->
+        <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
+        </h2>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
+            <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. Queue</span>
+            <div id="kpi-abnd-queue" class="text-xl font-extrabold text-rose-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. CSAT</span>
+            <div id="kpi-abnd-csat" class="text-xl font-extrabold text-amber-300 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. On Hold</span>
+            <div id="kpi-abnd-hold" class="text-xl font-extrabold text-orange-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Inbound Calls</span>
+            <div id="kpi-inbound" class="text-xl font-extrabold text-sky-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Agents + Overflow</span>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Tagged Convs</span>
+            <div id="kpi-tagged" class="text-xl font-extrabold text-emerald-400 mt-1">0</div>
+            <span class="text-[10px] text-slate-500">Overflow count</span>
+          </div>
         </div>
       </div>
 
-      <!-- Section: 10 Operational Visualizations -->
+      <!-- Section: Visualizations -->
       <div>
         <div class="flex items-center justify-between mb-4">
           <div>
+            <!-- Renamed Title: Performance Visualizations -->
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-              <i class="fa-solid fa-chart-line text-amber-500"></i> Executive Performance Visualizations
+              <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
-            <p class="text-xs text-slate-400">Charts 1 to 4 & 10 dynamically update daily (0:00 to 23:00). Charts 5 to 9 update weekly.</p>
+            <p class="text-xs text-slate-400">Charts 1-4 & 10 update daily. Charts 5-9 update weekly.</p>
           </div>
           <div class="text-right">
             <span class="text-xs font-semibold text-slate-400">Active Day:</span>
@@ -248,129 +255,97 @@
           </div>
         </div>
 
-        <!-- 10 Charts Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          
-          <!-- Chart 1: Date & Hour vs Answered (Daily) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">1. Date & Hour vs. Answered</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">Daily (0-23h)</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c1"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c1"></canvas></div>
           </div>
 
-          <!-- Chart 2: Date & Hour vs Abnd CSAT (Daily) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">2. Date & Hour vs. Abnd. In CSAT</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">Daily (0-23h)</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c2"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c2"></canvas></div>
           </div>
 
-          <!-- Chart 3: Date & Hour vs Abnd Queue (Daily) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">3. Date & Hour vs. Abnd. in Queue</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">Daily (0-23h)</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c3"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c3"></canvas></div>
           </div>
 
-          <!-- Chart 4: Date & Hour vs Abnd On Hold (Daily) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">4. Date & Hour vs. Abnd. On Hold</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">Daily (0-23h)</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c4"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c4"></canvas></div>
           </div>
 
-          <!-- Chart 10: Overflow Inbound vs Tagged (Daily) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">10. Calls Overflow: Inbound vs Tagged</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">Daily (0-23h)</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c10"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c10"></canvas></div>
           </div>
 
-          <!-- Chart 5: Team vs Answered & Abandons (Weekly) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">5. Team vs. Answered & Abandons</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">Weekly</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c5"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c5"></canvas></div>
           </div>
 
-          <!-- Chart 6: Teammate vs Abnd Inbound (Weekly) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">6. Teammate vs. Abnd. Inbound Calls</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">Weekly</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c6"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c6"></canvas></div>
           </div>
 
-          <!-- Chart 7: Teammate vs Answer Time (Weekly) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">7. Teammate vs. Answer Time (Sec)</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">Weekly</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c7"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c7"></canvas></div>
           </div>
 
-          <!-- Chart 8: Teammate vs Talk Time (Weekly) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">8. Teammate vs. Talk Time (Minutes)</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">Weekly</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c8"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c8"></canvas></div>
           </div>
 
-          <!-- Chart 9: Teammate vs Call Duration (Weekly) -->
           <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between md:col-span-2 xl:col-span-3">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">9. Teammate vs. Call Duration (Minutes)</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">Weekly</span>
             </div>
-            <div class="h-56 w-full">
-              <canvas id="chart-c9"></canvas>
-            </div>
+            <div class="h-56 w-full"><canvas id="chart-c9"></canvas></div>
           </div>
-
         </div>
       </div>
 
-      <!-- Section: The 4 Operational Tables -->
+      <!-- Section: Core Tables -->
       <div class="space-y-6 pt-4">
+        <!-- Renamed Title: Operational Data Tables -->
         <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-          <i class="fa-solid fa-table-cells text-amber-500"></i> Core Operational Data Tables
+          <i class="fa-solid fa-table-cells text-amber-500"></i> Operational Data Tables
         </h2>
 
-        <!-- Table 1: Calls Per Hour (Daily) -->
+        <!-- Table 1: Calls Per Hour -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -398,7 +373,7 @@
           </div>
         </div>
 
-        <!-- Table 2: Calls Per Queue (Weekly) -->
+        <!-- Table 2: Calls Per Queue -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -425,7 +400,7 @@
           </div>
         </div>
 
-        <!-- Table 3: Calls Per Agents (Weekly) -->
+        <!-- Table 3: Calls Per Agents -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -456,7 +431,7 @@
           </div>
         </div>
 
-        <!-- Table 4: Calls Overflow (Daily) -->
+        <!-- Table 4: Calls Overflow -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -489,8 +464,6 @@
     <!-- TAB 2: IMPORT INFORMATION                  -->
     <!-- ========================================== -->
     <div id="view-import" class="hidden space-y-6">
-      
-      <!-- Target Week Banner & Save Trigger -->
       <div class="bg-slate-900 border border-gold-600/30 rounded-2xl p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -498,12 +471,11 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Paste the contents of all 4 tables below from Excel or CSV. The button unlocks automatically once all 4 tables have data.
+              Paste data below from Excel or CSV. The process button unlocks when all 4 textareas have content.
             </p>
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
-            <!-- Target Month & Week Selector -->
             <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
               <span class="text-xs font-bold text-slate-300">Assign To:</span>
               <select id="target-month-select" class="bg-slate-950 text-xs text-amber-400 font-bold focus:outline-none cursor-pointer border-r border-slate-800 pr-2">
@@ -520,7 +492,7 @@
                 <option value="10">November</option>
                 <option value="11">December</option>
               </select>
-              <select id="target-week-select" onchange="onTargetWeekChanged(this.value)" class="bg-transparent text-xs text-amber-300 font-bold focus:outline-none cursor-pointer">
+              <select id="target-week-select" class="bg-transparent text-xs text-amber-300 font-bold focus:outline-none cursor-pointer">
                 <option value="Week 1">Week 1</option>
                 <option value="Week 2">Week 2</option>
                 <option value="Week 3">Week 3</option>
@@ -529,14 +501,12 @@
               </select>
             </div>
 
-            <!-- Unified Process & Save Week Action Button -->
             <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" disabled class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-400 bg-slate-800 border border-slate-700 cursor-not-allowed opacity-60 transition-all">
               <i class="fa-solid fa-lock text-xs"></i> Process & Save Week
             </button>
           </div>
         </div>
 
-        <!-- Saved Weeks Badges Display -->
         <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
           <span class="text-xs font-semibold text-slate-400">Stored Weeks in Storage:</span>
           <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
@@ -545,46 +515,40 @@
         </div>
       </div>
 
-      <!-- 4 Separate Paste Textareas -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Input 1: Calls Per Hour -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
           <div class="flex justify-between items-center mb-2">
             <div>
               <h3 class="text-sm font-bold text-amber-400">1. Calls Per Hour</h3>
-              <p class="text-[11px] text-slate-400">DATE & HOUR, ABND. IN ROUTING, ANSWERED, CSAT, QUEUE, HOLD</p>
+              <p class="text-[11px] text-slate-400">DATE & HOUR, ABND. ROUTING, ANSWERED, CSAT, QUEUE, HOLD</p>
             </div>
             <span id="badge-check-t1" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t1" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Hour table here..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t1" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Hour table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
-        <!-- Input 2: Calls Per Queue -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
           <div class="flex justify-between items-center mb-2">
             <div>
               <h3 class="text-sm font-bold text-amber-400">2. Calls Per Queue</h3>
-              <p class="text-[11px] text-slate-400">TEAM, ANSWERED, ABND. IN CSAT RATING, ABND. IN QUEUE, ABND. ON HOLD</p>
+              <p class="text-[11px] text-slate-400">TEAM, ANSWERED, ABND. CSAT, ABND. QUEUE, ABND. HOLD</p>
             </div>
             <span id="badge-check-t2" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t2" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Queue table here..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t2" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Queue table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
-        <!-- Input 3: Calls Per Agents -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
           <div class="flex justify-between items-center mb-2">
             <div>
               <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
-              <p class="text-[11px] text-slate-400">TEAMMATE, INBOUND, OUTBOUND, ABND, ANSWER/TALK/CALL TIME, DAYS</p>
+              <p class="text-[11px] text-slate-400">TEAMMATE, INBOUND, OUTBOUND, ABND, ANSWER/TALK TIME, DAYS</p>
             </div>
             <span id="badge-check-t3" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agents table here..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agents table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
-        <!-- Input 4: Calls Overflow -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
           <div class="flex justify-between items-center mb-2">
             <div>
@@ -593,11 +557,9 @@
             </div>
             <span id="badge-check-t4" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t4" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Overflow table here..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t4" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Overflow table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
         </div>
-
       </div>
-
     </div>
 
     <!-- ========================================== -->
@@ -606,23 +568,23 @@
     <div id="view-notes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Left: Hourly Notes for the Selected Day -->
+        <!-- Left: Hourly Notes for Selected Day -->
         <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
           <div class="flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-clock text-amber-500"></i> Notes Per Hour (Daily Operational Log)
+                <i class="fa-solid fa-clock text-amber-500"></i> Daily Notes Per Hour
               </h3>
-              <p class="text-xs text-slate-400">Daily notes auto-saved for: <span id="unified-day-label" class="font-bold text-amber-300">--</span></p>
+              <p class="text-xs text-slate-400">Notes for date: <span id="unified-day-label" class="font-bold text-amber-300">--</span></p>
             </div>
             <button onclick="saveAllHourlyNotes()" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30 transition">
               <i class="fa-solid fa-floppy-disk mr-1"></i> Save Day Notes
             </button>
           </div>
 
-          <!-- 24-Hour Grid -->
+          <!-- 24-Hour Input Grid -->
           <div id="unified-hourly-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[580px] overflow-y-auto pr-1">
-            <!-- Dynamically populated 24 hours -->
+            <!-- Dynamically populated -->
           </div>
         </div>
 
@@ -631,27 +593,37 @@
           <div class="flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-lightbulb text-amber-500"></i> Insights for the Week
+                <i class="fa-solid fa-lightbulb text-amber-500"></i> Weekly Insights
               </h3>
-              <p class="text-xs text-slate-400">Weekly scope: <span id="unified-week-label" class="font-bold text-gold-400">--</span></p>
+              <p class="text-xs text-slate-400">Scope: <span id="unified-week-label" class="font-bold text-gold-400">--</span></p>
             </div>
             <button onclick="saveWeeklyInsights()" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 transition">
-              <i class="fa-solid fa-check mr-1"></i> Save Insights
+              <i class="fa-solid fa-check mr-1"></i> Save Weekly Insights
             </button>
           </div>
 
           <div class="space-y-4">
+            <!-- Renamed Box 1: Missing Members During the Week -->
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Key Operational Achievements</label>
-              <textarea id="insights-achievements" rows="4" placeholder="Highlights, queue milestones..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Missing Members During the Week</label>
+              <textarea id="insights-achievements" rows="3" placeholder="Absent team members, leave notes, coverage impacts..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
             </div>
+
+            <!-- Renamed Box 2: Unexpected Events & Challenges -->
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Bottlenecks & Overflow Challenges</label>
-              <textarea id="insights-blockers" rows="4" placeholder="Staffing shortages, queue spikes..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Unexpected Events & Challenges</label>
+              <textarea id="insights-blockers" rows="3" placeholder="System outages, unexpected call spikes, technical issues..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
             </div>
+
+            <!-- Renamed Box 3: System Recommendations -->
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Action Items & Next Week Planning</label>
-              <textarea id="insights-actions" rows="4" placeholder="Schedule adjustments, agent coaching..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-amber-400"></textarea>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-amber-400">System Recommendations</label>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                  <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> AI Generated
+                </span>
+              </div>
+              <textarea id="insights-actions" rows="5" readonly placeholder="System analyzing data to generate 3 SLA recommendations..." class="w-full bg-slate-950/80 text-xs text-amber-300 font-mono p-3 rounded-xl border border-amber-500/30 focus:outline-none leading-relaxed cursor-not-allowed shadow-inner"></textarea>
             </div>
           </div>
         </div>
@@ -662,22 +634,22 @@
   </main>
 
   <script>
-    /* Complete Application Data Store */
     let appData = {
-      table1: [], // Calls Per Hour (Daily)
-      table2: [], // Calls Per Queue (Weekly)
-      table3: [], // Calls Per Agents (Weekly)
-      table4: []  // Calls Overflow (Daily)
+      table1: [],
+      table2: [],
+      table3: [],
+      table4: []
     };
 
     let selectedFilterWeek = 'Week 1';
     let currentSelectedDate = new Date().toISOString().split('T')[0];
-    let selectedMonthIndex = new Date().getMonth(); // 0 to 11
+    let selectedMonthIndex = new Date().getMonth();
     let chartInstances = {};
 
     window.onload = function () {
       initDateControls();
       loadAllWeeksFromStorage();
+      syncCurrentDateToSelectedWeek();
       renderAllTables();
       initUnifiedHourlyGrid();
       loadSavedWeeklyInsights();
@@ -700,15 +672,22 @@
     function initDateControls() {
       const picker = document.getElementById('date-picker');
       if (picker) picker.value = currentSelectedDate;
+      
+      selectedMonthIndex = parseInt(currentSelectedDate.split('-')[1], 10) - 1;
+      
       const monthSelect = document.getElementById('header-month-select');
       const targetMonthSelect = document.getElementById('target-month-select');
-      if (monthSelect) {
-        selectedMonthIndex = parseInt(currentSelectedDate.split('-')[1], 10) - 1;
-        monthSelect.value = selectedMonthIndex;
-      }
-      if (targetMonthSelect) {
-        targetMonthSelect.value = selectedMonthIndex;
-      }
+      if (monthSelect) monthSelect.value = selectedMonthIndex;
+      if (targetMonthSelect) targetMonthSelect.value = selectedMonthIndex;
+    }
+
+    function onHeaderWeekChanged(val) {
+      selectedFilterWeek = val;
+      const targetWeekSelect = document.getElementById('target-week-select');
+      if (targetWeekSelect) targetWeekSelect.value = val;
+      
+      syncCurrentDateToSelectedWeek();
+      handleDateNavigationUpdate();
     }
 
     function onHeaderMonthChanged(val) {
@@ -730,23 +709,21 @@
       handleDateNavigationUpdate();
     }
 
-    function onTargetWeekChanged(val) {
-      selectedFilterWeek = val;
-      const headerWeekSelect = document.getElementById('header-week-select');
-      if (headerWeekSelect) headerWeekSelect.value = val;
-      syncCurrentDateToSelectedWeek();
-      handleDateNavigationUpdate();
-    }
-
     function syncCurrentDateToSelectedWeek() {
-      if (selectedFilterWeek === 'all') return;
-      const weekDatesT1 = appData.table1.filter(r => r._week === selectedFilterWeek && r._date).map(r => r._date);
-      const weekDatesT4 = appData.table4.filter(r => r._week === selectedFilterWeek && r._date).map(r => r._date);
-      const combined = [...new Set([...weekDatesT1, ...weekDatesT4])].sort();
+      let weekDates = [];
+      if (selectedFilterWeek === 'all') {
+        const d1 = appData.table1.map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.map(r => r._date).filter(Boolean);
+        weekDates = [...new Set([...d1, ...d4])].sort();
+      } else {
+        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
+        weekDates = [...new Set([...d1, ...d4])].sort();
+      }
 
-      if (combined.length > 0) {
-        if (!combined.includes(currentSelectedDate)) {
-          currentSelectedDate = combined[0];
+      if (weekDates.length > 0) {
+        if (!weekDates.includes(currentSelectedDate)) {
+          currentSelectedDate = weekDates[0];
           const picker = document.getElementById('date-picker');
           if (picker) picker.value = currentSelectedDate;
         }
@@ -797,8 +774,8 @@
         const d4 = appData.table4.map(r => r._date).filter(Boolean);
         availableDates = [...new Set([...d1, ...d4])].sort();
       } else {
-        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek).map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek).map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
         availableDates = [...new Set([...d1, ...d4])].sort();
       }
 
@@ -819,11 +796,240 @@
         };
 
         pill.className = isSelected 
-          ? 'px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-500 text-slate-950 shadow transition'
-          : 'px-2.5 py-1 text-[11px] font-medium rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition';
+          ? 'px-3 py-1 text-[11px] font-bold rounded-lg bg-amber-500 text-slate-950 shadow transition'
+          : 'px-3 py-1 text-[11px] font-medium rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition';
         pill.innerText = dayLabel;
         container.appendChild(pill);
       });
+    }
+
+    function switchTab(tabId) {
+      ['overview', 'import', 'notes'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (view) view.classList.add('hidden');
+        if (btn) {
+          if (t === 'import') {
+            btn.className = 'fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all';
+          } else {
+            btn.className = 'w-full px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition';
+          }
+        }
+      });
+
+      const activeView = document.getElementById(`view-${tabId}`);
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeBtn) {
+        if (tabId === 'import') {
+          activeBtn.className = 'fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 bg-amber-400 border-2 border-amber-300 shadow-2xl shadow-amber-500/50 scale-105 transition-all';
+        } else {
+          activeBtn.className = 'w-full px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition';
+        }
+      }
+
+      if (tabId === 'overview') {
+        renderAllCharts();
+      }
+    }
+
+    function navigateDate(days) {
+      const parts = currentSelectedDate.split('-').map(Number);
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      d.setDate(d.getDate() + days);
+      const yr = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      currentSelectedDate = `${yr}-${m}-${day}`;
+      const picker = document.getElementById('date-picker');
+      if (picker) picker.value = currentSelectedDate;
+      handleDateNavigationUpdate();
+    }
+
+    function setToday() {
+      const now = new Date();
+      const yr = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      currentSelectedDate = `${yr}-${m}-${day}`;
+      const picker = document.getElementById('date-picker');
+      if (picker) picker.value = currentSelectedDate;
+      handleDateNavigationUpdate();
+    }
+
+    function onDatePickerChanged(val) {
+      if (!val) return;
+      currentSelectedDate = val;
+      const parts = val.split('-').map(Number);
+      if (parts[1]) {
+        selectedMonthIndex = parts[1] - 1;
+        const headerMonthSelect = document.getElementById('header-month-select');
+        if (headerMonthSelect) headerMonthSelect.value = selectedMonthIndex;
+        const targetMonthSelect = document.getElementById('target-month-select');
+        if (targetMonthSelect) targetMonthSelect.value = selectedMonthIndex;
+      }
+      handleDateNavigationUpdate();
+    }
+
+    function initUnifiedHourlyGrid() {
+      const grid = document.getElementById('unified-hourly-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const dayStoreKey = `notes_day_${currentSelectedDate}`;
+      const savedNotes = JSON.parse(localStorage.getItem(dayStoreKey) || '{}');
+
+      for (let h = 0; h < 24; h++) {
+        const hourStr = `${String(h).padStart(2, '0')}:00`;
+        const noteText = savedNotes[hourStr] || '';
+
+        const item = document.createElement('div');
+        item.className = 'bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1';
+        item.innerHTML = `
+          <div class="flex justify-between items-center text-[11px] font-bold text-amber-400">
+            <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>${hourStr}</span>
+            <span class="text-[10px] text-slate-500 font-mono">Interval #${h + 1}</span>
+          </div>
+          <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-800 focus:outline-none focus:border-amber-400">
+        `;
+        grid.appendChild(item);
+      }
+    }
+
+    function saveAllHourlyNotes() {
+      const dayStoreKey = `notes_day_${currentSelectedDate}`;
+      const notesObj = {};
+      document.querySelectorAll('.hourly-note-input').forEach(input => {
+        const hour = input.getAttribute('data-hour');
+        if (hour && input.value.trim()) {
+          notesObj[hour] = input.value.trim();
+        }
+      });
+
+      localStorage.setItem(dayStoreKey, JSON.stringify(notesObj));
+      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved for date <strong>${currentSelectedDate}</strong>!`);
+    }
+
+    /* Automated SLA Recommendations Engine */
+    function generateAutomatedSlaRecommendations() {
+      const t1Weekly = appData.table1.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
+      const t2Weekly = appData.table2.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
+      const t3Weekly = appData.table3.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
+      const t4Weekly = appData.table4.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
+
+      if (t1Weekly.length === 0 && t2Weekly.length === 0 && t3Weekly.length === 0) {
+        return "No operational data imported for this week yet. Please import weekly tables to generate dynamic SLA recommendations.";
+      }
+
+      // Calculations
+      const totalAnswered = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANSWERED']), 0);
+      const totalAbndQueue = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND. IN QUEUE']), 0);
+      const totalAbndCsat = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND. IN CSAT RATING']), 0);
+      const totalAbndHold = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANBD. ON HOLD']), 0);
+      const totalCallsReceived = totalAnswered + totalAbndQueue + totalAbndCsat + totalAbndHold;
+      const abandonRate = totalCallsReceived > 0 ? ((totalAbndQueue + totalAbndCsat) / totalCallsReceived) * 100 : 0;
+
+      // Peak Hours identification
+      const hourlyVolumeMap = {};
+      t1Weekly.forEach(r => {
+        const h = r._hour >= 0 ? r._hour : extractHourNumber(r['DATE & HOUR']);
+        if (h >= 0) {
+          hourlyVolumeMap[h] = (hourlyVolumeMap[h] || 0) + cleanNum(r['ANSWERED']) + cleanNum(r['ABND. IN QUEUE']);
+        }
+      });
+
+      let peakHour = -1;
+      let maxVol = -1;
+      Object.keys(hourlyVolumeMap).forEach(h => {
+        if (hourlyVolumeMap[h] > maxVol) {
+          maxVol = hourlyVolumeMap[h];
+          peakHour = parseInt(h, 10);
+        }
+      });
+      const peakHourLabel = peakHour >= 0 ? `${String(peakHour).padStart(2, '0')}:00 - ${String((peakHour + 1) % 24).padStart(2, '0')}:00` : "10:00 - 14:00";
+
+      // Agent performance parsing
+      let highestHoldAgent = null;
+      let maxHoldSec = -1;
+      let slowAnswerAgent = null;
+      let maxAnsSec = -1;
+
+      t3Weekly.forEach(r => {
+        const holdSec = parseTimeSeconds(r['AVERAGE HOLD TIME']);
+        const ansSec = parseTimeSeconds(r['ANSWER TIME']);
+        if (holdSec > maxHoldSec) {
+          maxHoldSec = holdSec;
+          highestHoldAgent = r['TEAMMATE'];
+        }
+        if (ansSec > maxAnsSec) {
+          maxAnsSec = ansSec;
+          slowAnswerAgent = r['TEAMMATE'];
+        }
+      });
+
+      const recs = [];
+
+      // Recommendation 1: Shift & Staffing Allocation
+      if (abandonRate > 5 || totalAbndQueue > 15) {
+        recs.push(`1. Shift Optimization: Reallocate 2-3 agents to peak interval (${peakHourLabel}) to mitigate high abandonment rate (${abandonRate.toFixed(1)}%) and reach target SLA.`);
+      } else {
+        recs.push(`1. Workforce Balance: Maintain present staffing levels during peak hours (${peakHourLabel}), but schedule breaks during low-volume windows to maximize overall occupancy.`);
+      }
+
+      // Recommendation 2: Queue & Overflow Routing
+      const totalOverflowInbound = t4Weekly.reduce((sum, r) => sum + cleanNum(r['INBOUND CALLS']), 0);
+      if (totalOverflowInbound > 20) {
+        recs.push(`2. Overflow Management: Activate automated callback routing for overflow queues (detected ${totalOverflowInbound} overflow calls) to stabilize queue response time.`);
+      } else if (totalAbndHold > 10) {
+        recs.push(`2. Hold Time Reduction: Implement mid-call check-in guidelines for agents (${highestHoldAgent ? 'e.g., coaching ' + highestHoldAgent : 'focus on active hold limits'}) to cut hold abandons.`);
+      } else {
+        recs.push(`2. Routing Efficiency: Refine queue pre-routing options to direct specialized queries faster and maintain average speed of answer below threshold.`);
+      }
+
+      // Recommendation 3: Agent Coaching & Process Speed
+      if (maxAnsSec > 30 && slowAnswerAgent) {
+        recs.push(`3. Speed of Answer Coaching: Conduct targeted coaching with ${slowAnswerAgent} (avg answer time: ${maxAnsSec}s) to improve initial call pickup speed.`);
+      } else if (maxHoldSec > 60 && highestHoldAgent) {
+        recs.push(`3. Knowledge Base Utilization: Provide quick-reference cheat sheets to ${highestHoldAgent} to decrease average hold duration (${Math.round(maxHoldSec)}s).`);
+      } else {
+        recs.push(`3. Continuous SLA Monitoring: Review agent wrap-up and talk times weekly to sustain optimal overall call handling capacity and meet SLA targets.`);
+      }
+
+      return recs.join("\n\n");
+    }
+
+    function loadSavedWeeklyInsights() {
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const currentMonthLabel = monthNames[selectedMonthIndex] || 'Oct';
+      const key = `insights_${currentMonthLabel}_${selectedFilterWeek}`;
+      
+      const saved = JSON.parse(localStorage.getItem(key) || '{}');
+      const ach = document.getElementById('insights-achievements');
+      const blk = document.getElementById('insights-blockers');
+      const act = document.getElementById('insights-actions');
+
+      if (ach) ach.value = saved.achievements || '';
+      if (blk) blk.value = saved.blockers || '';
+
+      // Auto Generate SLA Recommendations
+      const autoRecommendations = generateAutomatedSlaRecommendations();
+      if (act) act.value = autoRecommendations;
+    }
+
+    function saveWeeklyInsights() {
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const currentMonthLabel = monthNames[selectedMonthIndex] || 'Oct';
+      const key = `insights_${currentMonthLabel}_${selectedFilterWeek}`;
+
+      const payload = {
+        achievements: document.getElementById('insights-achievements')?.value || '',
+        blockers: document.getElementById('insights-blockers')?.value || '',
+        actions: document.getElementById('insights-actions')?.value || '',
+        savedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem(key, JSON.stringify(payload));
+      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved for <strong>${selectedFilterWeek}</strong>!`);
     }
 
     function parseDelimitedTable(rawText) {
@@ -930,66 +1136,6 @@
       return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     }
 
-    function switchTab(tabId) {
-      ['overview', 'import', 'notes'].forEach(t => {
-        const view = document.getElementById(`view-${t}`);
-        const btn = document.getElementById(`tab-btn-${t}`);
-        if (view) view.classList.add('hidden');
-        if (btn) {
-          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition';
-        }
-      });
-
-      const activeView = document.getElementById(`view-${tabId}`);
-      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-      if (activeView) activeView.classList.remove('hidden');
-      if (activeBtn) {
-        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition';
-      }
-
-      if (tabId === 'overview') {
-        renderAllCharts();
-      }
-    }
-
-    function navigateDate(days) {
-      const parts = currentSelectedDate.split('-').map(Number);
-      const d = new Date(parts[0], parts[1] - 1, parts[2]);
-      d.setDate(d.getDate() + days);
-      const yr = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      currentSelectedDate = `${yr}-${m}-${day}`;
-      const picker = document.getElementById('date-picker');
-      if (picker) picker.value = currentSelectedDate;
-      handleDateNavigationUpdate();
-    }
-
-    function setToday() {
-      const now = new Date();
-      const yr = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate()).padStart(2, '0');
-      currentSelectedDate = `${yr}-${m}-${day}`;
-      const picker = document.getElementById('date-picker');
-      if (picker) picker.value = currentSelectedDate;
-      handleDateNavigationUpdate();
-    }
-
-    function onDatePickerChanged(val) {
-      if (!val) return;
-      currentSelectedDate = val;
-      const parts = val.split('-').map(Number);
-      if (parts[1]) {
-        selectedMonthIndex = parts[1] - 1;
-        const headerMonthSelect = document.getElementById('header-month-select');
-        if (headerMonthSelect) headerMonthSelect.value = selectedMonthIndex;
-        const targetMonthSelect = document.getElementById('target-month-select');
-        if (targetMonthSelect) targetMonthSelect.value = selectedMonthIndex;
-      }
-      handleDateNavigationUpdate();
-    }
-
     function checkAllFourTablesReady() {
       const t1 = (document.getElementById('paste-input-t1')?.value || '').trim();
       const t2 = (document.getElementById('paste-input-t2')?.value || '').trim();
@@ -1064,7 +1210,6 @@
       let dayStepT1 = 0;
       let lastHourT1 = -1;
 
-      // Table 1 Processing
       t1Rows.forEach((rawRow) => {
         const rawVals = rawRow._rawValues || Object.values(rawRow);
         const cleanMap = {};
@@ -1104,7 +1249,6 @@
         });
       });
 
-      // Table 2 Processing
       t2Rows.forEach(rawRow => {
         const rawVals = rawRow._rawValues || Object.values(rawRow);
         const cleanMap = {};
@@ -1123,7 +1267,6 @@
         });
       });
 
-      // Table 3 Processing
       t3Rows.forEach(rawRow => {
         const rawVals = rawRow._rawValues || Object.values(rawRow);
         const cleanMap = {};
@@ -1146,7 +1289,6 @@
         });
       });
 
-      // Table 4 Processing
       let lastKnownDateT4 = detectedFirstDate || '';
       let dayStepT4 = 0;
       let lastHourT4 = -1;
@@ -1187,7 +1329,6 @@
         });
       });
 
-      // Commit to localStorage with month and week
       const allWeeksStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
       allWeeksStore[storageKey] = {
         monthIndex: targetMonthIdx,
@@ -1203,10 +1344,6 @@
 
       selectedFilterWeek = targetWeek;
       selectedMonthIndex = targetMonthIdx;
-      const headerWeekSelect = document.getElementById('header-week-select');
-      const headerMonthSelect = document.getElementById('header-month-select');
-      if (headerWeekSelect) headerWeekSelect.value = targetWeek;
-      if (headerMonthSelect) headerMonthSelect.value = targetMonthIdx;
 
       if (detectedFirstDate) {
         currentSelectedDate = detectedFirstDate;
@@ -1217,7 +1354,6 @@
       renderSavedWeeksBadges();
       handleDateNavigationUpdate();
 
-      // Clear paste inputs
       ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
@@ -1336,10 +1472,9 @@
       document.getElementById('badge-t3-count').innerText = `${t3Data.length} records`;
       document.getElementById('badge-t4-count').innerText = `${t4Data.length} records`;
 
-      // Render T1
       const tb1 = document.getElementById('tbody-t1');
       if (t1Data.length === 0) {
-        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No records found for the selected scope.</td></tr>';
+        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No records found for scope.</td></tr>';
       } else {
         tb1.innerHTML = t1Data.map(r => `
           <tr class="hover:bg-slate-800/40">
@@ -1353,7 +1488,6 @@
         `).join('');
       }
 
-      // Render T2
       const tb2 = document.getElementById('tbody-t2');
       if (t2Data.length === 0) {
         tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No queue records found for this week.</td></tr>';
@@ -1369,7 +1503,6 @@
         `).join('');
       }
 
-      // Render T3
       const tb3 = document.getElementById('tbody-t3');
       if (t3Data.length === 0) {
         tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No agent records found for this week.</td></tr>';
@@ -1389,10 +1522,9 @@
         `).join('');
       }
 
-      // Render T4
       const tb4 = document.getElementById('tbody-t4');
       if (t4Data.length === 0) {
-        tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No overflow records found for the selected scope.</td></tr>';
+        tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No overflow records found for scope.</td></tr>';
       } else {
         tb4.innerHTML = t4Data.map(r => `
           <tr class="hover:bg-slate-800/40">
@@ -1403,7 +1535,6 @@
         `).join('');
       }
 
-      // Update Highlights
       const sumAnswered = t1Data.reduce((acc, r) => acc + cleanNum(r['ANSWERED']), 0);
       const sumAbndQueue = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND. IN QUEUE']), 0);
       const sumAbndCsat = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND. IN CSAT RATING']), 0);
@@ -1497,9 +1628,7 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                labels: { color: '#94a3b8', font: { size: 10, family: 'Inter' } }
-              },
+              legend: { labels: { color: '#94a3b8', font: { size: 10, family: 'Inter' } } },
               tooltip: {
                 backgroundColor: '#0f172a',
                 borderColor: '#eab308',
@@ -1509,68 +1638,23 @@
               }
             },
             scales: {
-              x: {
-                ticks: { color: '#64748b', font: { size: 9, family: 'Inter' } },
-                grid: { color: 'rgba(51, 65, 85, 0.2)' }
-              },
-              y: {
-                beginAtZero: true,
-                ticks: { color: '#64748b', font: { size: 9, family: 'Inter' } },
-                grid: { color: 'rgba(51, 65, 85, 0.2)' }
-              }
+              x: { ticks: { color: '#64748b', font: { size: 9, family: 'Inter' } }, grid: { color: 'rgba(51, 65, 85, 0.2)' } },
+              y: { beginAtZero: true, ticks: { color: '#64748b', font: { size: 9, family: 'Inter' } }, grid: { color: 'rgba(51, 65, 85, 0.2)' } }
             },
             ...extraOpts
           }
         });
       };
 
-      // Chart 1: Date & Hour vs Answered
-      makeChart('chart-c1', 'line', hours24, [{
-        label: 'Answered',
-        data: answeredByHour,
-        borderColor: '#f59e0b',
-        backgroundColor: 'rgba(245, 158, 11, 0.15)',
-        fill: true,
-        tension: 0.3
-      }]);
-
-      // Chart 2: Date & Hour vs Abnd CSAT
-      makeChart('chart-c2', 'line', hours24, [{
-        label: 'Abnd. In CSAT',
-        data: csatByHour,
-        borderColor: '#fbbf24',
-        backgroundColor: 'rgba(251, 191, 36, 0.15)',
-        fill: true,
-        tension: 0.3
-      }]);
-
-      // Chart 3: Date & Hour vs Abnd Queue
-      makeChart('chart-c3', 'line', hours24, [{
-        label: 'Abnd. In Queue',
-        data: queueByHour,
-        borderColor: '#f43f5e',
-        backgroundColor: 'rgba(244, 63, 94, 0.15)',
-        fill: true,
-        tension: 0.3
-      }]);
-
-      // Chart 4: Date & Hour vs Abnd Hold
-      makeChart('chart-c4', 'line', hours24, [{
-        label: 'Abnd. On Hold',
-        data: holdByHour,
-        borderColor: '#fb923c',
-        backgroundColor: 'rgba(251, 146, 60, 0.15)',
-        fill: true,
-        tension: 0.3
-      }]);
-
-      // Chart 10: Calls Overflow
+      makeChart('chart-c1', 'line', hours24, [{ label: 'Answered', data: answeredByHour, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.15)', fill: true, tension: 0.3 }]);
+      makeChart('chart-c2', 'line', hours24, [{ label: 'Abnd. In CSAT', data: csatByHour, borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.15)', fill: true, tension: 0.3 }]);
+      makeChart('chart-c3', 'line', hours24, [{ label: 'Abnd. In Queue', data: queueByHour, borderColor: '#f43f5e', backgroundColor: 'rgba(244, 63, 94, 0.15)', fill: true, tension: 0.3 }]);
+      makeChart('chart-c4', 'line', hours24, [{ label: 'Abnd. On Hold', data: holdByHour, borderColor: '#fb923c', backgroundColor: 'rgba(251, 146, 60, 0.15)', fill: true, tension: 0.3 }]);
       makeChart('chart-c10', 'bar', hours24, [
         { label: 'Inbound Calls', data: overflowInboundByHour, backgroundColor: '#38bdf8' },
         { label: 'Tagged Convs', data: overflowTaggedByHour, backgroundColor: '#34d399' }
       ]);
 
-      // Chart 5: Team vs Answered & Abandons
       const teamLabels = t2Weekly.map(r => r['TEAM'] || 'Team');
       makeChart('chart-c5', 'bar', teamLabels, [
         { label: 'Answered', data: t2Weekly.map(r => cleanNum(r['ANSWERED'])), backgroundColor: '#10b981' },
@@ -1579,98 +1663,11 @@
         { label: 'Abnd Hold', data: t2Weekly.map(r => cleanNum(r['ABND. ON HOLD'])), backgroundColor: '#fb923c' }
       ]);
 
-      // Chart 6: Teammate vs Abnd Inbound
       const agentLabels = t3Weekly.map(r => r['TEAMMATE'] || 'Agent');
-      makeChart('chart-c6', 'bar', agentLabels, [{
-        label: 'Abnd. Inbound Calls',
-        data: t3Weekly.map(r => cleanNum(r['ABND. INBOUND CALLS'])),
-        backgroundColor: '#f43f5e'
-      }]);
-
-      // Chart 7: Teammate vs Answer Time
-      makeChart('chart-c7', 'bar', agentLabels, [{
-        label: 'Answer Time (Sec)',
-        data: t3Weekly.map(r => parseTimeSeconds(r['ANSWER TIME'])),
-        backgroundColor: '#eab308'
-      }]);
-
-      // Chart 8: Teammate vs Talk Time
-      makeChart('chart-c8', 'bar', agentLabels, [{
-        label: 'Talk Time (Min)',
-        data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))),
-        backgroundColor: '#06b6d4'
-      }]);
-
-      // Chart 9: Teammate vs Call Duration
-      makeChart('chart-c9', 'bar', agentLabels, [{
-        label: 'Call Duration (Min)',
-        data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))),
-        backgroundColor: '#a855f7'
-      }]);
-    }
-
-    function initUnifiedHourlyGrid() {
-      const grid = document.getElementById('unified-hourly-grid');
-      if (!grid) return;
-      grid.innerHTML = '';
-
-      const dayStoreKey = `notes_day_${currentSelectedDate}`;
-      const savedNotes = JSON.parse(localStorage.getItem(dayStoreKey) || '{}');
-
-      for (let h = 0; h < 24; h++) {
-        const hourStr = `${String(h).padStart(2, '0')}:00`;
-        const noteText = savedNotes[hourStr] || '';
-
-        const item = document.createElement('div');
-        item.className = 'bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1';
-        item.innerHTML = `
-          <div class="flex justify-between items-center text-[11px] font-bold text-amber-400">
-            <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>${hourStr}</span>
-            <span class="text-[10px] text-slate-500 font-mono">Interval #${h + 1}</span>
-          </div>
-          <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-800 focus:outline-none focus:border-amber-400">
-        `;
-        grid.appendChild(item);
-      }
-    }
-
-    function saveAllHourlyNotes() {
-      const dayStoreKey = `notes_day_${currentSelectedDate}`;
-      const notesObj = {};
-      document.querySelectorAll('.hourly-note-input').forEach(input => {
-        const hour = input.getAttribute('data-hour');
-        if (hour && input.value.trim()) {
-          notesObj[hour] = input.value.trim();
-        }
-      });
-
-      localStorage.setItem(dayStoreKey, JSON.stringify(notesObj));
-      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes for <strong>${currentSelectedDate}</strong> saved!`);
-    }
-
-    function loadSavedWeeklyInsights() {
-      const key = `insights_${selectedFilterWeek}`;
-      const saved = JSON.parse(localStorage.getItem(key) || '{}');
-      const ach = document.getElementById('insights-achievements');
-      const blk = document.getElementById('insights-blockers');
-      const act = document.getElementById('insights-actions');
-
-      if (ach) ach.value = saved.achievements || '';
-      if (blk) blk.value = saved.blockers || '';
-      if (act) act.value = saved.actions || '';
-    }
-
-    function saveWeeklyInsights() {
-      const key = `insights_${selectedFilterWeek}`;
-      const payload = {
-        achievements: document.getElementById('insights-achievements')?.value || '',
-        blockers: document.getElementById('insights-blockers')?.value || '',
-        actions: document.getElementById('insights-actions')?.value || '',
-        savedAt: new Date().toISOString()
-      };
-
-      localStorage.setItem(key, JSON.stringify(payload));
-      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights for <strong>${selectedFilterWeek}</strong> saved!`);
+      makeChart('chart-c6', 'bar', agentLabels, [{ label: 'Abnd. Inbound Calls', data: t3Weekly.map(r => cleanNum(r['ABND. INBOUND CALLS'])), backgroundColor: '#f43f5e' }]);
+      makeChart('chart-c7', 'bar', agentLabels, [{ label: 'Answer Time (Sec)', data: t3Weekly.map(r => parseTimeSeconds(r['ANSWER TIME'])), backgroundColor: '#eab308' }]);
+      makeChart('chart-c8', 'bar', agentLabels, [{ label: 'Talk Time (Min)', data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))), backgroundColor: '#06b6d4' }]);
+      makeChart('chart-c9', 'bar', agentLabels, [{ label: 'Call Duration (Min)', data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
     }
   </script>
 </body>
