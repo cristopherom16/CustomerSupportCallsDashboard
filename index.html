@@ -13,6 +13,10 @@
   <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Firebase SDKs Compat (Realtime Database) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -180,7 +184,7 @@
     </div>
   </div>
 
-  <!-- Bottom Right Fixed/Floating Button for Import Information -->
+  <!-- Floating Button for Import Information -->
   <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all">
     <i class="fa-solid fa-file-import text-sm"></i> Import Information
   </button>
@@ -450,7 +454,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-              <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables
+              <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables (Cloud Storage)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
               Paste data below from Excel or CSV.
@@ -484,28 +488,17 @@
             </div>
 
             <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95">
-              <i class="fa-solid fa-bolt text-xs"></i> Process & Save Week
+              <i class="fa-solid fa-cloud-arrow-up text-xs"></i> Save to Cloud
             </button>
           </div>
         </div>
 
-        <!-- Export & Import JSON Options for Sharing -->
         <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold text-slate-400">Stored Weeks:</span>
+            <span class="text-xs font-semibold text-slate-400">Cloud Stored Weeks:</span>
             <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
               <span class="text-xs text-slate-600 italic">None saved yet</span>
             </div>
-          </div>
-          
-          <div class="flex items-center gap-2">
-            <button onclick="exportDataJSON()" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 text-amber-400 border border-gold-600/30 hover:bg-slate-700 transition">
-              <i class="fa-solid fa-download mr-1"></i> Export Backup (JSON)
-            </button>
-            <label class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 text-amber-400 border border-gold-600/30 hover:bg-slate-700 transition cursor-pointer">
-              <i class="fa-solid fa-upload mr-1"></i> Import Backup (JSON)
-              <input type="file" id="file-import-json" accept=".json" onchange="importDataJSON(event)" class="hidden">
-            </label>
           </div>
         </div>
       </div>
@@ -614,22 +607,22 @@
   </main>
 
   <script>
-    // OPTIONAL: Puedes pegar tu objeto de datos predeterminado dentro de INITIAL_SEED_DATA.
-    // De esta manera, si un nuevo usuario abre el enlace sin datos guardados en su navegador,
-    // el tablero cargará automáticamente esta información.
-    const INITIAL_SEED_DATA = {
-      /* Ejemplo:
-      "Oct_Week 1": {
-        monthIndex: 9,
-        monthLabel: "Oct",
-        week: "Week 1",
-        table1: [ ... ],
-        table2: [ ... ],
-        table3: [ ... ],
-        table4: [ ... ]
-      }
-      */
+    // ----------------------------------------------------
+    // CREDENCIALES CONFIGURADAS
+    // ----------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
+      authDomain: "customersupportcallsdashboard.firebaseapp.com",
+      databaseURL: "https://customersupportcallsdashboard-default-rtdb.firebaseio.com",
+      projectId: "customersupportcallsdashboard",
+      storageBucket: "customersupportcallsdashboard.firebasestorage.app",
+      messagingSenderId: "778304348059",
+      appId: "1:778304348059:web:77ac60b41f287668ac0b3e",
+      measurementId: "G-1ZP68P7BB1"
     };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
     let appData = {
       table1: [],
@@ -638,6 +631,7 @@
       table4: []
     };
 
+    let rawWeeksStore = {};
     let selectedFilterWeek = 'Week 1';
     let currentSelectedDate = new Date().toISOString().split('T')[0];
     let selectedMonthIndex = new Date().getMonth();
@@ -645,75 +639,34 @@
 
     window.onload = function () {
       initDateControls();
-      loadAllWeeksFromStorage();
-      syncCurrentDateToSelectedWeek();
-      renderAllTables();
-      initUnifiedHourlyGrid();
-      loadSavedWeeklyInsights();
-      initAllCharts();
-      updateScopeLabels();
-      renderSavedWeeksBadges();
-      renderWeekDaysPills();
+      listenToFirebaseCloudData();
       checkAllFourTablesReady();
     };
 
-    function loadAllWeeksFromStorage() {
-      try {
-        let storeStr = localStorage.getItem('cs_dashboard_weeks_data');
-        if (!storeStr && Object.keys(INITIAL_SEED_DATA).length > 0) {
-          localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(INITIAL_SEED_DATA));
-          storeStr = JSON.stringify(INITIAL_SEED_DATA);
-        }
-
-        const store = JSON.parse(storeStr || '{}');
+    // Escucha en tiempo real de los datos en la Nube (Realtime Database)
+    function listenToFirebaseCloudData() {
+      db.ref("weeks_data").on("value", (snapshot) => {
+        rawWeeksStore = snapshot.val() || {};
         appData.table1 = [];
         appData.table2 = [];
         appData.table3 = [];
         appData.table4 = [];
 
-        Object.keys(store).forEach(key => {
-          const entry = store[key];
+        Object.keys(rawWeeksStore).forEach((key) => {
+          const entry = rawWeeksStore[key];
           if (entry.table1) appData.table1.push(...entry.table1);
           if (entry.table2) appData.table2.push(...entry.table2);
           if (entry.table3) appData.table3.push(...entry.table3);
           if (entry.table4) appData.table4.push(...entry.table4);
         });
-      } catch (e) {
-        console.error("Error loading storage:", e);
-      }
-    }
 
-    function exportDataJSON() {
-      const storeStr = localStorage.getItem('cs_dashboard_weeks_data') || '{}';
-      const blob = new Blob([storeStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `dashboard_data_backup_${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('<i class="fa-solid fa-download text-emerald-400 mr-2"></i>Backup file downloaded successfully!');
-    }
-
-    function importDataJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(parsed));
-          loadAllWeeksFromStorage();
-          syncCurrentDateToSelectedWeek();
-          handleDateNavigationUpdate();
-          renderSavedWeeksBadges();
-          showToast('<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Data imported successfully!');
-        } catch (err) {
-          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Invalid JSON file.');
-        }
-      };
-      reader.readAsText(file);
+        syncCurrentDateToSelectedWeek();
+        handleDateNavigationUpdate();
+        renderSavedWeeksBadges();
+      }, (error) => {
+        console.error("Firebase read error:", error);
+        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al leer la nube. Revisa las reglas.');
+      });
     }
 
     function showToast(msg) {
@@ -933,28 +886,27 @@
       if (!grid) return;
       grid.innerHTML = '';
 
-      const dayStoreKey = `notes_day_${currentSelectedDate}`;
-      const savedNotes = JSON.parse(localStorage.getItem(dayStoreKey) || '{}');
+      db.ref("daily_notes/" + currentSelectedDate).once("value").then((snapshot) => {
+        const savedNotes = snapshot.val() || {};
+        for (let h = 0; h < 24; h++) {
+          const hourStr = `${String(h).padStart(2, '0')}:00`;
+          const noteText = savedNotes[hourStr] || '';
 
-      for (let h = 0; h < 24; h++) {
-        const hourStr = `${String(h).padStart(2, '0')}:00`;
-        const noteText = savedNotes[hourStr] || '';
-
-        const item = document.createElement('div');
-        item.className = 'bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1';
-        item.innerHTML = `
-          <div class="flex justify-between items-center text-[11px] font-bold text-amber-400">
-            <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>${hourStr}</span>
-            <span class="text-[10px] text-slate-500 font-mono">Interval #${h + 1}</span>
-          </div>
-          <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-800 focus:outline-none focus:border-amber-400">
-        `;
-        grid.appendChild(item);
-      }
+          const item = document.createElement('div');
+          item.className = 'bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1';
+          item.innerHTML = `
+            <div class="flex justify-between items-center text-[11px] font-bold text-amber-400">
+              <span><i class="fa-regular fa-clock mr-1 text-slate-500"></i>${hourStr}</span>
+              <span class="text-[10px] text-slate-500 font-mono">Interval #${h + 1}</span>
+            </div>
+            <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-800 focus:outline-none focus:border-amber-400">
+          `;
+          grid.appendChild(item);
+        }
+      });
     }
 
     function saveAllHourlyNotes() {
-      const dayStoreKey = `notes_day_${currentSelectedDate}`;
       const notesObj = {};
       document.querySelectorAll('.hourly-note-input').forEach(input => {
         const hour = input.getAttribute('data-hour');
@@ -963,8 +915,11 @@
         }
       });
 
-      localStorage.setItem(dayStoreKey, JSON.stringify(notesObj));
-      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved for date <strong>${currentSelectedDate}</strong>!`);
+      db.ref("daily_notes/" + currentSelectedDate).set(notesObj)
+        .then(() => {
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved to Cloud for date <strong>${currentSelectedDate}</strong>!`);
+        })
+        .catch(err => console.error("Error saving notes:", err));
     }
 
     function generateAutomatedSlaRecommendations() {
@@ -1053,16 +1008,18 @@
       const currentMonthLabel = monthNames[selectedMonthIndex] || 'Oct';
       const key = `insights_${currentMonthLabel}_${selectedFilterWeek}`;
       
-      const saved = JSON.parse(localStorage.getItem(key) || '{}');
-      const ach = document.getElementById('insights-achievements');
-      const blk = document.getElementById('insights-blockers');
-      const act = document.getElementById('insights-actions');
+      db.ref("weekly_insights/" + key).once("value").then((snapshot) => {
+        const saved = snapshot.val() || {};
+        const ach = document.getElementById('insights-achievements');
+        const blk = document.getElementById('insights-blockers');
+        const act = document.getElementById('insights-actions');
 
-      if (ach) ach.value = saved.achievements || '';
-      if (blk) blk.value = saved.blockers || '';
+        if (ach) ach.value = saved.achievements || '';
+        if (blk) blk.value = saved.blockers || '';
 
-      const autoRecommendations = generateAutomatedSlaRecommendations();
-      if (act) act.value = autoRecommendations;
+        const autoRecommendations = generateAutomatedSlaRecommendations();
+        if (act) act.value = autoRecommendations;
+      });
     }
 
     function saveWeeklyInsights() {
@@ -1077,8 +1034,10 @@
         savedAt: new Date().toISOString()
       };
 
-      localStorage.setItem(key, JSON.stringify(payload));
-      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved for <strong>${selectedFilterWeek}</strong>!`);
+      db.ref("weekly_insights/" + key).set(payload)
+        .then(() => {
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved to Cloud for <strong>${selectedFilterWeek}</strong>!`);
+        });
     }
 
     function parseDelimitedTable(rawText) {
@@ -1384,52 +1343,53 @@
         savedAt: new Date().toISOString()
       };
 
-      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
-      localStore[storageKey] = weekPayload;
-      localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
+      // GUARDAR EN REALTIME DATABASE
+      db.ref("weeks_data/" + storageKey).set(weekPayload)
+        .then(() => {
+          selectedFilterWeek = targetWeek;
+          selectedMonthIndex = targetMonthIdx;
 
-      loadAllWeeksFromStorage();
+          if (detectedFirstDate) {
+            currentSelectedDate = detectedFirstDate;
+            const picker = document.getElementById('date-picker');
+            if (picker) picker.value = currentSelectedDate;
+          }
 
-      selectedFilterWeek = targetWeek;
-      selectedMonthIndex = targetMonthIdx;
+          ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+          });
 
-      if (detectedFirstDate) {
-        currentSelectedDate = detectedFirstDate;
-        const picker = document.getElementById('date-picker');
-        if (picker) picker.value = currentSelectedDate;
-      }
-
-      ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-
-      checkAllFourTablesReady();
-      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
-      switchTab('overview');
+          checkAllFourTablesReady();
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+          switchTab('overview');
+        })
+        .catch((error) => {
+          console.error("Error al guardar en Firebase:", error);
+          showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar los datos en la Nube.');
+        });
     }
 
     function renderSavedWeeksBadges() {
       const container = document.getElementById('saved-weeks-badges');
       if (!container) return;
       
-      const store = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
-      const keys = Object.keys(store).sort();
+      const keys = Object.keys(rawWeeksStore).sort();
 
       if (keys.length === 0) {
-        container.innerHTML = '<span class="text-xs text-slate-600 italic">None saved yet</span>';
+        container.innerHTML = '<span class="text-xs text-slate-600 italic">None saved in Cloud yet</span>';
         return;
       }
 
       container.innerHTML = '';
       keys.forEach(k => {
-        const entry = store[k];
+        const entry = rawWeeksStore[k];
         const displayLabel = entry.monthLabel && entry.week ? `${entry.monthLabel} - ${entry.week}` : k;
         const badge = document.createElement('div');
         badge.className = 'flex items-center gap-1.5 bg-slate-950 border border-gold-600/30 px-2.5 py-1 rounded-lg text-xs font-bold text-amber-300';
         badge.innerHTML = `
           <span class="cursor-pointer hover:underline" title="Click to view">${displayLabel}</span>
-          <button class="text-rose-400 hover:text-rose-300 ml-1" title="Delete">&times;</button>
+          <button class="text-rose-400 hover:text-rose-300 ml-1" title="Delete from Cloud">&times;</button>
         `;
 
         badge.querySelector('span').onclick = () => {
@@ -1457,12 +1417,11 @@
     }
 
     function deleteWeekData(storageKey) {
-      const localStore = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
-      delete localStore[storageKey];
-      localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(localStore));
-
-      loadAllWeeksFromStorage();
-      showToast(`Semana ${storageKey} eliminada.`);
+      db.ref("weeks_data/" + storageKey).remove()
+        .then(() => {
+          showToast(`Semana ${storageKey} eliminada de la Nube.`);
+        })
+        .catch(err => console.error("Error deleting from Cloud:", err));
     }
 
     function renderAllTables() {
