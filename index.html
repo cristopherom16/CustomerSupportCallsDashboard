@@ -66,8 +66,16 @@
     .gold-gradient-btn {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
-    .gold-gradient-btn:hover {
+    .gold-gradient-btn:hover:not(:disabled) {
       background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    }
+    .gold-gradient-btn:disabled {
+      background: #334155 !important;
+      color: #94a3b8 !important;
+      cursor: not-allowed !important;
+      opacity: 0.6;
+      box-shadow: none !important;
+      transform: none !important;
     }
   </style>
 </head>
@@ -457,7 +465,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables (Cloud Storage)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Paste data below from Excel or CSV.
+              Paste data below from Excel or CSV. Complete all 4 tables to enable processing.
             </p>
           </div>
 
@@ -487,7 +495,8 @@
               </select>
             </div>
 
-            <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95">
+            <!-- Botón de procesamiento bloqueado dinámicamente -->
+            <button id="btn-process-save-week" disabled onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 transition-all">
               <i class="fa-solid fa-bolt text-xs"></i> Process & Save Week
             </button>
           </div>
@@ -607,7 +616,7 @@
   </main>
 
   <script>
-    // CREDENCIALES DE FIREBASE REALTIME DATABASE
+    // CONFIGURACIÓN DE FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -1042,6 +1051,7 @@
         });
     }
 
+    // Parser robusto universal para Excel (TSV), CSV o listas delimitadas
     function parseDelimitedTable(rawText) {
       if (!rawText || !rawText.trim()) return [];
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
@@ -1071,7 +1081,6 @@
       return parsedRows;
     }
 
-    // Extracción posicional si los nombres de columna en Excel no coinciden exactamente
     function getNormalizedValue(row, cleanMap, aliases, fallbackIdx) {
       for (const alias of aliases) {
         const cleaned = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -1150,6 +1159,7 @@
       return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     }
 
+    // Verificar el estado de las 4 tablas y bloquear/habilitar el botón
     function checkAllFourTablesReady() {
       const t1 = (document.getElementById('paste-input-t1')?.value || '').trim();
       const t2 = (document.getElementById('paste-input-t2')?.value || '').trim();
@@ -1168,10 +1178,24 @@
         }
       };
 
-      updateBadge('badge-check-t1', t1.length > 0);
-      updateBadge('badge-check-t2', t2.length > 0);
-      updateBadge('badge-check-t3', t3.length > 0);
-      updateBadge('badge-check-t4', t4.length > 0);
+      const readyT1 = t1.length > 0;
+      const readyT2 = t2.length > 0;
+      const readyT3 = t3.length > 0;
+      const readyT4 = t4.length > 0;
+
+      updateBadge('badge-check-t1', readyT1);
+      updateBadge('badge-check-t2', readyT2);
+      updateBadge('badge-check-t3', readyT3);
+      updateBadge('badge-check-t4', readyT4);
+
+      const btn = document.getElementById('btn-process-save-week');
+      if (btn) {
+        if (readyT1 && readyT2 && readyT3 && readyT4) {
+          btn.removeAttribute('disabled');
+        } else {
+          btn.setAttribute('disabled', 'true');
+        }
+      }
     }
 
     function getFallbackDateForWeek(weekStr, dayOffset = 0, monthIdx = selectedMonthIndex) {
@@ -1184,15 +1208,15 @@
       return `${yr}-${m}-${d}`;
     }
 
-    // PROCESAR Y GUARDAR TABLAS
+    // PROCESAR Y GUARDAR TABLAS A FIREBASE
     function processAndSaveUnifiedWeek() {
       const t1Raw = document.getElementById('paste-input-t1')?.value || '';
       const t2Raw = document.getElementById('paste-input-t2')?.value || '';
       const t3Raw = document.getElementById('paste-input-t3')?.value || '';
       const t4Raw = document.getElementById('paste-input-t4')?.value || '';
 
-      if (!t1Raw.trim() && !t2Raw.trim() && !t3Raw.trim() && !t4Raw.trim()) {
-        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Por favor pega información antes de procesar.');
+      if (!t1Raw.trim() || !t2Raw.trim() || !t3Raw.trim() || !t4Raw.trim()) {
+        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Debes ingresar las 4 tablas para procesar.');
         return;
       }
 
@@ -1347,7 +1371,7 @@
         savedAt: new Date().toISOString()
       };
 
-      // Guardar directamente en Firebase
+      // Guardar directamente en la base de datos de Firebase
       db.ref("weeks_data/" + storageKey).set(weekPayload)
         .then(() => {
           selectedFilterWeek = targetWeek;
