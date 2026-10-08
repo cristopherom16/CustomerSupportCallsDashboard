@@ -1,4 +1,4 @@
-Axt-center text-slate-500 font-sans">No data available. Paste data in Import Information tab.</t<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -489,10 +489,23 @@ Axt-center text-slate-500 font-sans">No data available. Paste data in Import Inf
           </div>
         </div>
 
-        <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
-          <span class="text-xs font-semibold text-slate-400">Stored Weeks in Storage:</span>
-          <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
-            <span class="text-xs text-slate-600 italic">None saved yet</span>
+        <!-- Export & Import JSON Options for Sharing -->
+        <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-slate-400">Stored Weeks:</span>
+            <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
+              <span class="text-xs text-slate-600 italic">None saved yet</span>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <button onclick="exportDataJSON()" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 text-amber-400 border border-gold-600/30 hover:bg-slate-700 transition">
+              <i class="fa-solid fa-download mr-1"></i> Export Backup (JSON)
+            </button>
+            <label class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 text-amber-400 border border-gold-600/30 hover:bg-slate-700 transition cursor-pointer">
+              <i class="fa-solid fa-upload mr-1"></i> Import Backup (JSON)
+              <input type="file" id="file-import-json" accept=".json" onchange="importDataJSON(event)" class="hidden">
+            </label>
           </div>
         </div>
       </div>
@@ -601,6 +614,23 @@ Axt-center text-slate-500 font-sans">No data available. Paste data in Import Inf
   </main>
 
   <script>
+    // OPTIONAL: Puedes pegar tu objeto de datos predeterminado dentro de INITIAL_SEED_DATA.
+    // De esta manera, si un nuevo usuario abre el enlace sin datos guardados en su navegador,
+    // el tablero cargará automáticamente esta información.
+    const INITIAL_SEED_DATA = {
+      /* Ejemplo:
+      "Oct_Week 1": {
+        monthIndex: 9,
+        monthLabel: "Oct",
+        week: "Week 1",
+        table1: [ ... ],
+        table2: [ ... ],
+        table3: [ ... ],
+        table4: [ ... ]
+      }
+      */
+    };
+
     let appData = {
       table1: [],
       table2: [],
@@ -629,7 +659,13 @@ Axt-center text-slate-500 font-sans">No data available. Paste data in Import Inf
 
     function loadAllWeeksFromStorage() {
       try {
-        const store = JSON.parse(localStorage.getItem('cs_dashboard_weeks_data') || '{}');
+        let storeStr = localStorage.getItem('cs_dashboard_weeks_data');
+        if (!storeStr && Object.keys(INITIAL_SEED_DATA).length > 0) {
+          localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(INITIAL_SEED_DATA));
+          storeStr = JSON.stringify(INITIAL_SEED_DATA);
+        }
+
+        const store = JSON.parse(storeStr || '{}');
         appData.table1 = [];
         appData.table2 = [];
         appData.table3 = [];
@@ -643,8 +679,41 @@ Axt-center text-slate-500 font-sans">No data available. Paste data in Import Inf
           if (entry.table4) appData.table4.push(...entry.table4);
         });
       } catch (e) {
-        console.error("Error cargando almacenamiento:", e);
+        console.error("Error loading storage:", e);
       }
+    }
+
+    function exportDataJSON() {
+      const storeStr = localStorage.getItem('cs_dashboard_weeks_data') || '{}';
+      const blob = new Blob([storeStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dashboard_data_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('<i class="fa-solid fa-download text-emerald-400 mr-2"></i>Backup file downloaded successfully!');
+    }
+
+    function importDataJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          localStorage.setItem('cs_dashboard_weeks_data', JSON.stringify(parsed));
+          loadAllWeeksFromStorage();
+          syncCurrentDateToSelectedWeek();
+          handleDateNavigationUpdate();
+          renderSavedWeeksBadges();
+          showToast('<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Data imported successfully!');
+        } catch (err) {
+          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Invalid JSON file.');
+        }
+      };
+      reader.readAsText(file);
     }
 
     function showToast(msg) {
@@ -1430,7 +1499,7 @@ Axt-center text-slate-500 font-sans">No data available. Paste data in Import Inf
 
       const tb1 = document.getElementById('tbody-t1');
       if (t1Data.length === 0) {
-        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No records found for scope.</td></tr>';
+        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available. Paste data in Import Information tab.</td></tr>';
       } else {
         tb1.innerHTML = t1Data.map(r => `
           <tr class="hover:bg-slate-800/40">
