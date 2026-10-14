@@ -486,7 +486,7 @@
             </div>
 
             <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95">
-              <i class="fa-solid fa-cloud-arrow-up text-xs"></i> Save to Cloud
+              <i class="fa-solid fa-cloud-arrow-up text-xs"></i> Save & Process Week
             </button>
           </div>
         </div>
@@ -1105,9 +1105,9 @@
 
     function extractDatePart(str) {
       if (!str) return null;
-      const isoMatch = str.match(/\b\d{4}-\d{2}-\d{2}\b/);
+      const isoMatch = String(str).match(/\b\d{4}-\d{2}-\d{2}\b/);
       if (isoMatch) return isoMatch[0];
-      const slashMatch = str.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
+      const slashMatch = String(str).match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
       if (slashMatch) {
         const yr = slashMatch[3].length === 2 ? `20${slashMatch[3]}` : slashMatch[3];
         const m = slashMatch[1].padStart(2, '0');
@@ -1214,7 +1214,9 @@
       // TABLA 1
       t1Rows.forEach((rawRow) => {
         const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
+        Object.keys(rawRow).forEach(k => {
+          if (k !== '_rawValues') cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k];
+        });
 
         const dateHourStr = getNormalizedValue(rawRow, cleanMap, ['datehour', 'dateandhour', 'date', 'datetime', 'hour', 'interval', 'fecha', 'fechayhora'], 0) || '';
         let dPart = extractDatePart(dateHourStr);
@@ -1223,7 +1225,7 @@
         if (hourNum >= 0 && lastHourT1 >= 18 && hourNum <= 2 && !dPart) {
           dayStepT1++;
         }
-        lastHourT1 = hourNum;
+        if (hourNum >= 0) lastHourT1 = hourNum;
 
         if (dPart) {
           lastKnownDateT1 = dPart;
@@ -1237,11 +1239,11 @@
 
         newT1.push({
           'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-          'ABND. IN ROUTING': getNormalizedValue(rawRow, cleanMap, ['abndinrouting', 'abandonedinrouting', 'routing'], 1) ?? 0,
-          'ANSWERED': getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas', 'atendidas'], 2) ?? 0,
-          'ABND. IN CSAT RATING': getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 3) ?? 0,
-          'ABND. IN QUEUE': getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queue', 'cola'], 4) ?? 0,
-          'ANBD. ON HOLD': getNormalizedValue(rawRow, cleanMap, ['anbdonhold', 'abndonhold', 'hold', 'espera'], 5) ?? 0,
+          'ABND. IN ROUTING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinrouting', 'abandonedinrouting', 'routing'], 1)),
+          'ANSWERED': cleanNum(getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas', 'atendidas'], 2)),
+          'ABND. IN CSAT RATING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 3)),
+          'ABND. IN QUEUE': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queue', 'cola'], 4)),
+          'ANBD. ON HOLD': cleanNum(getNormalizedValue(rawRow, cleanMap, ['anbdonhold', 'abndonhold', 'hold', 'espera'], 5)),
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel,
@@ -1253,15 +1255,17 @@
       // TABLA 2
       t2Rows.forEach(rawRow => {
         const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
+        Object.keys(rawRow).forEach(k => {
+          if (k !== '_rawValues') cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k];
+        });
 
         const teamName = getNormalizedValue(rawRow, cleanMap, ['team', 'queuename', 'queue', 'group', 'cola', 'equipo'], 0) || 'Team';
         newT2.push({
           'TEAM': String(teamName).trim(),
-          'ANSWERED': getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas'], 1) ?? 0,
-          'ABND. IN CSAT RATING': getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 2) ?? 0,
-          'ABND. IN QUEUE': getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queueabnd'], 3) ?? 0,
-          'ABND. ON HOLD': getNormalizedValue(rawRow, cleanMap, ['abndonhold', 'anbdonhold', 'hold'], 4) ?? 0,
+          'ANSWERED': cleanNum(getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas'], 1)),
+          'ABND. IN CSAT RATING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 2)),
+          'ABND. IN QUEUE': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queueabnd'], 3)),
+          'ABND. ON HOLD': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndonhold', 'anbdonhold', 'hold'], 4)),
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel
@@ -1271,19 +1275,21 @@
       // TABLA 3
       t3Rows.forEach(rawRow => {
         const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
+        Object.keys(rawRow).forEach(k => {
+          if (k !== '_rawValues') cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k];
+        });
 
         const agentName = getNormalizedValue(rawRow, cleanMap, ['teammate', 'agent', 'agentname', 'name', 'employee', 'agente'], 0) || 'Agent';
         newT3.push({
           'TEAMMATE': String(agentName).trim(),
-          'INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1) ?? 0,
-          'OUTBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['outboundcalls', 'outbound', 'salientes'], 2) ?? 0,
-          'ABND. INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['abndinboundcalls', 'abandonedinbound', 'abndinbound'], 3) ?? 0,
+          'INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1)),
+          'OUTBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['outboundcalls', 'outbound', 'salientes'], 2)),
+          'ABND. INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinboundcalls', 'abandonedinbound', 'abndinbound'], 3)),
           'ANSWER TIME': getNormalizedValue(rawRow, cleanMap, ['answertime', 'avganswertime', 'ansspeed'], 4) || '00:15',
           'TALK TIME': getNormalizedValue(rawRow, cleanMap, ['talktime', 'avgtalktime'], 5) || '03:30',
           'CALL DURATION': getNormalizedValue(rawRow, cleanMap, ['callduration', 'duration'], 6) || '04:15',
           'AVERAGE HOLD TIME': getNormalizedValue(rawRow, cleanMap, ['averageholdtime', 'avgtime', 'holdtime'], 7) || '00:25',
-          'DAYS ATTENDED (OUT OF 5)': getNormalizedValue(rawRow, cleanMap, ['daysattendedoutof5', 'daysattended', 'days', 'dias'], 8) ?? 5,
+          'DAYS ATTENDED (OUT OF 5)': cleanNum(getNormalizedValue(rawRow, cleanMap, ['daysattendedoutof5', 'daysattended', 'days', 'dias'], 8)) || 5,
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel
@@ -1297,7 +1303,9 @@
 
       t4Rows.forEach(rawRow => {
         const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
+        Object.keys(rawRow).forEach(k => {
+          if (k !== '_rawValues') cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k];
+        });
 
         const dateHourStr = getNormalizedValue(rawRow, cleanMap, ['datehour', 'dateandhour', 'date', 'datetime', 'hour', 'interval', 'fecha'], 0) || '';
         let dPart = extractDatePart(dateHourStr);
@@ -1306,7 +1314,7 @@
         if (hourNum >= 0 && lastHourT4 >= 18 && hourNum <= 2 && !dPart) {
           dayStepT4++;
         }
-        lastHourT4 = hourNum;
+        if (hourNum >= 0) lastHourT4 = hourNum;
 
         if (dPart) {
           lastKnownDateT4 = dPart;
@@ -1320,8 +1328,8 @@
 
         newT4.push({
           'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-          'INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1) ?? 0,
-          'TAGGED CONVERSATIONS': getNormalizedValue(rawRow, cleanMap, ['taggedconversations', 'tagged', 'conversations', 'etiquetadas'], 2) ?? 0,
+          'INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1)),
+          'TAGGED CONVERSATIONS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['taggedconversations', 'tagged', 'conversations', 'etiquetadas'], 2)),
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel,
@@ -1341,30 +1349,50 @@
         savedAt: new Date().toISOString()
       };
 
+      // ACTUALIZAR ESTADO LOCAL Y PROCESAR
+      rawWeeksStore[storageKey] = weekPayload;
+      appData.table1 = [];
+      appData.table2 = [];
+      appData.table3 = [];
+      appData.table4 = [];
+
+      Object.keys(rawWeeksStore).forEach((key) => {
+        const entry = rawWeeksStore[key];
+        if (entry.table1) appData.table1.push(...entry.table1);
+        if (entry.table2) appData.table2.push(...entry.table2);
+        if (entry.table3) appData.table3.push(...entry.table3);
+        if (entry.table4) appData.table4.push(...entry.table4);
+      });
+
+      selectedFilterWeek = targetWeek;
+      selectedMonthIndex = targetMonthIdx;
+
+      if (detectedFirstDate) {
+        currentSelectedDate = detectedFirstDate;
+        const picker = document.getElementById('date-picker');
+        if (picker) picker.value = currentSelectedDate;
+      }
+
+      // RENDERIZAR VISTAS Y REFRESCAR TABLAS/GRÁFICOS
+      syncCurrentDateToSelectedWeek();
+      handleDateNavigationUpdate();
+
       // GUARDAR EN REALTIME DATABASE
       db.ref("weeks_data/" + storageKey).set(weekPayload)
         .then(() => {
-          selectedFilterWeek = targetWeek;
-          selectedMonthIndex = targetMonthIdx;
-
-          if (detectedFirstDate) {
-            currentSelectedDate = detectedFirstDate;
-            const picker = document.getElementById('date-picker');
-            if (picker) picker.value = currentSelectedDate;
-          }
-
           ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
           });
 
           checkAllFourTablesReady();
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información procesada y guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
           switchTab('overview');
         })
         .catch((error) => {
           console.error("Error al guardar en Firebase:", error);
-          showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar los datos en la Nube.');
+          showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Se procesó localmente pero hubo error al sincronizar en la Nube.');
+          switchTab('overview');
         });
     }
 
