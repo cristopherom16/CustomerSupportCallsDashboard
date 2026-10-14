@@ -652,10 +652,22 @@
 
         Object.keys(rawWeeksStore).forEach((key) => {
           const entry = rawWeeksStore[key];
-          if (entry.table1) appData.table1.push(...entry.table1);
-          if (entry.table2) appData.table2.push(...entry.table2);
-          if (entry.table3) appData.table3.push(...entry.table3);
-          if (entry.table4) appData.table4.push(...entry.table4);
+          // Inyectamos _monthIndex y _week explícitos en cada registro al cargar desde Firebase
+          const mIdx = entry.monthIndex !== undefined ? Number(entry.monthIndex) : selectedMonthIndex;
+          const wStr = entry.week || selectedFilterWeek;
+
+          if (entry.table1) {
+            appData.table1.push(...entry.table1.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+          }
+          if (entry.table2) {
+            appData.table2.push(...entry.table2.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+          }
+          if (entry.table3) {
+            appData.table3.push(...entry.table3.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+          }
+          if (entry.table4) {
+            appData.table4.push(...entry.table4.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+          }
         });
 
         syncCurrentDateToSelectedWeek();
@@ -720,12 +732,12 @@
     function syncCurrentDateToSelectedWeek() {
       let weekDates = [];
       if (selectedFilterWeek === 'all') {
-        const d1 = appData.table1.map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => r._monthIndex === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._monthIndex === selectedMonthIndex).map(r => r._date).filter(Boolean);
         weekDates = [...new Set([...d1, ...d4])].sort();
       } else {
-        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
         weekDates = [...new Set([...d1, ...d4])].sort();
       }
 
@@ -778,12 +790,12 @@
 
       let availableDates = [];
       if (selectedFilterWeek === 'all') {
-        const d1 = appData.table1.map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
         availableDates = [...new Set([...d1, ...d4])].sort();
       } else {
-        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
         availableDates = [...new Set([...d1, ...d4])].sort();
       }
 
@@ -921,10 +933,10 @@
     }
 
     function generateAutomatedSlaRecommendations() {
-      const t1Weekly = appData.table1.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
-      const t2Weekly = appData.table2.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
-      const t3Weekly = appData.table3.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
-      const t4Weekly = appData.table4.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
+      const t1Weekly = appData.table1.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && Number(r._monthIndex) === selectedMonthIndex);
+      const t2Weekly = appData.table2.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && Number(r._monthIndex) === selectedMonthIndex);
+      const t3Weekly = appData.table3.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && Number(r._monthIndex) === selectedMonthIndex);
+      const t4Weekly = appData.table4.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && Number(r._monthIndex) === selectedMonthIndex);
 
       if (t1Weekly.length === 0 && t2Weekly.length === 0 && t3Weekly.length === 0) {
         return "No operational data imported for this week yet. Please import weekly tables to generate dynamic SLA recommendations.";
@@ -1358,10 +1370,13 @@
 
       Object.keys(rawWeeksStore).forEach((key) => {
         const entry = rawWeeksStore[key];
-        if (entry.table1) appData.table1.push(...entry.table1);
-        if (entry.table2) appData.table2.push(...entry.table2);
-        if (entry.table3) appData.table3.push(...entry.table3);
-        if (entry.table4) appData.table4.push(...entry.table4);
+        const mIdx = Number(entry.monthIndex);
+        const wStr = entry.week;
+
+        if (entry.table1) appData.table1.push(...entry.table1.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+        if (entry.table2) appData.table2.push(...entry.table2.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+        if (entry.table3) appData.table3.push(...entry.table3.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+        if (entry.table4) appData.table4.push(...entry.table4.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
       });
 
       selectedFilterWeek = targetWeek;
@@ -1420,7 +1435,7 @@
 
         badge.querySelector('span').onclick = () => {
           if (entry.monthIndex !== undefined) {
-            selectedMonthIndex = entry.monthIndex;
+            selectedMonthIndex = Number(entry.monthIndex);
             const headerMonthSelect = document.getElementById('header-month-select');
             if (headerMonthSelect) headerMonthSelect.value = selectedMonthIndex;
           }
@@ -1453,26 +1468,26 @@
     function renderAllTables() {
       const t1Data = appData.table1.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
+        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
         const matchDate = !r._date || r._date === currentSelectedDate;
         return matchWeek && matchMonth && matchDate;
       });
 
       const t2Data = appData.table2.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
+        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
         return matchWeek && matchMonth;
       });
 
       const t3Data = appData.table3.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
+        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
         return matchWeek && matchMonth;
       });
 
       const t4Data = appData.table4.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
+        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
         const matchDate = !r._date || r._date === currentSelectedDate;
         return matchWeek && matchMonth && matchDate;
       });
@@ -1576,27 +1591,27 @@
 
       const t1Daily = appData.table1.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
+        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
         const matchDate = !r._date || r._date === currentSelectedDate;
         return matchWeek && matchMonth && matchDate;
       });
 
       const t4Daily = appData.table4.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
+        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
         const matchDate = !r._date || r._date === currentSelectedDate;
         return matchWeek && matchMonth && matchDate;
       });
 
       const t2Weekly = appData.table2.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
+        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
         return matchWeek && matchMonth;
       });
 
       const t3Weekly = appData.table3.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
+        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
         return matchWeek && matchMonth;
       });
 
