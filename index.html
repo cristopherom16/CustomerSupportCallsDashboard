@@ -77,7 +77,7 @@
   <header class="bg-slate-900/90 border-b border-gold-600/30 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3 transition-all">
     <div class="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-4">
       
-      <!-- Brand & Custom Logo -->
+      <!-- Brand & Custom Icon -->
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-gold-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <i class="fa-solid fa-headset text-xl text-amber-400"></i>
@@ -486,7 +486,7 @@
             </div>
 
             <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95">
-              <i class="fa-solid fa-cloud-arrow-up text-xs"></i> Save & Process Week
+              <i class="fa-solid fa-cloud-arrow-up text-xs"></i> Save to Cloud
             </button>
           </div>
         </div>
@@ -606,7 +606,7 @@
 
   <script>
     // ----------------------------------------------------
-    // CREDENCIALES CONFIGURADAS Y DUAL STORAGE
+    // CREDENCIALES CONFIGURADAS
     // ----------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
@@ -637,73 +637,33 @@
 
     window.onload = function () {
       initDateControls();
-      loadFromLocalStorage(); // Carga de respaldo inmediata
       listenToFirebaseCloudData();
       checkAllFourTablesReady();
     };
 
-    function loadFromLocalStorage() {
-      try {
-        const localData = localStorage.getItem('cs_rawWeeksStore');
-        if (localData) {
-          rawWeeksStore = JSON.parse(localData);
-          rebuildAppDataFromWeeksStore();
-          syncCurrentDateToSelectedWeek();
-          handleDateNavigationUpdate();
-          renderSavedWeeksBadges();
-        }
-      } catch (e) {
-        console.error("Local storage error:", e);
-      }
-    }
-
-    function saveToLocalStorage() {
-      try {
-        localStorage.setItem('cs_rawWeeksStore', JSON.stringify(rawWeeksStore));
-      } catch (e) {
-        console.error("Local storage save error:", e);
-      }
-    }
-
+    // Escucha en tiempo real de los datos en la Nube (Realtime Database)
     function listenToFirebaseCloudData() {
       db.ref("weeks_data").on("value", (snapshot) => {
-        const cloudVal = snapshot.val();
-        if (cloudVal && Object.keys(cloudVal).length > 0) {
-          rawWeeksStore = cloudVal;
-          saveToLocalStorage();
-        }
-        rebuildAppDataFromWeeksStore();
+        rawWeeksStore = snapshot.val() || {};
+        appData.table1 = [];
+        appData.table2 = [];
+        appData.table3 = [];
+        appData.table4 = [];
+
+        Object.keys(rawWeeksStore).forEach((key) => {
+          const entry = rawWeeksStore[key];
+          if (entry.table1) appData.table1.push(...entry.table1);
+          if (entry.table2) appData.table2.push(...entry.table2);
+          if (entry.table3) appData.table3.push(...entry.table3);
+          if (entry.table4) appData.table4.push(...entry.table4);
+        });
+
         syncCurrentDateToSelectedWeek();
         handleDateNavigationUpdate();
         renderSavedWeeksBadges();
       }, (error) => {
-        console.warn("Firebase sync fallback to LocalStorage:", error);
-      });
-    }
-
-    function rebuildAppDataFromWeeksStore() {
-      appData.table1 = [];
-      appData.table2 = [];
-      appData.table3 = [];
-      appData.table4 = [];
-
-      Object.keys(rawWeeksStore).forEach((key) => {
-        const entry = rawWeeksStore[key];
-        const mIdx = entry.monthIndex !== undefined ? Number(entry.monthIndex) : selectedMonthIndex;
-        const wStr = entry.week || selectedFilterWeek;
-
-        if (entry.table1) {
-          appData.table1.push(...entry.table1.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-        }
-        if (entry.table2) {
-          appData.table2.push(...entry.table2.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-        }
-        if (entry.table3) {
-          appData.table3.push(...entry.table3.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-        }
-        if (entry.table4) {
-          appData.table4.push(...entry.table4.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-        }
+        console.error("Firebase read error:", error);
+        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al leer la nube. Revisa las reglas.');
       });
     }
 
@@ -760,12 +720,12 @@
     function syncCurrentDateToSelectedWeek() {
       let weekDates = [];
       if (selectedFilterWeek === 'all') {
-        const d1 = appData.table1.filter(r => Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.filter(r => Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.map(r => r._date).filter(Boolean);
         weekDates = [...new Set([...d1, ...d4])].sort();
       } else {
-        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
         weekDates = [...new Set([...d1, ...d4])].sort();
       }
 
@@ -818,12 +778,12 @@
 
       let availableDates = [];
       if (selectedFilterWeek === 'all') {
-        const d1 = appData.table1.filter(r => Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.filter(r => Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.map(r => r._date).filter(Boolean);
         availableDates = [...new Set([...d1, ...d4])].sort();
       } else {
-        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
         availableDates = [...new Set([...d1, ...d4])].sort();
       }
 
@@ -955,16 +915,16 @@
 
       db.ref("daily_notes/" + currentSelectedDate).set(notesObj)
         .then(() => {
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved for date <strong>${currentSelectedDate}</strong>!`);
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved to Cloud for date <strong>${currentSelectedDate}</strong>!`);
         })
         .catch(err => console.error("Error saving notes:", err));
     }
 
     function generateAutomatedSlaRecommendations() {
-      const t1Weekly = appData.table1.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && Number(r._monthIndex) === selectedMonthIndex);
-      const t2Weekly = appData.table2.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && Number(r._monthIndex) === selectedMonthIndex);
-      const t3Weekly = appData.table3.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && Number(r._monthIndex) === selectedMonthIndex);
-      const t4Weekly = appData.table4.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && Number(r._monthIndex) === selectedMonthIndex);
+      const t1Weekly = appData.table1.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
+      const t2Weekly = appData.table2.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
+      const t3Weekly = appData.table3.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
+      const t4Weekly = appData.table4.filter(r => (selectedFilterWeek === 'all' || r._week === selectedFilterWeek) && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex));
 
       if (t1Weekly.length === 0 && t2Weekly.length === 0 && t3Weekly.length === 0) {
         return "No operational data imported for this week yet. Please import weekly tables to generate dynamic SLA recommendations.";
@@ -1074,7 +1034,7 @@
 
       db.ref("weekly_insights/" + key).set(payload)
         .then(() => {
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved for <strong>${selectedFilterWeek}</strong>!`);
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved to Cloud for <strong>${selectedFilterWeek}</strong>!`);
         });
     }
 
@@ -1145,9 +1105,9 @@
 
     function extractDatePart(str) {
       if (!str) return null;
-      const isoMatch = String(str).match(/\b\d{4}-\d{2}-\d{2}\b/);
+      const isoMatch = str.match(/\b\d{4}-\d{2}-\d{2}\b/);
       if (isoMatch) return isoMatch[0];
-      const slashMatch = String(str).match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
+      const slashMatch = str.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
       if (slashMatch) {
         const yr = slashMatch[3].length === 2 ? `20${slashMatch[3]}` : slashMatch[3];
         const m = slashMatch[1].padStart(2, '0');
@@ -1254,9 +1214,7 @@
       // TABLA 1
       t1Rows.forEach((rawRow) => {
         const cleanMap = {};
-        Object.keys(rawRow).forEach(k => {
-          if (k !== '_rawValues') cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k];
-        });
+        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
 
         const dateHourStr = getNormalizedValue(rawRow, cleanMap, ['datehour', 'dateandhour', 'date', 'datetime', 'hour', 'interval', 'fecha', 'fechayhora'], 0) || '';
         let dPart = extractDatePart(dateHourStr);
@@ -1265,7 +1223,7 @@
         if (hourNum >= 0 && lastHourT1 >= 18 && hourNum <= 2 && !dPart) {
           dayStepT1++;
         }
-        if (hourNum >= 0) lastHourT1 = hourNum;
+        lastHourT1 = hourNum;
 
         if (dPart) {
           lastKnownDateT1 = dPart;
@@ -1279,11 +1237,11 @@
 
         newT1.push({
           'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-          'ABND. IN ROUTING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinrouting', 'abandonedinrouting', 'routing'], 1)),
-          'ANSWERED': cleanNum(getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas', 'atendidas'], 2)),
-          'ABND. IN CSAT RATING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 3)),
-          'ABND. IN QUEUE': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queue', 'cola'], 4)),
-          'ANBD. ON HOLD': cleanNum(getNormalizedValue(rawRow, cleanMap, ['anbdonhold', 'abndonhold', 'hold', 'espera'], 5)),
+          'ABND. IN ROUTING': getNormalizedValue(rawRow, cleanMap, ['abndinrouting', 'abandonedinrouting', 'routing'], 1) ?? 0,
+          'ANSWERED': getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas', 'atendidas'], 2) ?? 0,
+          'ABND. IN CSAT RATING': getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 3) ?? 0,
+          'ABND. IN QUEUE': getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queue', 'cola'], 4) ?? 0,
+          'ANBD. ON HOLD': getNormalizedValue(rawRow, cleanMap, ['anbdonhold', 'abndonhold', 'hold', 'espera'], 5) ?? 0,
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel,
@@ -1295,17 +1253,15 @@
       // TABLA 2
       t2Rows.forEach(rawRow => {
         const cleanMap = {};
-        Object.keys(rawRow).forEach(k => {
-          if (k !== '_rawValues') cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k];
-        });
+        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
 
         const teamName = getNormalizedValue(rawRow, cleanMap, ['team', 'queuename', 'queue', 'group', 'cola', 'equipo'], 0) || 'Team';
         newT2.push({
           'TEAM': String(teamName).trim(),
-          'ANSWERED': cleanNum(getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas'], 1)),
-          'ABND. IN CSAT RATING': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 2)),
-          'ABND. IN QUEUE': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queueabnd'], 3)),
-          'ABND. ON HOLD': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndonhold', 'anbdonhold', 'hold'], 4)),
+          'ANSWERED': getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas'], 1) ?? 0,
+          'ABND. IN CSAT RATING': getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 2) ?? 0,
+          'ABND. IN QUEUE': getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queueabnd'], 3) ?? 0,
+          'ABND. ON HOLD': getNormalizedValue(rawRow, cleanMap, ['abndonhold', 'anbdonhold', 'hold'], 4) ?? 0,
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel
@@ -1315,21 +1271,19 @@
       // TABLA 3
       t3Rows.forEach(rawRow => {
         const cleanMap = {};
-        Object.keys(rawRow).forEach(k => {
-          if (k !== '_rawValues') cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k];
-        });
+        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
 
         const agentName = getNormalizedValue(rawRow, cleanMap, ['teammate', 'agent', 'agentname', 'name', 'employee', 'agente'], 0) || 'Agent';
         newT3.push({
           'TEAMMATE': String(agentName).trim(),
-          'INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1)),
-          'OUTBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['outboundcalls', 'outbound', 'salientes'], 2)),
-          'ABND. INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['abndinboundcalls', 'abandonedinbound', 'abndinbound'], 3)),
+          'INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1) ?? 0,
+          'OUTBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['outboundcalls', 'outbound', 'salientes'], 2) ?? 0,
+          'ABND. INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['abndinboundcalls', 'abandonedinbound', 'abndinbound'], 3) ?? 0,
           'ANSWER TIME': getNormalizedValue(rawRow, cleanMap, ['answertime', 'avganswertime', 'ansspeed'], 4) || '00:15',
           'TALK TIME': getNormalizedValue(rawRow, cleanMap, ['talktime', 'avgtalktime'], 5) || '03:30',
           'CALL DURATION': getNormalizedValue(rawRow, cleanMap, ['callduration', 'duration'], 6) || '04:15',
           'AVERAGE HOLD TIME': getNormalizedValue(rawRow, cleanMap, ['averageholdtime', 'avgtime', 'holdtime'], 7) || '00:25',
-          'DAYS ATTENDED (OUT OF 5)': cleanNum(getNormalizedValue(rawRow, cleanMap, ['daysattendedoutof5', 'daysattended', 'days', 'dias'], 8)) || 5,
+          'DAYS ATTENDED (OUT OF 5)': getNormalizedValue(rawRow, cleanMap, ['daysattendedoutof5', 'daysattended', 'days', 'dias'], 8) ?? 5,
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel
@@ -1343,9 +1297,7 @@
 
       t4Rows.forEach(rawRow => {
         const cleanMap = {};
-        Object.keys(rawRow).forEach(k => {
-          if (k !== '_rawValues') cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k];
-        });
+        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
 
         const dateHourStr = getNormalizedValue(rawRow, cleanMap, ['datehour', 'dateandhour', 'date', 'datetime', 'hour', 'interval', 'fecha'], 0) || '';
         let dPart = extractDatePart(dateHourStr);
@@ -1354,7 +1306,7 @@
         if (hourNum >= 0 && lastHourT4 >= 18 && hourNum <= 2 && !dPart) {
           dayStepT4++;
         }
-        if (hourNum >= 0) lastHourT4 = hourNum;
+        lastHourT4 = hourNum;
 
         if (dPart) {
           lastKnownDateT4 = dPart;
@@ -1368,8 +1320,8 @@
 
         newT4.push({
           'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-          'INBOUND CALLS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1)),
-          'TAGGED CONVERSATIONS': cleanNum(getNormalizedValue(rawRow, cleanMap, ['taggedconversations', 'tagged', 'conversations', 'etiquetadas'], 2)),
+          'INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1) ?? 0,
+          'TAGGED CONVERSATIONS': getNormalizedValue(rawRow, cleanMap, ['taggedconversations', 'tagged', 'conversations', 'etiquetadas'], 2) ?? 0,
           '_week': targetWeek,
           '_monthIndex': targetMonthIdx,
           '_monthLabel': targetMonthLabel,
@@ -1389,40 +1341,30 @@
         savedAt: new Date().toISOString()
       };
 
-      // GUARDA EN ALMACENAMIENTO LOCAL Y RECONSTRUYE
-      rawWeeksStore[storageKey] = weekPayload;
-      saveToLocalStorage();
-      rebuildAppDataFromWeeksStore();
-
-      selectedFilterWeek = targetWeek;
-      selectedMonthIndex = targetMonthIdx;
-
-      if (detectedFirstDate) {
-        currentSelectedDate = detectedFirstDate;
-        const picker = document.getElementById('date-picker');
-        if (picker) picker.value = currentSelectedDate;
-      }
-
-      // REFRESCAR UI
-      syncCurrentDateToSelectedWeek();
-      handleDateNavigationUpdate();
-
-      // INTENTO DE GUARDADO EN FIREBASE
+      // GUARDAR EN REALTIME DATABASE
       db.ref("weeks_data/" + storageKey).set(weekPayload)
         .then(() => {
+          selectedFilterWeek = targetWeek;
+          selectedMonthIndex = targetMonthIdx;
+
+          if (detectedFirstDate) {
+            currentSelectedDate = detectedFirstDate;
+            const picker = document.getElementById('date-picker');
+            if (picker) picker.value = currentSelectedDate;
+          }
+
           ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
           });
 
           checkAllFourTablesReady();
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
           switchTab('overview');
         })
         .catch((error) => {
-          console.error("Firebase Sync Error:", error);
-          showToast('<i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Guardado localmente. Revisa permisos de Firebase si deseas sincro global.');
-          switchTab('overview');
+          console.error("Error al guardar en Firebase:", error);
+          showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar los datos en la Nube.');
         });
     }
 
@@ -1433,7 +1375,7 @@
       const keys = Object.keys(rawWeeksStore).sort();
 
       if (keys.length === 0) {
-        container.innerHTML = '<span class="text-xs text-slate-600 italic">None saved yet</span>';
+        container.innerHTML = '<span class="text-xs text-slate-600 italic">None saved in Cloud yet</span>';
         return;
       }
 
@@ -1445,12 +1387,12 @@
         badge.className = 'flex items-center gap-1.5 bg-slate-950 border border-gold-600/30 px-2.5 py-1 rounded-lg text-xs font-bold text-amber-300';
         badge.innerHTML = `
           <span class="cursor-pointer hover:underline" title="Click to view">${displayLabel}</span>
-          <button class="text-rose-400 hover:text-rose-300 ml-1" title="Delete Week">&times;</button>
+          <button class="text-rose-400 hover:text-rose-300 ml-1" title="Delete from Cloud">&times;</button>
         `;
 
         badge.querySelector('span').onclick = () => {
           if (entry.monthIndex !== undefined) {
-            selectedMonthIndex = Number(entry.monthIndex);
+            selectedMonthIndex = entry.monthIndex;
             const headerMonthSelect = document.getElementById('header-month-select');
             if (headerMonthSelect) headerMonthSelect.value = selectedMonthIndex;
           }
@@ -1473,15 +1415,9 @@
     }
 
     function deleteWeekData(storageKey) {
-      delete rawWeeksStore[storageKey];
-      saveToLocalStorage();
-      rebuildAppDataFromWeeksStore();
-      handleDateNavigationUpdate();
-      renderSavedWeeksBadges();
-
       db.ref("weeks_data/" + storageKey).remove()
         .then(() => {
-          showToast(`Semana ${storageKey} eliminada.`);
+          showToast(`Semana ${storageKey} eliminada de la Nube.`);
         })
         .catch(err => console.error("Error deleting from Cloud:", err));
     }
@@ -1489,26 +1425,26 @@
     function renderAllTables() {
       const t1Data = appData.table1.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
+        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
         const matchDate = !r._date || r._date === currentSelectedDate;
         return matchWeek && matchMonth && matchDate;
       });
 
       const t2Data = appData.table2.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
+        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
         return matchWeek && matchMonth;
       });
 
       const t3Data = appData.table3.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
+        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
         return matchWeek && matchMonth;
       });
 
       const t4Data = appData.table4.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
+        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
         const matchDate = !r._date || r._date === currentSelectedDate;
         return matchWeek && matchMonth && matchDate;
       });
@@ -1612,27 +1548,27 @@
 
       const t1Daily = appData.table1.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
+        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
         const matchDate = !r._date || r._date === currentSelectedDate;
         return matchWeek && matchMonth && matchDate;
       });
 
       const t4Daily = appData.table4.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
+        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
         const matchDate = !r._date || r._date === currentSelectedDate;
         return matchWeek && matchMonth && matchDate;
       });
 
       const t2Weekly = appData.table2.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
+        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
         return matchWeek && matchMonth;
       });
 
       const t3Weekly = appData.table3.filter(r => {
         const matchWeek = selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-        const matchMonth = Number(r._monthIndex) === selectedMonthIndex;
+        const matchMonth = r._monthIndex === undefined || r._monthIndex === selectedMonthIndex;
         return matchWeek && matchMonth;
       });
 
