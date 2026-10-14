@@ -13,7 +13,7 @@
   <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Firebase SDKs Compat (Realtime Database) -->
+  <!-- Firebase SDKs Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -77,10 +77,12 @@
   <header class="bg-slate-900/90 border-b border-gold-600/30 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3 transition-all">
     <div class="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-4">
       
-      <!-- Brand & Custom Icon -->
+      <!-- Brand & Custom Logo -->
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-gold-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
-          <i class="fa-solid fa-headset text-xl text-amber-400"></i>
+          <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 15 82 L 29 18 L 43 18 L 40.3 43 L 59.7 43 L 57 18 L 71 18 L 85 82 L 64 82 L 61.3 57 L 38.7 57 L 36 82 Z" fill="#FAC815" />
+          </svg>
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-black tracking-wider text-amber-400 uppercase leading-none">
@@ -164,8 +166,6 @@
   <!-- Main View Navigation & Quick Days Pills -->
   <div class="bg-slate-900/60 border-b border-slate-800 px-4 lg:px-8 py-3">
     <div class="max-w-[1700px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-      
-      <!-- Tabs: Overview & Charts, Notes & Insights -->
       <div class="flex flex-col gap-2 w-full md:w-64">
         <button id="tab-btn-overview" onclick="switchTab('overview')" class="w-full px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition">
           <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
@@ -175,9 +175,7 @@
         </button>
       </div>
 
-      <!-- Quick Day Nav Pills -->
       <div id="week-days-pills" class="flex flex-wrap items-center gap-1.5 py-1 self-start md:self-center">
-        <!-- Injected via JavaScript -->
       </div>
     </div>
   </div>
@@ -486,7 +484,7 @@
             </div>
 
             <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95">
-              <i class="fa-solid fa-cloud-arrow-up text-xs"></i> Save to Cloud
+              <i class="fa-solid fa-bolt text-xs"></i> Process & Save Week
             </button>
           </div>
         </div>
@@ -495,7 +493,7 @@
           <div class="flex items-center gap-2">
             <span class="text-xs font-semibold text-slate-400">Cloud Stored Weeks:</span>
             <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
-              <span class="text-xs text-slate-600 italic">None saved yet</span>
+              <span class="text-xs text-slate-600 italic">None saved in Cloud yet</span>
             </div>
           </div>
         </div>
@@ -605,9 +603,7 @@
   </main>
 
   <script>
-    // ----------------------------------------------------
-    // CREDENCIALES CONFIGURADAS
-    // ----------------------------------------------------
+    // CONFIGURACIÓN FIREBASE REALTIME DATABASE
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -619,7 +615,12 @@
       measurementId: "G-1ZP68P7BB1"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+      console.error("Firebase init error:", e);
+    }
+    
     const db = firebase.database();
 
     let appData = {
@@ -641,7 +642,6 @@
       checkAllFourTablesReady();
     };
 
-    // Escucha en tiempo real de los datos en la Nube (Realtime Database)
     function listenToFirebaseCloudData() {
       db.ref("weeks_data").on("value", (snapshot) => {
         rawWeeksStore = snapshot.val() || {};
@@ -662,8 +662,7 @@
         handleDateNavigationUpdate();
         renderSavedWeeksBadges();
       }, (error) => {
-        console.error("Firebase read error:", error);
-        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al leer la nube. Revisa las reglas.');
+        console.error("Firebase error:", error);
       });
     }
 
@@ -1038,16 +1037,17 @@
         });
     }
 
+    // Parser universal para copiar y pegar desde Excel/CSV
     function parseDelimitedTable(rawText) {
       if (!rawText || !rawText.trim()) return [];
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length < 1) return [];
 
       const delimiter = rawText.includes('\t') ? '\t' : (rawText.includes(',') ? ',' : ';');
-      const firstLineTokens = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
       
+      const firstLineTokens = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
       const isHeaderRow = isNaN(parseFloat(firstLineTokens[1])) && isNaN(parseFloat(firstLineTokens[firstLineTokens.length - 1]));
-      const headers = isHeaderRow ? firstLineTokens : firstLineTokens.map((_, i) => `col_${i}`);
+      
       const startIndex = isHeaderRow ? 1 : 0;
       const parsedRows = [];
 
@@ -1056,30 +1056,14 @@
         if (!lineStr) continue;
 
         const vals = lineStr.split(delimiter).map(v => v.trim().replace(/^"|"$/g, ''));
-        if (!vals.some(v => v.length > 0)) continue;
-
-        const row = { _rawValues: vals };
-        headers.forEach((h, idx) => {
-          row[h] = vals[idx] !== undefined ? vals[idx] : '';
-        });
-        parsedRows.push(row);
+        if (vals.length > 0 && vals.some(v => v !== '')) {
+          parsedRows.push(vals);
+        }
       }
       return parsedRows;
     }
 
-    function getNormalizedValue(row, cleanMap, aliases, fallbackIdx) {
-      for (const alias of aliases) {
-        const cleaned = alias.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (cleanMap[cleaned] !== undefined && cleanMap[cleaned] !== '') {
-          return cleanMap[cleaned];
-        }
-      }
-      if (row._rawValues && row._rawValues[fallbackIdx] !== undefined) {
-        return row._rawValues[fallbackIdx];
-      }
-      return undefined;
-    }
-
+    // Limpiador estricto para evitar ceros corruptos o NaN en Firebase
     function cleanNum(val) {
       if (val === null || val === undefined || val === '') return 0;
       if (typeof val === 'number') return isNaN(val) ? 0 : val;
@@ -1105,9 +1089,9 @@
 
     function extractDatePart(str) {
       if (!str) return null;
-      const isoMatch = str.match(/\b\d{4}-\d{2}-\d{2}\b/);
+      const isoMatch = String(str).match(/\b\d{4}-\d{2}-\d{2}\b/);
       if (isoMatch) return isoMatch[0];
-      const slashMatch = str.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
+      const slashMatch = String(str).match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
       if (slashMatch) {
         const yr = slashMatch[3].length === 2 ? `20${slashMatch[3]}` : slashMatch[3];
         const m = slashMatch[1].padStart(2, '0');
@@ -1179,193 +1163,193 @@
       return `${yr}-${m}-${d}`;
     }
 
+    // PROCESAMIENTO Y GUARDADO TOTALMENTE SANITIZADO
     function processAndSaveUnifiedWeek() {
-      const t1Raw = document.getElementById('paste-input-t1')?.value || '';
-      const t2Raw = document.getElementById('paste-input-t2')?.value || '';
-      const t3Raw = document.getElementById('paste-input-t3')?.value || '';
-      const t4Raw = document.getElementById('paste-input-t4')?.value || '';
+      try {
+        const t1Raw = document.getElementById('paste-input-t1')?.value || '';
+        const t2Raw = document.getElementById('paste-input-t2')?.value || '';
+        const t3Raw = document.getElementById('paste-input-t3')?.value || '';
+        const t4Raw = document.getElementById('paste-input-t4')?.value || '';
 
-      if (!t1Raw.trim() && !t2Raw.trim() && !t3Raw.trim() && !t4Raw.trim()) {
-        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Por favor pega información antes de procesar.');
-        return;
-      }
+        const t1Rows = parseDelimitedTable(t1Raw);
+        const t2Rows = parseDelimitedTable(t2Raw);
+        const t3Rows = parseDelimitedTable(t3Raw);
+        const t4Rows = parseDelimitedTable(t4Raw);
 
-      const t1Rows = parseDelimitedTable(t1Raw);
-      const t2Rows = parseDelimitedTable(t2Raw);
-      const t3Rows = parseDelimitedTable(t3Raw);
-      const t4Rows = parseDelimitedTable(t4Raw);
-
-      const targetWeek = document.getElementById('target-week-select').value;
-      const targetMonthIdx = parseInt(document.getElementById('target-month-select')?.value ?? selectedMonthIndex, 10);
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const targetMonthLabel = monthNames[targetMonthIdx] || 'Month';
-      const storageKey = `${targetMonthLabel}_${targetWeek}`;
-
-      const newT1 = [];
-      const newT2 = [];
-      const newT3 = [];
-      const newT4 = [];
-
-      let detectedFirstDate = null;
-      let lastKnownDateT1 = '';
-      let dayStepT1 = 0;
-      let lastHourT1 = -1;
-
-      // TABLA 1
-      t1Rows.forEach((rawRow) => {
-        const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
-
-        const dateHourStr = getNormalizedValue(rawRow, cleanMap, ['datehour', 'dateandhour', 'date', 'datetime', 'hour', 'interval', 'fecha', 'fechayhora'], 0) || '';
-        let dPart = extractDatePart(dateHourStr);
-        const hourNum = extractHourNumber(dateHourStr);
-
-        if (hourNum >= 0 && lastHourT1 >= 18 && hourNum <= 2 && !dPart) {
-          dayStepT1++;
-        }
-        lastHourT1 = hourNum;
-
-        if (dPart) {
-          lastKnownDateT1 = dPart;
-        } else if (lastKnownDateT1) {
-          dPart = lastKnownDateT1;
-        } else {
-          dPart = getFallbackDateForWeek(targetWeek, dayStepT1, targetMonthIdx);
+        if (t1Rows.length === 0 && t2Rows.length === 0 && t3Rows.length === 0 && t4Rows.length === 0) {
+          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Por favor pega información en los cuadros antes de procesar.');
+          return;
         }
 
-        if (dPart && !detectedFirstDate) detectedFirstDate = dPart;
+        const targetWeek = document.getElementById('target-week-select').value;
+        const targetMonthIdx = parseInt(document.getElementById('target-month-select')?.value ?? selectedMonthIndex, 10);
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const targetMonthLabel = monthNames[targetMonthIdx] || 'Month';
+        const storageKey = `${targetMonthLabel}_${targetWeek}`;
 
-        newT1.push({
-          'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-          'ABND. IN ROUTING': getNormalizedValue(rawRow, cleanMap, ['abndinrouting', 'abandonedinrouting', 'routing'], 1) ?? 0,
-          'ANSWERED': getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas', 'atendidas'], 2) ?? 0,
-          'ABND. IN CSAT RATING': getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 3) ?? 0,
-          'ABND. IN QUEUE': getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queue', 'cola'], 4) ?? 0,
-          'ANBD. ON HOLD': getNormalizedValue(rawRow, cleanMap, ['anbdonhold', 'abndonhold', 'hold', 'espera'], 5) ?? 0,
-          '_week': targetWeek,
-          '_monthIndex': targetMonthIdx,
-          '_monthLabel': targetMonthLabel,
-          '_date': dPart,
-          '_hour': hourNum
-        });
-      });
+        const newT1 = [];
+        const newT2 = [];
+        const newT3 = [];
+        const newT4 = [];
 
-      // TABLA 2
-      t2Rows.forEach(rawRow => {
-        const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
+        let detectedFirstDate = null;
+        let lastKnownDateT1 = '';
+        let dayStepT1 = 0;
+        let lastHourT1 = -1;
 
-        const teamName = getNormalizedValue(rawRow, cleanMap, ['team', 'queuename', 'queue', 'group', 'cola', 'equipo'], 0) || 'Team';
-        newT2.push({
-          'TEAM': String(teamName).trim(),
-          'ANSWERED': getNormalizedValue(rawRow, cleanMap, ['answered', 'ans', 'contestadas'], 1) ?? 0,
-          'ABND. IN CSAT RATING': getNormalizedValue(rawRow, cleanMap, ['abndincsatrating', 'abndincsat', 'csat'], 2) ?? 0,
-          'ABND. IN QUEUE': getNormalizedValue(rawRow, cleanMap, ['abndinqueue', 'queueabnd'], 3) ?? 0,
-          'ABND. ON HOLD': getNormalizedValue(rawRow, cleanMap, ['abndonhold', 'anbdonhold', 'hold'], 4) ?? 0,
-          '_week': targetWeek,
-          '_monthIndex': targetMonthIdx,
-          '_monthLabel': targetMonthLabel
-        });
-      });
+        // TABLA 1 (Campos sanitizados para Firebase)
+        t1Rows.forEach((rowVals) => {
+          const dateHourStr = rowVals[0] || '';
+          let dPart = extractDatePart(dateHourStr);
+          const hourNum = extractHourNumber(dateHourStr);
 
-      // TABLA 3
-      t3Rows.forEach(rawRow => {
-        const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
+          if (hourNum >= 0 && lastHourT1 >= 18 && hourNum <= 2 && !dPart) {
+            dayStepT1++;
+          }
+          if (hourNum >= 0) lastHourT1 = hourNum;
 
-        const agentName = getNormalizedValue(rawRow, cleanMap, ['teammate', 'agent', 'agentname', 'name', 'employee', 'agente'], 0) || 'Agent';
-        newT3.push({
-          'TEAMMATE': String(agentName).trim(),
-          'INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1) ?? 0,
-          'OUTBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['outboundcalls', 'outbound', 'salientes'], 2) ?? 0,
-          'ABND. INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['abndinboundcalls', 'abandonedinbound', 'abndinbound'], 3) ?? 0,
-          'ANSWER TIME': getNormalizedValue(rawRow, cleanMap, ['answertime', 'avganswertime', 'ansspeed'], 4) || '00:15',
-          'TALK TIME': getNormalizedValue(rawRow, cleanMap, ['talktime', 'avgtalktime'], 5) || '03:30',
-          'CALL DURATION': getNormalizedValue(rawRow, cleanMap, ['callduration', 'duration'], 6) || '04:15',
-          'AVERAGE HOLD TIME': getNormalizedValue(rawRow, cleanMap, ['averageholdtime', 'avgtime', 'holdtime'], 7) || '00:25',
-          'DAYS ATTENDED (OUT OF 5)': getNormalizedValue(rawRow, cleanMap, ['daysattendedoutof5', 'daysattended', 'days', 'dias'], 8) ?? 5,
-          '_week': targetWeek,
-          '_monthIndex': targetMonthIdx,
-          '_monthLabel': targetMonthLabel
-        });
-      });
-
-      // TABLA 4
-      let lastKnownDateT4 = detectedFirstDate || '';
-      let dayStepT4 = 0;
-      let lastHourT4 = -1;
-
-      t4Rows.forEach(rawRow => {
-        const cleanMap = {};
-        Object.keys(rawRow).forEach(k => cleanMap[k.toLowerCase().replace(/[^a-z0-9]/g, '')] = rawRow[k]);
-
-        const dateHourStr = getNormalizedValue(rawRow, cleanMap, ['datehour', 'dateandhour', 'date', 'datetime', 'hour', 'interval', 'fecha'], 0) || '';
-        let dPart = extractDatePart(dateHourStr);
-        const hourNum = extractHourNumber(dateHourStr);
-
-        if (hourNum >= 0 && lastHourT4 >= 18 && hourNum <= 2 && !dPart) {
-          dayStepT4++;
-        }
-        lastHourT4 = hourNum;
-
-        if (dPart) {
-          lastKnownDateT4 = dPart;
-        } else if (lastKnownDateT4) {
-          dPart = lastKnownDateT4;
-        } else {
-          dPart = getFallbackDateForWeek(targetWeek, dayStepT4, targetMonthIdx);
-        }
-
-        if (dPart && !detectedFirstDate) detectedFirstDate = dPart;
-
-        newT4.push({
-          'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-          'INBOUND CALLS': getNormalizedValue(rawRow, cleanMap, ['inboundcalls', 'inbound', 'entrantes'], 1) ?? 0,
-          'TAGGED CONVERSATIONS': getNormalizedValue(rawRow, cleanMap, ['taggedconversations', 'tagged', 'conversations', 'etiquetadas'], 2) ?? 0,
-          '_week': targetWeek,
-          '_monthIndex': targetMonthIdx,
-          '_monthLabel': targetMonthLabel,
-          '_date': dPart,
-          '_hour': hourNum
-        });
-      });
-
-      const weekPayload = {
-        monthIndex: targetMonthIdx,
-        monthLabel: targetMonthLabel,
-        week: targetWeek,
-        table1: newT1,
-        table2: newT2,
-        table3: newT3,
-        table4: newT4,
-        savedAt: new Date().toISOString()
-      };
-
-      // GUARDAR EN REALTIME DATABASE
-      db.ref("weeks_data/" + storageKey).set(weekPayload)
-        .then(() => {
-          selectedFilterWeek = targetWeek;
-          selectedMonthIndex = targetMonthIdx;
-
-          if (detectedFirstDate) {
-            currentSelectedDate = detectedFirstDate;
-            const picker = document.getElementById('date-picker');
-            if (picker) picker.value = currentSelectedDate;
+          if (dPart) {
+            lastKnownDateT1 = dPart;
+          } else if (lastKnownDateT1) {
+            dPart = lastKnownDateT1;
+          } else {
+            dPart = getFallbackDateForWeek(targetWeek, dayStepT1, targetMonthIdx);
           }
 
-          ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
+          if (dPart && !detectedFirstDate) detectedFirstDate = dPart;
+
+          newT1.push({
+            'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
+            'ABND IN ROUTING': cleanNum(rowVals[1]),
+            'ANSWERED': cleanNum(rowVals[2]),
+            'ABND IN CSAT RATING': cleanNum(rowVals[3]),
+            'ABND IN QUEUE': cleanNum(rowVals[4]),
+            'ANBD ON HOLD': cleanNum(rowVals[5]),
+            '_week': targetWeek,
+            '_monthIndex': targetMonthIdx,
+            '_monthLabel': targetMonthLabel,
+            '_date': dPart,
+            '_hour': hourNum >= 0 ? hourNum : 0
+          });
+        });
+
+        // TABLA 2
+        t2Rows.forEach(rowVals => {
+          newT2.push({
+            'TEAM': String(rowVals[0] || 'Team').trim(),
+            'ANSWERED': cleanNum(rowVals[1]),
+            'ABND IN CSAT RATING': cleanNum(rowVals[2]),
+            'ABND IN QUEUE': cleanNum(rowVals[3]),
+            'ABND ON HOLD': cleanNum(rowVals[4]),
+            '_week': targetWeek,
+            '_monthIndex': targetMonthIdx,
+            '_monthLabel': targetMonthLabel
+          });
+        });
+
+        // TABLA 3
+        t3Rows.forEach(rowVals => {
+          newT3.push({
+            'TEAMMATE': String(rowVals[0] || 'Agent').trim(),
+            'INBOUND CALLS': cleanNum(rowVals[1]),
+            'OUTBOUND CALLS': cleanNum(rowVals[2]),
+            'ABND INBOUND CALLS': cleanNum(rowVals[3]),
+            'ANSWER TIME': rowVals[4] || '00:15',
+            'TALK TIME': rowVals[5] || '03:30',
+            'CALL DURATION': rowVals[6] || '04:15',
+            'AVERAGE HOLD TIME': rowVals[7] || '00:25',
+            'DAYS ATTENDED OUT OF 5': cleanNum(rowVals[8]) || 5,
+            '_week': targetWeek,
+            '_monthIndex': targetMonthIdx,
+            '_monthLabel': targetMonthLabel
+          });
+        });
+
+        // TABLA 4
+        let lastKnownDateT4 = detectedFirstDate || '';
+        let dayStepT4 = 0;
+        let lastHourT4 = -1;
+
+        t4Rows.forEach(rowVals => {
+          const dateHourStr = rowVals[0] || '';
+          let dPart = extractDatePart(dateHourStr);
+          const hourNum = extractHourNumber(dateHourStr);
+
+          if (hourNum >= 0 && lastHourT4 >= 18 && hourNum <= 2 && !dPart) {
+            dayStepT4++;
+          }
+          if (hourNum >= 0) lastHourT4 = hourNum;
+
+          if (dPart) {
+            lastKnownDateT4 = dPart;
+          } else if (lastKnownDateT4) {
+            dPart = lastKnownDateT4;
+          } else {
+            dPart = getFallbackDateForWeek(targetWeek, dayStepT4, targetMonthIdx);
+          }
+
+          if (dPart && !detectedFirstDate) detectedFirstDate = dPart;
+
+          newT4.push({
+            'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
+            'INBOUND CALLS': cleanNum(rowVals[1]),
+            'TAGGED CONVERSATIONS': cleanNum(rowVals[2]),
+            '_week': targetWeek,
+            '_monthIndex': targetMonthIdx,
+            '_monthLabel': targetMonthLabel,
+            '_date': dPart,
+            '_hour': hourNum >= 0 ? hourNum : 0
+          });
+        });
+
+        const weekPayload = {
+          monthIndex: targetMonthIdx,
+          monthLabel: targetMonthLabel,
+          week: targetWeek,
+          table1: newT1,
+          table2: newT2,
+          table3: newT3,
+          table4: newT4,
+          savedAt: new Date().toISOString()
+        };
+
+        // 1. Guardar en memoria local e inmediatamente enviar a Firebase Realtime Database
+        rawWeeksStore[storageKey] = weekPayload;
+
+        db.ref("weeks_data/" + storageKey).set(weekPayload)
+          .then(() => {
+            selectedFilterWeek = targetWeek;
+            selectedMonthIndex = targetMonthIdx;
+
+            if (detectedFirstDate) {
+              currentSelectedDate = detectedFirstDate;
+              const picker = document.getElementById('date-picker');
+              if (picker) picker.value = currentSelectedDate;
+            }
+
+            // Limpiar cajas
+            ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+            });
+
+            syncCurrentDateToSelectedWeek();
+            handleDateNavigationUpdate();
+            renderSavedWeeksBadges();
+            checkAllFourTablesReady();
+
+            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+            switchTab('overview');
+          })
+          .catch((error) => {
+            console.error("Error al enviar a Firebase:", error);
+            showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar en Firebase: ' + error.message);
           });
 
-          checkAllFourTablesReady();
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
-          switchTab('overview');
-        })
-        .catch((error) => {
-          console.error("Error al guardar en Firebase:", error);
-          showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar los datos en la Nube.');
-        });
+      } catch (err) {
+        console.error("Error en processAndSaveUnifiedWeek:", err);
+        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al procesar: ' + err.message);
+      }
     }
 
     function renderSavedWeeksBadges() {
@@ -1415,11 +1399,12 @@
     }
 
     function deleteWeekData(storageKey) {
+      delete rawWeeksStore[storageKey];
       db.ref("weeks_data/" + storageKey).remove()
         .then(() => {
           showToast(`Semana ${storageKey} eliminada de la Nube.`);
         })
-        .catch(err => console.error("Error deleting from Cloud:", err));
+        .catch(err => console.error("Error deleting:", err));
     }
 
     function renderAllTables() {
@@ -1461,11 +1446,11 @@
         tb1.innerHTML = t1Data.map(r => `
           <tr class="hover:bg-slate-800/40">
             <td class="p-2.5 text-amber-300">${r['DATE & HOUR'] || '--'}</td>
-            <td class="p-2.5">${r['ABND. IN ROUTING'] ?? 0}</td>
+            <td class="p-2.5">${r['ABND IN ROUTING'] ?? 0}</td>
             <td class="p-2.5 text-emerald-400 font-bold">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300">${r['ABND. IN CSAT RATING'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold">${r['ABND. IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400">${r['ANBD. ON HOLD'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300">${r['ABND IN CSAT RATING'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="p-2.5 text-orange-400">${r['ANBD ON HOLD'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -1478,9 +1463,9 @@
           <tr class="hover:bg-slate-800/40">
             <td class="p-2.5 font-bold text-amber-300 font-sans">${r['TEAM'] || '--'}</td>
             <td class="p-2.5 text-emerald-400 font-bold">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300">${r['ABND. IN CSAT RATING'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold">${r['ABND. IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400">${r['ABND. ON HOLD'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300">${r['ABND IN CSAT RATING'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="p-2.5 text-orange-400">${r['ABND ON HOLD'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -1494,12 +1479,12 @@
             <td class="p-2.5 font-bold text-slate-200 font-sans">${r['TEAMMATE'] || '--'}</td>
             <td class="p-2.5 text-sky-400">${r['INBOUND CALLS'] ?? 0}</td>
             <td class="p-2.5">${r['OUTBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold">${r['ABND. INBOUND CALLS'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold">${r['ABND INBOUND CALLS'] ?? 0}</td>
             <td class="p-2.5 text-amber-300">${r['ANSWER TIME'] || '--'}</td>
             <td class="p-2.5">${r['TALK TIME'] || '--'}</td>
             <td class="p-2.5 text-emerald-400">${r['CALL DURATION'] || '--'}</td>
             <td class="p-2.5 text-orange-400">${r['AVERAGE HOLD TIME'] || '--'}</td>
-            <td class="p-2.5 font-sans">${r['DAYS ATTENDED (OUT OF 5)'] ?? 5}</td>
+            <td class="p-2.5 font-sans">${r['DAYS ATTENDED OUT OF 5'] ?? 5}</td>
           </tr>
         `).join('');
       }
@@ -1518,9 +1503,9 @@
       }
 
       const sumAnswered = t1Data.reduce((acc, r) => acc + cleanNum(r['ANSWERED']), 0);
-      const sumAbndQueue = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND. IN QUEUE']), 0);
-      const sumAbndCsat = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND. IN CSAT RATING']), 0);
-      const sumAbndHold = t1Data.reduce((acc, r) => acc + cleanNum(r['ANBD. ON HOLD']), 0);
+      const sumAbndQueue = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND IN QUEUE']), 0);
+      const sumAbndCsat = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND IN CSAT RATING']), 0);
+      const sumAbndHold = t1Data.reduce((acc, r) => acc + cleanNum(r['ANBD ON HOLD']), 0);
       const sumInbound = t3Data.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0) + t4Data.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0);
       const sumTagged = t4Data.reduce((acc, r) => acc + cleanNum(r['TAGGED CONVERSATIONS']), 0);
 
@@ -1581,9 +1566,9 @@
         const h = r._hour >= 0 && r._hour < 24 ? r._hour : extractHourNumber(r['DATE & HOUR']);
         if (h >= 0 && h < 24) {
           answeredByHour[h] += cleanNum(r['ANSWERED']);
-          csatByHour[h] += cleanNum(r['ABND. IN CSAT RATING']);
-          queueByHour[h] += cleanNum(r['ABND. IN QUEUE']);
-          holdByHour[h] += cleanNum(r['ANBD. ON HOLD']);
+          csatByHour[h] += cleanNum(r['ABND IN CSAT RATING']);
+          queueByHour[h] += cleanNum(r['ABND IN QUEUE']);
+          holdByHour[h] += cleanNum(r['ANBD ON HOLD']);
         }
       });
 
@@ -1640,13 +1625,13 @@
       const teamLabels = t2Weekly.map(r => r['TEAM'] || 'Team');
       makeChart('chart-c5', 'bar', teamLabels, [
         { label: 'Answered', data: t2Weekly.map(r => cleanNum(r['ANSWERED'])), backgroundColor: '#10b981' },
-        { label: 'Abnd CSAT', data: t2Weekly.map(r => cleanNum(r['ABND. IN CSAT RATING'])), backgroundColor: '#facc15' },
-        { label: 'Abnd Queue', data: t2Weekly.map(r => cleanNum(r['ABND. IN QUEUE'])), backgroundColor: '#f43f5e' },
-        { label: 'Abnd Hold', data: t2Weekly.map(r => cleanNum(r['ABND. ON HOLD'])), backgroundColor: '#fb923c' }
+        { label: 'Abnd CSAT', data: t2Weekly.map(r => cleanNum(r['ABND IN CSAT RATING'])), backgroundColor: '#facc15' },
+        { label: 'Abnd Queue', data: t2Weekly.map(r => cleanNum(r['ABND IN QUEUE'])), backgroundColor: '#f43f5e' },
+        { label: 'Abnd Hold', data: t2Weekly.map(r => cleanNum(r['ABND ON HOLD'])), backgroundColor: '#fb923c' }
       ]);
 
       const agentLabels = t3Weekly.map(r => r['TEAMMATE'] || 'Agent');
-      makeChart('chart-c6', 'bar', agentLabels, [{ label: 'Abnd. Inbound Calls', data: t3Weekly.map(r => cleanNum(r['ABND. INBOUND CALLS'])), backgroundColor: '#f43f5e' }]);
+      makeChart('chart-c6', 'bar', agentLabels, [{ label: 'Abnd. Inbound Calls', data: t3Weekly.map(r => cleanNum(r['ABND INBOUND CALLS'])), backgroundColor: '#f43f5e' }]);
       makeChart('chart-c7', 'bar', agentLabels, [{ label: 'Answer Time (Sec)', data: t3Weekly.map(r => parseTimeSeconds(r['ANSWER TIME'])), backgroundColor: '#eab308' }]);
       makeChart('chart-c8', 'bar', agentLabels, [{ label: 'Talk Time (Min)', data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))), backgroundColor: '#06b6d4' }]);
       makeChart('chart-c9', 'bar', agentLabels, [{ label: 'Call Duration (Min)', data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
