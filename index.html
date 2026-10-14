@@ -606,7 +606,7 @@
 
   <script>
     // ----------------------------------------------------
-    // CREDENCIALES CONFIGURADAS
+    // CREDENCIALES CONFIGURADAS Y DUAL STORAGE
     // ----------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
@@ -637,45 +637,73 @@
 
     window.onload = function () {
       initDateControls();
+      loadFromLocalStorage(); // Carga de respaldo inmediata
       listenToFirebaseCloudData();
       checkAllFourTablesReady();
     };
 
-    // Escucha en tiempo real de los datos en la Nube (Realtime Database)
+    function loadFromLocalStorage() {
+      try {
+        const localData = localStorage.getItem('cs_rawWeeksStore');
+        if (localData) {
+          rawWeeksStore = JSON.parse(localData);
+          rebuildAppDataFromWeeksStore();
+          syncCurrentDateToSelectedWeek();
+          handleDateNavigationUpdate();
+          renderSavedWeeksBadges();
+        }
+      } catch (e) {
+        console.error("Local storage error:", e);
+      }
+    }
+
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem('cs_rawWeeksStore', JSON.stringify(rawWeeksStore));
+      } catch (e) {
+        console.error("Local storage save error:", e);
+      }
+    }
+
     function listenToFirebaseCloudData() {
       db.ref("weeks_data").on("value", (snapshot) => {
-        rawWeeksStore = snapshot.val() || {};
-        appData.table1 = [];
-        appData.table2 = [];
-        appData.table3 = [];
-        appData.table4 = [];
-
-        Object.keys(rawWeeksStore).forEach((key) => {
-          const entry = rawWeeksStore[key];
-          // Inyectamos _monthIndex y _week explícitos en cada registro al cargar desde Firebase
-          const mIdx = entry.monthIndex !== undefined ? Number(entry.monthIndex) : selectedMonthIndex;
-          const wStr = entry.week || selectedFilterWeek;
-
-          if (entry.table1) {
-            appData.table1.push(...entry.table1.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-          }
-          if (entry.table2) {
-            appData.table2.push(...entry.table2.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-          }
-          if (entry.table3) {
-            appData.table3.push(...entry.table3.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-          }
-          if (entry.table4) {
-            appData.table4.push(...entry.table4.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-          }
-        });
-
+        const cloudVal = snapshot.val();
+        if (cloudVal && Object.keys(cloudVal).length > 0) {
+          rawWeeksStore = cloudVal;
+          saveToLocalStorage();
+        }
+        rebuildAppDataFromWeeksStore();
         syncCurrentDateToSelectedWeek();
         handleDateNavigationUpdate();
         renderSavedWeeksBadges();
       }, (error) => {
-        console.error("Firebase read error:", error);
-        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al leer la nube. Revisa las reglas.');
+        console.warn("Firebase sync fallback to LocalStorage:", error);
+      });
+    }
+
+    function rebuildAppDataFromWeeksStore() {
+      appData.table1 = [];
+      appData.table2 = [];
+      appData.table3 = [];
+      appData.table4 = [];
+
+      Object.keys(rawWeeksStore).forEach((key) => {
+        const entry = rawWeeksStore[key];
+        const mIdx = entry.monthIndex !== undefined ? Number(entry.monthIndex) : selectedMonthIndex;
+        const wStr = entry.week || selectedFilterWeek;
+
+        if (entry.table1) {
+          appData.table1.push(...entry.table1.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+        }
+        if (entry.table2) {
+          appData.table2.push(...entry.table2.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+        }
+        if (entry.table3) {
+          appData.table3.push(...entry.table3.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+        }
+        if (entry.table4) {
+          appData.table4.push(...entry.table4.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
+        }
       });
     }
 
@@ -732,8 +760,8 @@
     function syncCurrentDateToSelectedWeek() {
       let weekDates = [];
       if (selectedFilterWeek === 'all') {
-        const d1 = appData.table1.filter(r => r._monthIndex === selectedMonthIndex).map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.filter(r => r._monthIndex === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
         weekDates = [...new Set([...d1, ...d4])].sort();
       } else {
         const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && Number(r._monthIndex) === selectedMonthIndex).map(r => r._date).filter(Boolean);
@@ -927,7 +955,7 @@
 
       db.ref("daily_notes/" + currentSelectedDate).set(notesObj)
         .then(() => {
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved to Cloud for date <strong>${currentSelectedDate}</strong>!`);
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved for date <strong>${currentSelectedDate}</strong>!`);
         })
         .catch(err => console.error("Error saving notes:", err));
     }
@@ -1046,7 +1074,7 @@
 
       db.ref("weekly_insights/" + key).set(payload)
         .then(() => {
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved to Cloud for <strong>${selectedFilterWeek}</strong>!`);
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved for <strong>${selectedFilterWeek}</strong>!`);
         });
     }
 
@@ -1361,23 +1389,10 @@
         savedAt: new Date().toISOString()
       };
 
-      // ACTUALIZAR ESTADO LOCAL Y PROCESAR
+      // GUARDA EN ALMACENAMIENTO LOCAL Y RECONSTRUYE
       rawWeeksStore[storageKey] = weekPayload;
-      appData.table1 = [];
-      appData.table2 = [];
-      appData.table3 = [];
-      appData.table4 = [];
-
-      Object.keys(rawWeeksStore).forEach((key) => {
-        const entry = rawWeeksStore[key];
-        const mIdx = Number(entry.monthIndex);
-        const wStr = entry.week;
-
-        if (entry.table1) appData.table1.push(...entry.table1.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-        if (entry.table2) appData.table2.push(...entry.table2.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-        if (entry.table3) appData.table3.push(...entry.table3.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-        if (entry.table4) appData.table4.push(...entry.table4.map(r => ({ ...r, _monthIndex: Number(r._monthIndex ?? mIdx), _week: r._week || wStr })));
-      });
+      saveToLocalStorage();
+      rebuildAppDataFromWeeksStore();
 
       selectedFilterWeek = targetWeek;
       selectedMonthIndex = targetMonthIdx;
@@ -1388,11 +1403,11 @@
         if (picker) picker.value = currentSelectedDate;
       }
 
-      // RENDERIZAR VISTAS Y REFRESCAR TABLAS/GRÁFICOS
+      // REFRESCAR UI
       syncCurrentDateToSelectedWeek();
       handleDateNavigationUpdate();
 
-      // GUARDAR EN REALTIME DATABASE
+      // INTENTO DE GUARDADO EN FIREBASE
       db.ref("weeks_data/" + storageKey).set(weekPayload)
         .then(() => {
           ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
@@ -1401,12 +1416,12 @@
           });
 
           checkAllFourTablesReady();
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información procesada y guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
           switchTab('overview');
         })
         .catch((error) => {
-          console.error("Error al guardar en Firebase:", error);
-          showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Se procesó localmente pero hubo error al sincronizar en la Nube.');
+          console.error("Firebase Sync Error:", error);
+          showToast('<i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Guardado localmente. Revisa permisos de Firebase si deseas sincro global.');
           switchTab('overview');
         });
     }
@@ -1418,7 +1433,7 @@
       const keys = Object.keys(rawWeeksStore).sort();
 
       if (keys.length === 0) {
-        container.innerHTML = '<span class="text-xs text-slate-600 italic">None saved in Cloud yet</span>';
+        container.innerHTML = '<span class="text-xs text-slate-600 italic">None saved yet</span>';
         return;
       }
 
@@ -1430,7 +1445,7 @@
         badge.className = 'flex items-center gap-1.5 bg-slate-950 border border-gold-600/30 px-2.5 py-1 rounded-lg text-xs font-bold text-amber-300';
         badge.innerHTML = `
           <span class="cursor-pointer hover:underline" title="Click to view">${displayLabel}</span>
-          <button class="text-rose-400 hover:text-rose-300 ml-1" title="Delete from Cloud">&times;</button>
+          <button class="text-rose-400 hover:text-rose-300 ml-1" title="Delete Week">&times;</button>
         `;
 
         badge.querySelector('span').onclick = () => {
@@ -1458,9 +1473,15 @@
     }
 
     function deleteWeekData(storageKey) {
+      delete rawWeeksStore[storageKey];
+      saveToLocalStorage();
+      rebuildAppDataFromWeeksStore();
+      handleDateNavigationUpdate();
+      renderSavedWeeksBadges();
+
       db.ref("weeks_data/" + storageKey).remove()
         .then(() => {
-          showToast(`Semana ${storageKey} eliminada de la Nube.`);
+          showToast(`Semana ${storageKey} eliminada.`);
         })
         .catch(err => console.error("Error deleting from Cloud:", err));
     }
