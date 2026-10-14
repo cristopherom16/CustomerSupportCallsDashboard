@@ -80,9 +80,7 @@
       <!-- Brand & Custom Logo -->
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-gold-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
-          <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 15 82 L 29 18 L 43 18 L 40.3 43 L 59.7 43 L 57 18 L 71 18 L 85 82 L 64 82 L 61.3 57 L 38.7 57 L 36 82 Z" fill="#FAC815" />
-          </svg>
+          <i class="fa-solid fa-gauge-high text-xl text-amber-400"></i>
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-black tracking-wider text-amber-400 uppercase leading-none">
@@ -930,9 +928,9 @@
       }
 
       const totalAnswered = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANSWERED']), 0);
-      const totalAbndQueue = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND. IN QUEUE']), 0);
-      const totalAbndCsat = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND. IN CSAT RATING']), 0);
-      const totalAbndHold = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANBD. ON HOLD']), 0);
+      const totalAbndQueue = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND IN QUEUE']), 0);
+      const totalAbndCsat = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND IN CSAT RATING']), 0);
+      const totalAbndHold = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANBD ON HOLD']), 0);
       const totalCallsReceived = totalAnswered + totalAbndQueue + totalAbndCsat + totalAbndHold;
       const abandonRate = totalCallsReceived > 0 ? ((totalAbndQueue + totalAbndCsat) / totalCallsReceived) * 100 : 0;
 
@@ -940,7 +938,7 @@
       t1Weekly.forEach(r => {
         const h = r._hour >= 0 ? r._hour : extractHourNumber(r['DATE & HOUR']);
         if (h >= 0) {
-          hourlyVolumeMap[h] = (hourlyVolumeMap[h] || 0) + cleanNum(r['ANSWERED']) + cleanNum(r['ABND. IN QUEUE']);
+          hourlyVolumeMap[h] = (hourlyVolumeMap[h] || 0) + cleanNum(r['ANSWERED']) + cleanNum(r['ABND IN QUEUE']);
         }
       });
 
