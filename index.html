@@ -44,11 +44,63 @@
   </script>
 
   <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #1c2234;
+      --card-inner-bg: #0f172a;
+      --border-color: rgba(245, 158, 11, 0.3);
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --input-bg: #0f172a;
+    }
+
+    body.light-mode {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --card-inner-bg: #f1f5f9;
+      --border-color: rgba(217, 119, 6, 0.4);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --input-bg: #ffffff;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #0b0f19;
-      color: #e2e8f0;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      transition: background-color 0.3s, color 0.3s;
     }
+
+    body.light-mode header,
+    body.light-mode .bg-slate-900\/90,
+    body.light-mode .bg-slate-900\/80,
+    body.light-mode .bg-slate-900,
+    body.light-mode .bg-slate-900\/60,
+    body.light-mode .bg-slate-950,
+    body.light-mode .bg-slate-950\/80,
+    body.light-mode .bg-slate-950\/90 {
+      background-color: var(--card-bg) !important;
+      color: var(--text-main) !important;
+    }
+
+    body.light-mode .text-slate-300,
+    body.light-mode .text-slate-200,
+    body.light-mode .text-white {
+      color: var(--text-main) !important;
+    }
+
+    body.light-mode .text-slate-400,
+    body.light-mode .text-slate-500 {
+      color: var(--text-muted) !important;
+    }
+
+    body.light-mode input,
+    body.light-mode select,
+    body.light-mode textarea {
+      background-color: var(--input-bg) !important;
+      color: var(--text-main) !important;
+    }
+
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -69,9 +121,38 @@
     .gold-gradient-btn:hover {
       background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
     }
+
+    /* COMPACT FLOATING THEME TOGGLE BUTTON */
+    .theme-toggle-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 50;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #0b0f19;
+      border: 2px solid #fbbf24;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .theme-toggle-btn:hover {
+      transform: scale(1.1);
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
+
+  <!-- SMALL FLOATING DARK/LIGHT MODE TOGGLE BUTTON (BOTTOM-LEFT) -->
+  <button onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
+    <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
+  </button>
 
   <!-- Top Navigation Bar -->
   <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-3 transition-all">
@@ -601,7 +682,7 @@
   </main>
 
   <script>
-    // CONFIGURACIÓN FIREBASE REALTIME DATABASE
+    // FIREBASE INITIALIZATION
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -635,10 +716,38 @@
     let chartInstances = {};
 
     window.onload = function () {
+      initTheme();
       initDateControls();
       listenToFirebaseCloudData();
       checkAllFourTablesReady();
     };
+
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.getElementById('themeIcon');
+      const isLight = body.classList.toggle('light-mode');
+
+      if (isLight) {
+        icon.className = 'fa-solid fa-moon text-lg';
+        localStorage.setItem('calls_dashboard_theme', 'light');
+      } else {
+        icon.className = 'fa-solid fa-sun text-lg';
+        localStorage.setItem('calls_dashboard_theme', 'dark');
+      }
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('calls_dashboard_theme') || 'dark';
+      const icon = document.getElementById('themeIcon');
+
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        if (icon) icon.className = 'fa-solid fa-moon text-lg';
+      } else {
+        document.body.classList.remove('light-mode');
+        if (icon) icon.className = 'fa-solid fa-sun text-lg';
+      }
+    }
 
     function listenToFirebaseCloudData() {
       db.ref("weeks_data").on("value", (snapshot) => {
