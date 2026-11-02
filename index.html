@@ -112,12 +112,12 @@
             </span>
           </div>
           <span class="text-[11px] font-semibold text-slate-400 tracking-widest uppercase">
-            CALLS DASHBOARD
+            CALLS DASHBOARD (CLOUD STORAGE UNLIMITED)
           </span>
         </div>
       </div>
 
-      <!-- Controls -->
+      <!-- Header Controls -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
         <!-- Date Back/Forward Controls -->
         <div class="flex items-center gap-1">
@@ -129,6 +129,10 @@
             <i class="fa-solid fa-chevron-right text-xs"></i>
           </button>
         </div>
+
+        <button onclick="setToday()" class="text-[11px] font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-2.5 py-1 rounded-md border border-amber-500/30 transition-all cursor-pointer">
+          Today
+        </button>
 
         <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
 
@@ -169,7 +173,7 @@
       <!-- Scope Badges -->
       <div class="flex items-center gap-2">
         <span id="scope-month-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
-          Month: October
+          Month: --
         </span>
         <span id="scope-week-badge" class="text-xs font-bold text-gold-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
           Week 1
@@ -181,7 +185,6 @@
     </div>
   </header>
 
-  <!-- View Switcher & Day Navigation Pills -->
   <div class="bg-slate-900/60 border-b border-amber-500/30 py-3" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
@@ -198,7 +201,6 @@
     </div>
   </div>
 
-  <!-- Floating Import Button -->
   <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 border border-amber-400 hover:scale-105 active:scale-95 transition-all cursor-pointer">
     <i class="fa-solid fa-file-import text-sm"></i> Import Information
   </button>
@@ -458,7 +460,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Select Month and Week to assign your imported data.
+              Select Month and Week to assign your imported data directly to the Cloud.
             </p>
           </div>
 
@@ -654,7 +656,7 @@
       const isLight = document.body.classList.toggle('light-mode');
       const icon = document.getElementById('themeIcon');
       if (icon) icon.className = isLight ? 'fa-solid fa-moon text-lg' : 'fa-solid fa-sun text-lg';
-      localStorage.setItem('calls_dashboard_theme', isLight ? 'light' : 'dark');
+      safeSetLocal('calls_dashboard_theme', isLight ? 'light' : 'dark');
       setTimeout(() => renderAllCharts(), 150);
     }
 
@@ -688,6 +690,15 @@
       } else {
         badge.className = 'text-[9px] px-1.5 py-0.5 rounded font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
         badge.innerText = text || 'Offline';
+      }
+    }
+
+    // SAFE LOCAL STORAGE WRITE (Prevents QuotaExceededError crashes)
+    function safeSetLocal(key, val) {
+      try {
+        localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val));
+      } catch (e) {
+        // Ignored silently when quota exceeded
       }
     }
 
@@ -835,7 +846,6 @@
             let rowCopy = normalizeRowFields(r, tType);
             rowCopy._scope = key;
 
-            // Normalize Date & Hour
             const dateHourStr = rowCopy['DATE & HOUR'] || rowCopy['Date & Hour'] || rowCopy['date_hour'] || '';
             if (!rowCopy._date && dateHourStr) {
               rowCopy._date = extractDatePart(dateHourStr) || '';
@@ -922,6 +932,16 @@
       handleDateNavigationUpdate();
     }
 
+    function setToday() {
+      const now = new Date();
+      const yr = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      currentSelectedDate = `${yr}-${m}-${d}`;
+      syncControlsToDate(currentSelectedDate);
+      handleDateNavigationUpdate();
+    }
+
     function getAllGlobalDates() {
       const d1 = appData.table1.map(r => r._date).filter(Boolean);
       const d4 = appData.table4.map(r => r._date).filter(Boolean);
@@ -955,18 +975,15 @@
 
     function loadLocalCacheFirst() {
       try {
-        const cached = localStorage.getItem('open_calls_raw_store') || localStorage.getItem('local_raw_weeks');
-        if (cached) {
-          rawStore = JSON.parse(cached);
-          rebuildAppDataFromStore();
-        }
-        const cachedNotes = localStorage.getItem('open_calls_daily_notes') || localStorage.getItem('local_daily_notes');
+        const cached = localStorage.getItem('open_calls_raw_store');
+        if (cached) rawStore = JSON.parse(cached);
+        const cachedNotes = localStorage.getItem('open_calls_daily_notes');
         if (cachedNotes) localNotesStore = JSON.parse(cachedNotes);
-
-        const cachedInsights = localStorage.getItem('open_calls_insights') || localStorage.getItem('local_weekly_insights');
+        const cachedInsights = localStorage.getItem('open_calls_insights');
         if (cachedInsights) localInsightsStore = JSON.parse(cachedInsights);
+        rebuildAppDataFromStore();
       } catch (e) {
-        console.warn("Error reading cache:", e);
+        console.warn("Storage cache note:", e);
       }
     }
 
@@ -981,7 +998,6 @@
         const val = snapshot.val();
         if (val) {
           Object.assign(rawStore, val);
-          localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
           rebuildAppDataFromStore();
         }
         updateCloudStatus('connected', 'Online');
@@ -994,7 +1010,6 @@
         const val = snapshot.val();
         if (val) {
           Object.assign(rawStore, val);
-          localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
           rebuildAppDataFromStore();
         }
       });
@@ -1003,7 +1018,6 @@
         const val = snapshot.val();
         if (val) {
           Object.assign(localNotesStore, val);
-          localStorage.setItem('open_calls_daily_notes', JSON.stringify(localNotesStore));
           initUnifiedHourlyGrid();
         }
       });
@@ -1014,7 +1028,6 @@
           Object.keys(val).forEach(k => {
             if (!localNotesStore[k]) localNotesStore[k] = val[k];
           });
-          localStorage.setItem('open_calls_daily_notes', JSON.stringify(localNotesStore));
           initUnifiedHourlyGrid();
         }
       });
@@ -1023,7 +1036,6 @@
         const val = snapshot.val();
         if (val) {
           Object.assign(localInsightsStore, val);
-          localStorage.setItem('open_calls_insights', JSON.stringify(localInsightsStore));
           loadSavedWeeklyInsights();
         }
       });
@@ -1032,7 +1044,6 @@
         const val = snapshot.val();
         if (val) {
           Object.assign(localInsightsStore, val);
-          localStorage.setItem('open_calls_insights', JSON.stringify(localInsightsStore));
           loadSavedWeeklyInsights();
         }
       });
@@ -1053,7 +1064,6 @@
       let t1 = appData.table1.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
       let t4 = appData.table4.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
 
-      // If strict filter is empty, fallback to active month
       if (t1.length === 0) {
         t1 = appData.table1.filter(r => r._monthIndex === selectedMonthIndex);
       }
@@ -1061,7 +1071,7 @@
         t4 = appData.table4.filter(r => r._monthIndex === selectedMonthIndex);
       }
 
-      // 2. Weekly & Team data (Tables 2 & 3)
+      // 2. Weekly rows (Tables 2 & 3)
       let t2 = appData.table2.filter(r => {
         const matchM = r._monthIndex === undefined || r._monthIndex === -1 || r._monthIndex === selectedMonthIndex;
         const matchW = !r._week || r._week.toLowerCase() === selectedWeek.toLowerCase();
@@ -1074,12 +1084,8 @@
         return matchM && matchW;
       });
 
-      if (t2.length === 0) {
-        t2 = appData.table2.filter(r => r._monthIndex === selectedMonthIndex);
-      }
-      if (t3.length === 0) {
-        t3 = appData.table3.filter(r => r._monthIndex === selectedMonthIndex);
-      }
+      if (t2.length === 0) t2 = appData.table2.filter(r => r._monthIndex === selectedMonthIndex);
+      if (t3.length === 0) t3 = appData.table3.filter(r => r._monthIndex === selectedMonthIndex);
 
       if (t2.length === 0) t2 = appData.table2;
       if (t3.length === 0) t3 = appData.table3;
@@ -1201,19 +1207,18 @@
 
       if (!localNotesStore) localNotesStore = {};
       localNotesStore[dateKey] = notesObj;
-      localStorage.setItem('open_calls_daily_notes', JSON.stringify(localNotesStore));
 
       if (db) {
         db.ref("open_notes/" + dateKey).set(notesObj);
         db.ref("daily_notes/" + dateKey).set(notesObj)
           .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved successfully!`))
-          .catch(err => showToast(`<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Saved locally: ${err.message}`));
+          .catch(err => showToast(`<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Error: ${err.message}`));
       } else {
+        safeSetLocal('open_calls_daily_notes', localNotesStore);
         showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved in local storage!`);
       }
     }
 
-    // MULTI-PATTERN LOOKUP FOR WEEKLY INSIGHTS
     function getPossibleInsightKeys() {
       const mShort = monthNamesShort[selectedMonthIndex] || '';
       const mFull = monthNames[selectedMonthIndex] || '';
@@ -1282,7 +1287,6 @@
 
       if (!localInsightsStore) localInsightsStore = {};
       localInsightsStore[primaryKey] = payload;
-      localStorage.setItem('open_calls_insights', JSON.stringify(localInsightsStore));
 
       if (db) {
         db.ref("weekly_insights/" + primaryKey).set(payload);
@@ -1290,6 +1294,7 @@
           .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved!`))
           .catch(err => console.error(err));
       } else {
+        safeSetLocal('open_calls_insights', localInsightsStore);
         showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved locally!`);
       }
     }
@@ -1436,7 +1441,6 @@
         };
 
         rawStore[storageKey] = payload;
-        localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
 
         if (db) {
           db.ref("weeks_data/" + storageKey).set(payload)
@@ -1508,7 +1512,6 @@
           e.stopPropagation();
           if (confirm(`Delete dataset "${displayLabel}"?`)) {
             delete rawStore[k];
-            localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
             if (db) {
               db.ref("open_data/" + k).remove();
               db.ref("weeks_data/" + k).remove();
