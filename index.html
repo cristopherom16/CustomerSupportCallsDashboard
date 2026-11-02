@@ -148,16 +148,13 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
-  <!-- SMALL FLOATING DARK/LIGHT MODE TOGGLE BUTTON (BOTTOM-LEFT) -->
   <button onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
     <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
   </button>
 
-  <!-- Top Navigation Bar -->
   <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 py-3 transition-all" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-wrap items-center justify-between gap-4">
       
-      <!-- Brand & Custom Logo -->
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <i class="fa-solid fa-gauge-high text-xl text-amber-400"></i>
@@ -172,9 +169,7 @@
         </div>
       </div>
 
-      <!-- Center Calendar & Scope Navigation -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
-        <!-- Date Navigator -->
         <div class="flex items-center gap-1">
           <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition border border-amber-500/20">
             <i class="fa-solid fa-chevron-left text-xs"></i>
@@ -191,7 +186,6 @@
 
         <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
 
-        <!-- 12-Month Selector -->
         <div class="flex items-center gap-1.5 pl-1">
           <span class="text-[10px] uppercase font-bold text-slate-400">Month:</span>
           <select id="header-month-select" onchange="onHeaderMonthChanged(this.value)" class="bg-slate-900 text-amber-400 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
@@ -212,7 +206,6 @@
 
         <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
 
-        <!-- 5-Week Filter Selector -->
         <div class="flex items-center gap-1.5 pl-1">
           <span class="text-[10px] uppercase font-bold text-slate-400">Week:</span>
           <select id="header-week-select" onchange="onHeaderWeekChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
@@ -226,13 +219,12 @@
         </div>
       </div>
 
-      <!-- Scope Display Badges -->
       <div class="flex items-center gap-2">
         <span id="scope-month-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
-          Month: October
+          Month: --
         </span>
         <span id="scope-week-badge" class="text-xs font-bold text-gold-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
-          Week 1
+          Week: --
         </span>
         <span id="scope-day-badge" class="text-xs font-bold text-amber-300 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/40 hidden md:inline-block">
           Day: --
@@ -241,7 +233,6 @@
     </div>
   </header>
 
-  <!-- Main View Navigation & Quick Days Pills -->
   <div class="bg-slate-900/60 border-b border-amber-500/30 py-3" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
@@ -258,12 +249,10 @@
     </div>
   </div>
 
-  <!-- Floating Button for Import Information -->
   <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 border border-amber-400 hover:scale-105 active:scale-95 transition-all">
     <i class="fa-solid fa-file-import text-sm"></i> Import Information
   </button>
 
-  <!-- Notification Banner -->
   <div id="toast-banner" class="hidden fixed bottom-20 right-6 z-50 bg-slate-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300">
     <span id="toast-message" class="text-xs font-medium">Notification message</span>
     <button onclick="document.getElementById('toast-banner').classList.add('hidden')" class="text-slate-400 hover:text-white ml-2 text-sm">&times;</button>
@@ -271,7 +260,6 @@
 
   <main class="flex-1 w-full py-8 space-y-8 pb-24" style="padding-left: 67px; padding-right: 10mm;">
 
-    <!-- TAB 1: OVERVIEW & CHARTS -->
     <div id="view-overview" class="space-y-8">
       <div>
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
@@ -317,7 +305,7 @@
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
-            <p class="text-xs text-slate-400">Charts 1-4 & 10 reflect the selected date. Charts 5-9 reflect the selected week.</p>
+            <p class="text-xs text-slate-400">Visualizaciones filtradas por ámbito activo.</p>
           </div>
           <div class="text-right">
             <span class="text-xs font-semibold text-slate-400">Active Day:</span>
@@ -434,7 +422,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t1" class="divide-y divide-amber-500/20 font-mono">
-                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available. Paste data in Import Information tab.</td></tr>
+                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
           </div>
@@ -460,7 +448,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t2" class="divide-y divide-amber-500/20 font-mono">
-                <tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No data available. Paste data in Import Information tab.</td></tr>
+                <tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No records found.</td></tr>
               </tbody>
             </table>
           </div>
@@ -490,7 +478,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono">
-                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available. Paste data in Import Information tab.</td></tr>
+                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No records found.</td></tr>
               </tbody>
             </table>
           </div>
@@ -514,7 +502,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t4" class="divide-y divide-amber-500/20 font-mono">
-                <tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available. Paste data in Import Information tab.</td></tr>
+                <tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No records found.</td></tr>
               </tbody>
             </table>
           </div>
@@ -522,16 +510,15 @@
       </div>
     </div>
 
-    <!-- TAB 2: IMPORT INFORMATION -->
     <div id="view-import" class="hidden space-y-6">
       <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-              <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables (Cloud Storage)
+              <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Pega la información copiada desde Excel o CSV. Los datos se sincronizan y acumulan de forma permanente.
+              Pega la información copiada desde Excel o CSV. Se guarda automáticamente en memoria local y en la nube.
             </p>
           </div>
 
@@ -569,9 +556,9 @@
 
         <div class="mt-4 pt-4 border-t border-amber-500/30 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold text-slate-400">Cloud Stored Weeks:</span>
+            <span class="text-xs font-semibold text-slate-400">Stored Weeks:</span>
             <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
-              <span class="text-xs text-slate-600 italic">None saved in Cloud yet</span>
+              <span class="text-xs text-slate-600 italic">None saved yet</span>
             </div>
           </div>
         </div>
@@ -624,7 +611,6 @@
       </div>
     </div>
 
-    <!-- TAB 3: NOTES & INSIGHTS -->
     <div id="view-notes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 space-y-4">
@@ -635,7 +621,7 @@
               </h3>
               <p class="text-xs text-slate-400">Notes for date: <span id="unified-day-label" class="font-bold text-amber-300">--</span></p>
             </div>
-            <button onclick="saveAllHourlyNotes()" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30 transition">
+            <button onclick="saveAllHourlyNotes()" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 transition">
               <i class="fa-solid fa-floppy-disk mr-1"></i> Save Day Notes
             </button>
           </div>
@@ -672,7 +658,7 @@
                   <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> AI Generated
                 </span>
               </div>
-              <textarea id="insights-actions" rows="5" readonly placeholder="System analyzing data to generate 3 SLA recommendations..." class="w-full bg-slate-950/80 text-xs text-amber-300 font-mono p-3 rounded-xl border border-amber-500/30 focus:outline-none leading-relaxed cursor-not-allowed shadow-inner"></textarea>
+              <textarea id="insights-actions" rows="5" readonly placeholder="System analyzing data to generate SLA recommendations..." class="w-full bg-slate-950/80 text-xs text-amber-300 font-mono p-3 rounded-xl border border-amber-500/30 focus:outline-none leading-relaxed cursor-not-allowed shadow-inner"></textarea>
             </div>
           </div>
         </div>
@@ -684,7 +670,6 @@
     const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const monthNamesFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    // FIREBASE INITIALIZATION
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -696,13 +681,15 @@
       measurementId: "G-1ZP68P7BB1"
     };
 
+    let db = null;
     try {
-      firebase.initializeApp(firebaseConfig);
+      if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+      }
     } catch (e) {
-      console.error("Firebase init error:", e);
+      console.warn("Firebase offline or initialization warning:", e);
     }
-    
-    const db = firebase.database();
 
     let appData = {
       table1: [],
@@ -712,6 +699,8 @@
     };
 
     let rawWeeksStore = {};
+    let localNotesStore = {};
+    let localInsightsStore = {};
     let selectedFilterWeek = 'all';
     let currentSelectedDate = new Date().toISOString().split('T')[0];
     let selectedMonthIndex = new Date().getMonth();
@@ -720,35 +709,42 @@
     window.onload = function () {
       initTheme();
       initDateControls();
+      loadLocalCacheFirst();
       listenToFirebaseCloudData();
       checkAllFourTablesReady();
     };
 
     function toggleTheme() {
-      const body = document.body;
+      const isLight = document.body.classList.toggle('light-mode');
       const icon = document.getElementById('themeIcon');
-      const isLight = body.classList.toggle('light-mode');
-
-      if (isLight) {
-        icon.className = 'fa-solid fa-moon text-lg';
-        localStorage.setItem('calls_dashboard_theme', 'light');
-      } else {
-        icon.className = 'fa-solid fa-sun text-lg';
-        localStorage.setItem('calls_dashboard_theme', 'dark');
-      }
+      if (icon) icon.className = isLight ? 'fa-solid fa-moon text-lg' : 'fa-solid fa-sun text-lg';
+      localStorage.setItem('calls_dashboard_theme', isLight ? 'light' : 'dark');
       setTimeout(() => renderAllCharts(), 150);
     }
 
     function initTheme() {
       const savedTheme = localStorage.getItem('calls_dashboard_theme') || 'dark';
       const icon = document.getElementById('themeIcon');
-
       if (savedTheme === 'light') {
         document.body.classList.add('light-mode');
         if (icon) icon.className = 'fa-solid fa-moon text-lg';
-      } else {
-        document.body.classList.remove('light-mode');
-        if (icon) icon.className = 'fa-solid fa-sun text-lg';
+      }
+    }
+
+    function loadLocalCacheFirst() {
+      try {
+        const cachedWeeks = localStorage.getItem('local_raw_weeks');
+        if (cachedWeeks) {
+          rawWeeksStore = JSON.parse(cachedWeeks);
+          rebuildAppDataFromStore();
+        }
+        const cachedNotes = localStorage.getItem('local_daily_notes');
+        if (cachedNotes) localNotesStore = JSON.parse(cachedNotes);
+
+        const cachedInsights = localStorage.getItem('local_weekly_insights');
+        if (cachedInsights) localInsightsStore = JSON.parse(cachedInsights);
+      } catch (e) {
+        console.warn("Cache load issue:", e);
       }
     }
 
@@ -763,47 +759,75 @@
       return selectedMonthIndex;
     }
 
+    function rebuildAppDataFromStore() {
+      appData.table1 = [];
+      appData.table2 = [];
+      appData.table3 = [];
+      appData.table4 = [];
+
+      Object.keys(rawWeeksStore).forEach((key) => {
+        const entry = rawWeeksStore[key];
+        if (!entry) return;
+
+        let entryMonth = entry.monthIndex !== undefined ? parseInt(entry.monthIndex, 10) : undefined;
+        let entryWeek = entry.week || 'Week 1';
+
+        const injectMeta = (arr) => {
+          if (!Array.isArray(arr)) return [];
+          return arr.map(r => {
+            const rowCopy = { ...r };
+            if (rowCopy._week === undefined) rowCopy._week = entryWeek;
+            if (rowCopy._monthIndex === undefined && entryMonth !== undefined) rowCopy._monthIndex = entryMonth;
+            rowCopy._monthIndex = normalizeRowMonth(rowCopy);
+            return rowCopy;
+          });
+        };
+
+        if (entry.table1) appData.table1.push(...injectMeta(entry.table1));
+        if (entry.table2) appData.table2.push(...injectMeta(entry.table2));
+        if (entry.table3) appData.table3.push(...injectMeta(entry.table3));
+        if (entry.table4) appData.table4.push(...injectMeta(entry.table4));
+      });
+
+      autoSelectFirstAvailableData();
+      handleDateNavigationUpdate();
+      renderSavedWeeksBadges();
+    }
+
     function listenToFirebaseCloudData() {
+      if (!db) {
+        rebuildAppDataFromStore();
+        return;
+      }
+
       db.ref("weeks_data").on("value", (snapshot) => {
-        rawWeeksStore = snapshot.val() || {};
-        appData.table1 = [];
-        appData.table2 = [];
-        appData.table3 = [];
-        appData.table4 = [];
+        const cloudData = snapshot.val();
+        if (cloudData) {
+          rawWeeksStore = cloudData;
+          localStorage.setItem('local_raw_weeks', JSON.stringify(rawWeeksStore));
+        }
+        rebuildAppDataFromStore();
+      }, (err) => {
+        console.warn("Firebase realtime sync error (falling back to local):", err);
+        rebuildAppDataFromStore();
+      });
 
-        const weekKeys = Object.keys(rawWeeksStore);
+      db.ref("daily_notes").on("value", (snapshot) => {
+        const notes = snapshot.val();
+        if (notes) {
+          localNotesStore = notes;
+          localStorage.setItem('local_daily_notes', JSON.stringify(localNotesStore));
+          initUnifiedHourlyGrid();
+        }
+      });
 
-        weekKeys.forEach((key) => {
-          const entry = rawWeeksStore[key];
-          if (!entry) return;
-
-          let entryMonth = entry.monthIndex !== undefined ? parseInt(entry.monthIndex, 10) : undefined;
-          let entryWeek = entry.week || 'Week 1';
-
-          const injectMeta = (arr) => {
-            if (!Array.isArray(arr)) return [];
-            return arr.map(r => {
-              const rowCopy = { ...r };
-              if (rowCopy._week === undefined) rowCopy._week = entryWeek;
-              if (rowCopy._monthIndex === undefined && entryMonth !== undefined) rowCopy._monthIndex = entryMonth;
-              rowCopy._monthIndex = normalizeRowMonth(rowCopy);
-              return rowCopy;
-            });
-          };
-
-          if (entry.table1) appData.table1.push(...injectMeta(entry.table1));
-          if (entry.table2) appData.table2.push(...injectMeta(entry.table2));
-          if (entry.table3) appData.table3.push(...injectMeta(entry.table3));
-          if (entry.table4) appData.table4.push(...injectMeta(entry.table4));
-        });
-
-        // Si el mes o semana seleccionados no tienen datos pero existen semanas en Firebase, sincronizar automáticamente
-        autoSelectFirstAvailableData();
-
-        handleDateNavigationUpdate();
-        renderSavedWeeksBadges();
-      }, (error) => {
-        console.error("Firebase error:", error);
+      db.ref("weekly_insights").on("value", (snapshot) => {
+        const ins = snapshot.val();
+        if (ins) {
+          localInsightsStore = ins;
+          localStorage.setItem('local_weekly_insights', JSON.stringify(localInsightsStore));
+          loadSavedWeeklyInsights();
+        }
       });
     }
 
@@ -811,12 +835,10 @@
       const keys = Object.keys(rawWeeksStore);
       if (keys.length === 0) return;
 
-      // Buscar si el mes/semana actual tiene datos
       const hasCurrent = appData.table1.some(r => r._monthIndex === selectedMonthIndex) ||
                          appData.table2.some(r => r._monthIndex === selectedMonthIndex);
 
       if (!hasCurrent) {
-        // Tomar la primera semana guardada disponible
         const firstEntry = rawWeeksStore[keys[0]];
         if (firstEntry) {
           if (firstEntry.monthIndex !== undefined) {
@@ -831,7 +853,6 @@
           }
         }
       }
-
       syncCurrentDateToSelectedWeek();
     }
 
@@ -841,7 +862,7 @@
       if (banner && msgEl) {
         msgEl.innerHTML = msg;
         banner.classList.remove('hidden');
-        setTimeout(() => banner.classList.add('hidden'), 5000);
+        setTimeout(() => banner.classList.add('hidden'), 4000);
       }
     }
 
@@ -902,7 +923,6 @@
 
     function syncCurrentDateToSelectedWeek() {
       const weekDates = getAvailableDatesForCurrentScope();
-
       if (weekDates.length > 0) {
         if (!weekDates.includes(currentSelectedDate)) {
           currentSelectedDate = weekDates[0];
@@ -1004,7 +1024,11 @@
       }
 
       if (tabId === 'overview') {
-        setTimeout(() => renderAllCharts(), 50);
+        setTimeout(() => renderAllCharts(), 60);
+      }
+      if (tabId === 'notes') {
+        initUnifiedHourlyGrid();
+        loadSavedWeeklyInsights();
       }
     }
 
@@ -1050,29 +1074,24 @@
     function initUnifiedHourlyGrid() {
       const grid = document.getElementById('unified-hourly-grid');
       if (!grid) return;
-      grid.innerHTML = '<span class="text-xs text-slate-500 p-2">Loading notes...</span>';
 
-      db.ref("daily_notes/" + currentSelectedDate).once("value").then((snapshot) => {
-        const savedNotes = snapshot.val() || {};
-        grid.innerHTML = '';
-        for (let h = 0; h < 24; h++) {
-          const hourStr = `${String(h).padStart(2, '0')}:00`;
-          const noteText = savedNotes[hourStr] || '';
+      const savedNotes = (localNotesStore && localNotesStore[currentSelectedDate]) || {};
+      grid.innerHTML = '';
+      for (let h = 0; h < 24; h++) {
+        const hourStr = `${String(h).padStart(2, '0')}:00`;
+        const noteText = savedNotes[hourStr] || '';
 
-          const item = document.createElement('div');
-          item.className = 'bg-slate-950 p-2.5 rounded-xl border border-amber-500/30 space-y-1';
-          item.innerHTML = `
-            <div class="flex justify-between items-center text-[11px] font-bold text-amber-400">
-              <span><i class="fa-regular fa-clock mr-1 text-amber-500/70"></i>${hourStr}</span>
-              <span class="text-[10px] text-slate-500 font-mono">Interval #${h + 1}</span>
-            </div>
-            <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-amber-500/30 focus:outline-none focus:border-amber-400">
-          `;
-          grid.appendChild(item);
-        }
-      }).catch(err => {
-        grid.innerHTML = '<span class="text-xs text-rose-400">Error loading notes.</span>';
-      });
+        const item = document.createElement('div');
+        item.className = 'bg-slate-950 p-2.5 rounded-xl border border-amber-500/30 space-y-1';
+        item.innerHTML = `
+          <div class="flex justify-between items-center text-[11px] font-bold text-amber-400">
+            <span><i class="fa-regular fa-clock mr-1 text-amber-500/70"></i>${hourStr}</span>
+            <span class="text-[10px] text-slate-500 font-mono">Interval #${h + 1}</span>
+          </div>
+          <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-amber-500/30 focus:outline-none focus:border-amber-400">
+        `;
+        grid.appendChild(item);
+      }
     }
 
     function saveAllHourlyNotes() {
@@ -1084,11 +1103,16 @@
         }
       });
 
-      db.ref("daily_notes/" + currentSelectedDate).set(notesObj)
-        .then(() => {
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Daily notes saved to Cloud for date <strong>${currentSelectedDate}</strong>!`);
-        })
-        .catch(err => console.error("Error saving notes:", err));
+      if (!localNotesStore) localNotesStore = {};
+      localNotesStore[currentSelectedDate] = notesObj;
+      localStorage.setItem('local_daily_notes', JSON.stringify(localNotesStore));
+
+      if (db) {
+        db.ref("daily_notes/" + currentSelectedDate).set(notesObj)
+          .catch(err => console.warn("Cloud notes sync deferred:", err));
+      }
+
+      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notas guardadas para la fecha <strong>${currentSelectedDate}</strong>!`);
     }
 
     function generateAutomatedSlaRecommendations() {
@@ -1180,19 +1204,17 @@
 
     function loadSavedWeeklyInsights() {
       const key = getInsightsStorageKey();
-      
-      db.ref("weekly_insights/" + key).once("value").then((snapshot) => {
-        const saved = snapshot.val() || {};
-        const ach = document.getElementById('insights-achievements');
-        const blk = document.getElementById('insights-blockers');
-        const act = document.getElementById('insights-actions');
+      const saved = (localInsightsStore && localInsightsStore[key]) || {};
 
-        if (ach) ach.value = saved.achievements || '';
-        if (blk) blk.value = saved.blockers || '';
+      const ach = document.getElementById('insights-achievements');
+      const blk = document.getElementById('insights-blockers');
+      const act = document.getElementById('insights-actions');
 
-        const autoRecommendations = generateAutomatedSlaRecommendations();
-        if (act) act.value = autoRecommendations;
-      });
+      if (ach) ach.value = saved.achievements || '';
+      if (blk) blk.value = saved.blockers || '';
+
+      const autoRecommendations = generateAutomatedSlaRecommendations();
+      if (act) act.value = autoRecommendations;
     }
 
     function saveWeeklyInsights() {
@@ -1205,10 +1227,16 @@
         savedAt: new Date().toISOString()
       };
 
-      db.ref("weekly_insights/" + key).set(payload)
-        .then(() => {
-          showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved to Cloud for <strong>${selectedFilterWeek}</strong>!`);
-        });
+      if (!localInsightsStore) localInsightsStore = {};
+      localInsightsStore[key] = payload;
+      localStorage.setItem('local_weekly_insights', JSON.stringify(localInsightsStore));
+
+      if (db) {
+        db.ref("weekly_insights/" + key).set(payload)
+          .catch(err => console.warn("Cloud insights sync deferred:", err));
+      }
+
+      showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights guardadas exitosamente!`);
     }
 
     function parseDelimitedTable(rawText) {
@@ -1217,7 +1245,6 @@
       if (lines.length < 1) return [];
 
       const delimiter = rawText.includes('\t') ? '\t' : (rawText.includes(',') ? ',' : ';');
-      
       const firstLineTokens = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
       const isHeaderRow = isNaN(parseFloat(firstLineTokens[1])) && isNaN(parseFloat(firstLineTokens[firstLineTokens.length - 1]));
       
@@ -1348,7 +1375,7 @@
         const t4Rows = parseDelimitedTable(t4Raw);
 
         if (t1Rows.length === 0 && t2Rows.length === 0 && t3Rows.length === 0 && t4Rows.length === 0) {
-          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Por favor pega información en al menos una de las tablas antes de procesar.');
+          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Pega datos en al menos una tabla.');
           return;
         }
 
@@ -1494,38 +1521,37 @@
           savedAt: new Date().toISOString()
         };
 
-        db.ref("weeks_data/" + storageKey).set(weekPayload)
-          .then(() => {
-            selectedFilterWeek = targetWeek;
-            selectedMonthIndex = targetMonthIdx;
+        rawWeeksStore[storageKey] = weekPayload;
+        localStorage.setItem('local_raw_weeks', JSON.stringify(rawWeeksStore));
 
-            if (detectedFirstDate) {
-              currentSelectedDate = detectedFirstDate;
-              const picker = document.getElementById('date-picker');
-              if (picker) picker.value = currentSelectedDate;
-            }
+        if (db) {
+          db.ref("weeks_data/" + storageKey).set(weekPayload)
+            .catch(err => console.warn("Cloud save warning (saved locally):", err));
+        }
 
-            if (t1Rows.length > 0) document.getElementById('paste-input-t1').value = '';
-            if (t2Rows.length > 0) document.getElementById('paste-input-t2').value = '';
-            if (t3Rows.length > 0) document.getElementById('paste-input-t3').value = '';
-            if (t4Rows.length > 0) document.getElementById('paste-input-t4').value = '';
+        selectedFilterWeek = targetWeek;
+        selectedMonthIndex = targetMonthIdx;
 
-            syncCurrentDateToSelectedWeek();
-            handleDateNavigationUpdate();
-            renderSavedWeeksBadges();
-            checkAllFourTablesReady();
+        if (detectedFirstDate) {
+          currentSelectedDate = detectedFirstDate;
+          const picker = document.getElementById('date-picker');
+          if (picker) picker.value = currentSelectedDate;
+        }
 
-            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
-            switchTab('overview');
-          })
-          .catch((error) => {
-            console.error("Error al enviar a Firebase:", error);
-            showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al guardar en Firebase: ' + error.message);
-          });
+        if (t1Rows.length > 0) document.getElementById('paste-input-t1').value = '';
+        if (t2Rows.length > 0) document.getElementById('paste-input-t2').value = '';
+        if (t3Rows.length > 0) document.getElementById('paste-input-t3').value = '';
+        if (t4Rows.length > 0) document.getElementById('paste-input-t4').value = '';
+
+        rebuildAppDataFromStore();
+        checkAllFourTablesReady();
+
+        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Datos guardados con éxito para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+        switchTab('overview');
 
       } catch (err) {
-        console.error("Error en processAndSaveUnifiedWeek:", err);
-        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error al procesar: ' + err.message);
+        console.error("Error saving week:", err);
+        showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error: ' + err.message);
       }
     }
 
@@ -1534,9 +1560,8 @@
       if (!container) return;
       
       const keys = Object.keys(rawWeeksStore).sort();
-
       if (keys.length === 0) {
-        container.innerHTML = '<span class="text-xs text-slate-600 italic">None saved in Cloud yet</span>';
+        container.innerHTML = '<span class="text-xs text-slate-600 italic">None saved yet</span>';
         return;
       }
 
@@ -1548,7 +1573,7 @@
         badge.className = 'flex items-center gap-1.5 bg-slate-950 border border-amber-500/40 px-2.5 py-1 rounded-lg text-xs font-bold text-amber-300';
         badge.innerHTML = `
           <span class="cursor-pointer hover:underline" title="Click to view">${displayLabel}</span>
-          <button class="text-rose-400 hover:text-rose-300 ml-1 p-0.5 rounded hover:bg-rose-500/10" title="Delete from Cloud">&times;</button>
+          <button class="text-rose-400 hover:text-rose-300 ml-1 p-0.5 rounded hover:bg-rose-500/10" title="Delete">&times;</button>
         `;
 
         badge.querySelector('span').onclick = () => {
@@ -1568,7 +1593,7 @@
 
         badge.querySelector('button').onclick = (e) => {
           e.stopPropagation();
-          if (confirm(`¿Eliminar los datos guardados para "${displayLabel}"?`)) {
+          if (confirm(`¿Eliminar los datos de "${displayLabel}"?`)) {
             deleteWeekData(k);
           }
         };
@@ -1579,18 +1604,21 @@
 
     function deleteWeekData(storageKey) {
       delete rawWeeksStore[storageKey];
-      db.ref("weeks_data/" + storageKey).remove()
-        .then(() => {
-          showToast(`Semana ${storageKey} eliminada.`);
-        })
-        .catch(err => console.error("Error deleting:", err));
+      localStorage.setItem('local_raw_weeks', JSON.stringify(rawWeeksStore));
+
+      if (db) {
+        db.ref("weeks_data/" + storageKey).remove()
+          .catch(err => console.warn("Cloud delete deferred:", err));
+      }
+
+      rebuildAppDataFromStore();
+      showToast(`Semana ${storageKey} eliminada.`);
     }
 
     function renderAllTables() {
       const matchMonth = (r) => normalizeRowMonth(r) === selectedMonthIndex;
       const matchWeek = (r) => selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
 
-      // Para T1 y T4 filtramos por día; si no hay fecha definida en el registro, coincide con todo
       const t1Data = appData.table1.filter(r => matchMonth(r) && matchWeek(r) && (!r._date || r._date === currentSelectedDate));
       const t2Data = appData.table2.filter(r => matchMonth(r) && matchWeek(r));
       const t3Data = appData.table3.filter(r => matchMonth(r) && matchWeek(r));
