@@ -122,7 +122,6 @@
       background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
     }
 
-    /* COMPACT FLOATING THEME TOGGLE BUTTON */
     .theme-toggle-btn {
       position: fixed;
       bottom: 24px;
@@ -532,7 +531,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables (Cloud Storage)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Paste data below from Excel or CSV.
+              Pega la información copiada desde Excel o CSV. Si ya tienes datos para esta semana, solo se actualizarán las tablas que pegues.
             </p>
           </div>
 
@@ -759,10 +758,10 @@
 
         Object.keys(rawWeeksStore).forEach((key) => {
           const entry = rawWeeksStore[key];
-          if (entry.table1) appData.table1.push(...entry.table1);
-          if (entry.table2) appData.table2.push(...entry.table2);
-          if (entry.table3) appData.table3.push(...entry.table3);
-          if (entry.table4) appData.table4.push(...entry.table4);
+          if (entry.table1 && Array.isArray(entry.table1)) appData.table1.push(...entry.table1);
+          if (entry.table2 && Array.isArray(entry.table2)) appData.table2.push(...entry.table2);
+          if (entry.table3 && Array.isArray(entry.table3)) appData.table3.push(...entry.table3);
+          if (entry.table4 && Array.isArray(entry.table4)) appData.table4.push(...entry.table4);
         });
 
         syncCurrentDateToSelectedWeek();
@@ -798,7 +797,7 @@
     function onHeaderWeekChanged(val) {
       selectedFilterWeek = val;
       const targetWeekSelect = document.getElementById('target-week-select');
-      if (targetWeekSelect) targetWeekSelect.value = val;
+      if (targetWeekSelect && val !== 'all') targetWeekSelect.value = val;
       
       syncCurrentDateToSelectedWeek();
       handleDateNavigationUpdate();
@@ -826,8 +825,8 @@
     function syncCurrentDateToSelectedWeek() {
       let weekDates = [];
       if (selectedFilterWeek === 'all') {
-        const d1 = appData.table1.map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => r._monthIndex === undefined || r._monthIndex === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._monthIndex === undefined || r._monthIndex === selectedMonthIndex).map(r => r._date).filter(Boolean);
         weekDates = [...new Set([...d1, ...d4])].sort();
       } else {
         const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
@@ -884,8 +883,8 @@
 
       let availableDates = [];
       if (selectedFilterWeek === 'all') {
-        const d1 = appData.table1.map(r => r._date).filter(Boolean);
-        const d4 = appData.table4.map(r => r._date).filter(Boolean);
+        const d1 = appData.table1.filter(r => r._monthIndex === undefined || r._monthIndex === selectedMonthIndex).map(r => r._date).filter(Boolean);
+        const d4 = appData.table4.filter(r => r._monthIndex === undefined || r._monthIndex === selectedMonthIndex).map(r => r._date).filter(Boolean);
         availableDates = [...new Set([...d1, ...d4])].sort();
       } else {
         const d1 = appData.table1.filter(r => r._week === selectedFilterWeek && (r._monthIndex === undefined || r._monthIndex === selectedMonthIndex)).map(r => r._date).filter(Boolean);
@@ -1144,7 +1143,6 @@
         });
     }
 
-    // Parser universal para copiar y pegar desde Excel/CSV
     function parseDelimitedTable(rawText) {
       if (!rawText || !rawText.trim()) return [];
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
@@ -1170,7 +1168,6 @@
       return parsedRows;
     }
 
-    // Limpiador estricto para evitar ceros corruptos o NaN en Firebase
     function cleanNum(val) {
       if (val === null || val === undefined || val === '') return 0;
       if (typeof val === 'number') return isNaN(val) ? 0 : val;
@@ -1270,7 +1267,7 @@
       return `${yr}-${m}-${d}`;
     }
 
-    // PROCESAMIENTO Y GUARDADO TOTALMENTE SANITIZADO
+    // PROCESAMIENTO CON PRESERVACIÓN Y FUSIÓN DE DATOS PREVIOS
     function processAndSaveUnifiedWeek() {
       try {
         const t1Raw = document.getElementById('paste-input-t1')?.value || '';
@@ -1284,7 +1281,7 @@
         const t4Rows = parseDelimitedTable(t4Raw);
 
         if (t1Rows.length === 0 && t2Rows.length === 0 && t3Rows.length === 0 && t4Rows.length === 0) {
-          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Por favor pega información en los cuadros antes de procesar.');
+          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Por favor pega información en al menos una de las tablas antes de procesar.');
           return;
         }
 
@@ -1294,120 +1291,136 @@
         const targetMonthLabel = monthNames[targetMonthIdx] || 'Month';
         const storageKey = `${targetMonthLabel}_${targetWeek}`;
 
-        const newT1 = [];
-        const newT2 = [];
-        const newT3 = [];
-        const newT4 = [];
+        // Obtener datos existentes en la memoria para esta semana para NO BORRAR tablas previas
+        const existingWeekData = rawWeeksStore[storageKey] || {};
+
+        let newT1 = existingWeekData.table1 ? [...existingWeekData.table1] : [];
+        let newT2 = existingWeekData.table2 ? [...existingWeekData.table2] : [];
+        let newT3 = existingWeekData.table3 ? [...existingWeekData.table3] : [];
+        let newT4 = existingWeekData.table4 ? [...existingWeekData.table4] : [];
 
         let detectedFirstDate = null;
-        let lastKnownDateT1 = '';
-        let dayStepT1 = 0;
-        let lastHourT1 = -1;
 
-        // TABLA 1 (Campos sanitizados para Firebase)
-        t1Rows.forEach((rowVals) => {
-          const dateHourStr = rowVals[0] || '';
-          let dPart = extractDatePart(dateHourStr);
-          const hourNum = extractHourNumber(dateHourStr);
+        // TABLA 1: Si el usuario pegó datos nuevos para T1, procesamos y reemplazamos T1
+        if (t1Rows.length > 0) {
+          newT1 = [];
+          let lastKnownDateT1 = '';
+          let dayStepT1 = 0;
+          let lastHourT1 = -1;
 
-          if (hourNum >= 0 && lastHourT1 >= 18 && hourNum <= 2 && !dPart) {
-            dayStepT1++;
-          }
-          if (hourNum >= 0) lastHourT1 = hourNum;
+          t1Rows.forEach((rowVals) => {
+            const dateHourStr = rowVals[0] || '';
+            let dPart = extractDatePart(dateHourStr);
+            const hourNum = extractHourNumber(dateHourStr);
 
-          if (dPart) {
-            lastKnownDateT1 = dPart;
-          } else if (lastKnownDateT1) {
-            dPart = lastKnownDateT1;
-          } else {
-            dPart = getFallbackDateForWeek(targetWeek, dayStepT1, targetMonthIdx);
-          }
+            if (hourNum >= 0 && lastHourT1 >= 18 && hourNum <= 2 && !dPart) {
+              dayStepT1++;
+            }
+            if (hourNum >= 0) lastHourT1 = hourNum;
 
-          if (dPart && !detectedFirstDate) detectedFirstDate = dPart;
+            if (dPart) {
+              lastKnownDateT1 = dPart;
+            } else if (lastKnownDateT1) {
+              dPart = lastKnownDateT1;
+            } else {
+              dPart = getFallbackDateForWeek(targetWeek, dayStepT1, targetMonthIdx);
+            }
 
-          newT1.push({
-            'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-            'ABND IN ROUTING': cleanNum(rowVals[1]),
-            'ANSWERED': cleanNum(rowVals[2]),
-            'ABND IN CSAT RATING': cleanNum(rowVals[3]),
-            'ABND IN QUEUE': cleanNum(rowVals[4]),
-            'ANBD ON HOLD': cleanNum(rowVals[5]),
-            '_week': targetWeek,
-            '_monthIndex': targetMonthIdx,
-            '_monthLabel': targetMonthLabel,
-            '_date': dPart,
-            '_hour': hourNum >= 0 ? hourNum : 0
+            if (dPart && !detectedFirstDate) detectedFirstDate = dPart;
+
+            newT1.push({
+              'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
+              'ABND IN ROUTING': cleanNum(rowVals[1]),
+              'ANSWERED': cleanNum(rowVals[2]),
+              'ABND IN CSAT RATING': cleanNum(rowVals[3]),
+              'ABND IN QUEUE': cleanNum(rowVals[4]),
+              'ANBD ON HOLD': cleanNum(rowVals[5]),
+              '_week': targetWeek,
+              '_monthIndex': targetMonthIdx,
+              '_monthLabel': targetMonthLabel,
+              '_date': dPart,
+              '_hour': hourNum >= 0 ? hourNum : 0
+            });
           });
-        });
+        }
 
         // TABLA 2
-        t2Rows.forEach(rowVals => {
-          newT2.push({
-            'TEAM': String(rowVals[0] || 'Team').trim(),
-            'ANSWERED': cleanNum(rowVals[1]),
-            'ABND IN CSAT RATING': cleanNum(rowVals[2]),
-            'ABND IN QUEUE': cleanNum(rowVals[3]),
-            'ABND ON HOLD': cleanNum(rowVals[4]),
-            '_week': targetWeek,
-            '_monthIndex': targetMonthIdx,
-            '_monthLabel': targetMonthLabel
+        if (t2Rows.length > 0) {
+          newT2 = [];
+          t2Rows.forEach(rowVals => {
+            newT2.push({
+              'TEAM': String(rowVals[0] || 'Team').trim(),
+              'ANSWERED': cleanNum(rowVals[1]),
+              'ABND IN CSAT RATING': cleanNum(rowVals[2]),
+              'ABND IN QUEUE': cleanNum(rowVals[3]),
+              'ABND ON HOLD': cleanNum(rowVals[4]),
+              '_week': targetWeek,
+              '_monthIndex': targetMonthIdx,
+              '_monthLabel': targetMonthLabel
+            });
           });
-        });
+        }
 
         // TABLA 3
-        t3Rows.forEach(rowVals => {
-          newT3.push({
-            'TEAMMATE': String(rowVals[0] || 'Agent').trim(),
-            'INBOUND CALLS': cleanNum(rowVals[1]),
-            'OUTBOUND CALLS': cleanNum(rowVals[2]),
-            'ABND INBOUND CALLS': cleanNum(rowVals[3]),
-            'ANSWER TIME': rowVals[4] || '00:15',
-            'TALK TIME': rowVals[5] || '03:30',
-            'CALL DURATION': rowVals[6] || '04:15',
-            'AVERAGE HOLD TIME': rowVals[7] || '00:25',
-            'DAYS ATTENDED OUT OF 5': cleanNum(rowVals[8]) || 5,
-            '_week': targetWeek,
-            '_monthIndex': targetMonthIdx,
-            '_monthLabel': targetMonthLabel
+        if (t3Rows.length > 0) {
+          newT3 = [];
+          t3Rows.forEach(rowVals => {
+            newT3.push({
+              'TEAMMATE': String(rowVals[0] || 'Agent').trim(),
+              'INBOUND CALLS': cleanNum(rowVals[1]),
+              'OUTBOUND CALLS': cleanNum(rowVals[2]),
+              'ABND INBOUND CALLS': cleanNum(rowVals[3]),
+              'ANSWER TIME': rowVals[4] || '00:15',
+              'TALK TIME': rowVals[5] || '03:30',
+              'CALL DURATION': rowVals[6] || '04:15',
+              'AVERAGE HOLD TIME': rowVals[7] || '00:25',
+              'DAYS ATTENDED OUT OF 5': cleanNum(rowVals[8]) || 5,
+              '_week': targetWeek,
+              '_monthIndex': targetMonthIdx,
+              '_monthLabel': targetMonthLabel
+            });
           });
-        });
+        }
 
         // TABLA 4
-        let lastKnownDateT4 = detectedFirstDate || '';
-        let dayStepT4 = 0;
-        let lastHourT4 = -1;
+        if (t4Rows.length > 0) {
+          newT4 = [];
+          let lastKnownDateT4 = detectedFirstDate || '';
+          let dayStepT4 = 0;
+          let lastHourT4 = -1;
 
-        t4Rows.forEach(rowVals => {
-          const dateHourStr = rowVals[0] || '';
-          let dPart = extractDatePart(dateHourStr);
-          const hourNum = extractHourNumber(dateHourStr);
+          t4Rows.forEach(rowVals => {
+            const dateHourStr = rowVals[0] || '';
+            let dPart = extractDatePart(dateHourStr);
+            const hourNum = extractHourNumber(dateHourStr);
 
-          if (hourNum >= 0 && lastHourT4 >= 18 && hourNum <= 2 && !dPart) {
-            dayStepT4++;
-          }
-          if (hourNum >= 0) lastHourT4 = hourNum;
+            if (hourNum >= 0 && lastHourT4 >= 18 && hourNum <= 2 && !dPart) {
+              dayStepT4++;
+            }
+            if (hourNum >= 0) lastHourT4 = hourNum;
 
-          if (dPart) {
-            lastKnownDateT4 = dPart;
-          } else if (lastKnownDateT4) {
-            dPart = lastKnownDateT4;
-          } else {
-            dPart = getFallbackDateForWeek(targetWeek, dayStepT4, targetMonthIdx);
-          }
+            if (dPart) {
+              lastKnownDateT4 = dPart;
+            } else if (lastKnownDateT4) {
+              dPart = lastKnownDateT4;
+            } else {
+              dPart = getFallbackDateForWeek(targetWeek, dayStepT4, targetMonthIdx);
+            }
 
-          if (dPart && !detectedFirstDate) detectedFirstDate = dPart;
+            if (dPart && !detectedFirstDate) detectedFirstDate = dPart;
 
-          newT4.push({
-            'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
-            'INBOUND CALLS': cleanNum(rowVals[1]),
-            'TAGGED CONVERSATIONS': cleanNum(rowVals[2]),
-            '_week': targetWeek,
-            '_monthIndex': targetMonthIdx,
-            '_monthLabel': targetMonthLabel,
-            '_date': dPart,
-            '_hour': hourNum >= 0 ? hourNum : 0
+            newT4.push({
+              'DATE & HOUR': dateHourStr || `${dPart} ${hourNum >= 0 ? hourNum + ':00' : ''}`,
+              'INBOUND CALLS': cleanNum(rowVals[1]),
+              'TAGGED CONVERSATIONS': cleanNum(rowVals[2]),
+              '_week': targetWeek,
+              '_monthIndex': targetMonthIdx,
+              '_monthLabel': targetMonthLabel,
+              '_date': dPart,
+              '_hour': hourNum >= 0 ? hourNum : 0
+            });
           });
-        });
+        }
 
         const weekPayload = {
           monthIndex: targetMonthIdx,
@@ -1420,9 +1433,7 @@
           savedAt: new Date().toISOString()
         };
 
-        // 1. Guardar en memoria local e inmediatamente enviar a Firebase Realtime Database
-        rawWeeksStore[storageKey] = weekPayload;
-
+        // Guardado seguro usando update/set sobre la clave específica
         db.ref("weeks_data/" + storageKey).set(weekPayload)
           .then(() => {
             selectedFilterWeek = targetWeek;
@@ -1434,18 +1445,18 @@
               if (picker) picker.value = currentSelectedDate;
             }
 
-            // Limpiar cajas
-            ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
-              const el = document.getElementById(id);
-              if (el) el.value = '';
-            });
+            // Solo limpiar las cajas que tenían datos pegados
+            if (t1Rows.length > 0) document.getElementById('paste-input-t1').value = '';
+            if (t2Rows.length > 0) document.getElementById('paste-input-t2').value = '';
+            if (t3Rows.length > 0) document.getElementById('paste-input-t3').value = '';
+            if (t4Rows.length > 0) document.getElementById('paste-input-t4').value = '';
 
             syncCurrentDateToSelectedWeek();
             handleDateNavigationUpdate();
             renderSavedWeeksBadges();
             checkAllFourTablesReady();
 
-            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada en la Nube para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
+            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>¡Información guardada/actualizada para <strong>${targetMonthLabel} - ${targetWeek}</strong>!`);
             switchTab('overview');
           })
           .catch((error) => {
@@ -1472,13 +1483,13 @@
 
       container.innerHTML = '';
       keys.forEach(k => {
-        const entry = rawWeeksStore[k];
+        const entry = rawWeeksStore[k] || {};
         const displayLabel = entry.monthLabel && entry.week ? `${entry.monthLabel} - ${entry.week}` : k;
         const badge = document.createElement('div');
         badge.className = 'flex items-center gap-1.5 bg-slate-950 border border-amber-500/40 px-2.5 py-1 rounded-lg text-xs font-bold text-amber-300';
         badge.innerHTML = `
           <span class="cursor-pointer hover:underline" title="Click to view">${displayLabel}</span>
-          <button class="text-rose-400 hover:text-rose-300 ml-1" title="Delete from Cloud">&times;</button>
+          <button class="text-rose-400 hover:text-rose-300 ml-1 p-0.5 rounded hover:bg-rose-500/10" title="Delete from Cloud">&times;</button>
         `;
 
         badge.querySelector('span').onclick = () => {
@@ -1498,7 +1509,9 @@
 
         badge.querySelector('button').onclick = (e) => {
           e.stopPropagation();
-          deleteWeekData(k);
+          if (confirm(`¿Estás seguro de que deseas eliminar permanentemente los datos guardados para "${displayLabel}"?`)) {
+            deleteWeekData(k);
+          }
         };
 
         container.appendChild(badge);
