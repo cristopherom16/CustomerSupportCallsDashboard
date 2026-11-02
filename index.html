@@ -637,7 +637,7 @@
     let localNotesStore = {};
     let localInsightsStore = {};
 
-    let selectedMonthIndex = 9; // Default to October (index 9)
+    let selectedMonthIndex = 9; // October default
     let selectedWeek = 'Week 1';
     let currentSelectedDate = '';
     let chartInstances = {};
@@ -737,6 +737,14 @@
         if (/am\b/i.test(str) && hour === 12) hour = 0;
         return hour >= 0 && hour <= 23 ? hour : -1;
       }
+      const singleHour = String(str).match(/\b(\d{1,2})\s*(am|pm)\b/i);
+      if (singleHour) {
+        let hour = parseInt(singleHour[1], 10);
+        const meridian = singleHour[2].toLowerCase();
+        if (meridian === 'pm' && hour < 12) hour += 12;
+        if (meridian === 'am' && hour === 12) hour = 0;
+        return hour >= 0 && hour <= 23 ? hour : -1;
+      }
       return -1;
     }
 
@@ -779,8 +787,10 @@
     }
 
     function extractMonthIndexFromKey(key) {
+      if (!key) return -1;
+      const lower = key.toLowerCase();
       for (let i = 0; i < monthNamesShort.length; i++) {
-        if (key.toLowerCase().includes(monthNamesShort[i].toLowerCase()) || key.toLowerCase().includes(monthNames[i].toLowerCase())) {
+        if (lower.includes(monthNamesShort[i].toLowerCase()) || lower.includes(monthNames[i].toLowerCase())) {
           return i;
         }
       }
@@ -788,6 +798,7 @@
     }
 
     function extractWeekFromKey(key) {
+      if (!key) return 'Week 1';
       const match = key.match(/week[\s_-]?([1-5])/i);
       return match ? `Week ${match[1]}` : 'Week 1';
     }
@@ -802,7 +813,13 @@
         const entry = rawStore[key];
         if (!entry) return;
 
-        let entryMonth = entry.monthIndex !== undefined ? parseInt(entry.monthIndex, 10) : extractMonthIndexFromKey(key);
+        let entryMonth = -1;
+        if (entry.monthIndex !== undefined && !isNaN(entry.monthIndex)) {
+          entryMonth = parseInt(entry.monthIndex, 10);
+        } else {
+          entryMonth = extractMonthIndexFromKey(key);
+        }
+
         let entryWeek = entry.week || extractWeekFromKey(key);
 
         const injectMeta = (arr, tType) => {
@@ -810,14 +827,26 @@
           return arr.map(r => {
             let rowCopy = normalizeRowFields(r, tType);
             rowCopy._scope = key;
-            rowCopy._monthIndex = entryMonth;
-            rowCopy._week = entryWeek;
 
-            // If date is embedded in string
+            // Extract date and hour
             if (!rowCopy._date && rowCopy['DATE & HOUR']) {
               rowCopy._date = extractDatePart(rowCopy['DATE & HOUR']) || '';
               rowCopy._hour = extractHourNumber(rowCopy['DATE & HOUR']);
             }
+
+            // Derive month from date if available
+            if (rowCopy._date) {
+              const p = rowCopy._date.split('-').map(Number);
+              if (p.length >= 2 && !isNaN(p[1])) {
+                rowCopy._monthIndex = p[1] - 1;
+              } else {
+                rowCopy._monthIndex = entryMonth;
+              }
+            } else {
+              rowCopy._monthIndex = entryMonth;
+            }
+
+            rowCopy._week = entryWeek;
             return rowCopy;
           });
         };
@@ -829,16 +858,49 @@
       });
 
       updateScopeDropdown();
-      autoFocusDateForActiveWeek();
+      ensureInitialScopeSync();
       handleDateNavigationUpdate();
       renderSavedWeeksBadges();
+    }
+
+    function ensureInitialScopeSync() {
+      const dates = getAllGlobalDates();
+      if (dates.length > 0) {
+        if (!currentSelectedDate || !dates.includes(currentSelectedDate)) {
+          currentSelectedDate = dates[0];
+          syncControlsToDate(currentSelectedDate);
+        }
+      }
+    }
+
+    function syncControlsToDate(dateStr) {
+      if (!dateStr) return;
+      const parts = dateStr.split('-').map(Number);
+      if (parts.length >= 2 && !isNaN(parts[1])) {
+        selectedMonthIndex = parts[1] - 1;
+        const mSel = document.getElementById('header-month-select');
+        if (mSel) mSel.value = selectedMonthIndex;
+      }
+      const picker = document.getElementById('date-picker');
+      if (picker) picker.value = dateStr;
     }
 
     function onMonthChanged(val) {
       selectedMonthIndex = parseInt(val, 10);
       const tm = document.getElementById('target-month-select');
       if (tm) tm.value = selectedMonthIndex;
-      autoFocusDateForActiveWeek();
+      
+      // Auto-jump to first date matching this month
+      const dates = getAllGlobalDates().filter(d => {
+        const parts = d.split('-').map(Number);
+        return parts[1] - 1 === selectedMonthIndex;
+      });
+
+      if (dates.length > 0) {
+        currentSelectedDate = dates[0];
+        const picker = document.getElementById('date-picker');
+        if (picker) picker.value = currentSelectedDate;
+      }
       handleDateNavigationUpdate();
     }
 
@@ -846,7 +908,6 @@
       selectedWeek = val;
       const tw = document.getElementById('target-week-select');
       if (tw) tw.value = selectedWeek;
-      autoFocusDateForActiveWeek();
       handleDateNavigationUpdate();
     }
 
@@ -869,71 +930,41 @@
     }
 
     function onScopeChanged(val) {
-      activeScope = val;
       if (val !== 'all' && rawStore[val]) {
         if (rawStore[val].monthIndex !== undefined && rawStore[val].monthIndex !== -1) {
           selectedMonthIndex = rawStore[val].monthIndex;
           document.getElementById('header-month-select').value = selectedMonthIndex;
+        } else {
+          const mi = extractMonthIndexFromKey(val);
+          if (mi !== -1) {
+            selectedMonthIndex = mi;
+            document.getElementById('header-month-select').value = selectedMonthIndex;
+          }
         }
         if (rawStore[val].week) {
           selectedWeek = rawStore[val].week;
           document.getElementById('header-week-select').value = selectedWeek;
         }
       }
-      autoFocusDateForActiveWeek();
-      handleDateNavigationUpdate();
-    }
-
-    function clearDateFilter() {
-      currentSelectedDate = '';
-      const picker = document.getElementById('date-picker');
-      if (picker) picker.value = '';
+      ensureInitialScopeSync();
       handleDateNavigationUpdate();
     }
 
     function onDatePickerChanged(val) {
       currentSelectedDate = val || '';
+      syncControlsToDate(currentSelectedDate);
       handleDateNavigationUpdate();
     }
 
-    function getDatesForCurrentScope() {
-      let t1 = appData.table1;
-      let t4 = appData.table4;
-
-      if (activeScope !== 'all') {
-        t1 = t1.filter(r => r._scope === activeScope);
-        t4 = t4.filter(r => r._scope === activeScope);
-      } else {
-        if (selectedMonthIndex !== -1) {
-          t1 = t1.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
-          t4 = t4.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
-        }
-        if (selectedWeek) {
-          t1 = t1.filter(r => r._week === selectedWeek);
-          t4 = t4.filter(r => r._week === selectedWeek);
-        }
-      }
-
-      const d1 = t1.map(r => r._date).filter(Boolean);
-      const d4 = t4.map(r => r._date).filter(Boolean);
+    // GLOBAL UNRESTRICTED DATES LIST (Solves arrow navigation bug)
+    function getAllGlobalDates() {
+      const d1 = appData.table1.map(r => r._date).filter(Boolean);
+      const d4 = appData.table4.map(r => r._date).filter(Boolean);
       return [...new Set([...d1, ...d4])].sort();
     }
 
-    function autoFocusDateForActiveWeek() {
-      const dates = getDatesForCurrentScope();
-      if (dates.length > 0) {
-        currentSelectedDate = dates[0];
-      } else {
-        // Fallback to all dates if none match exactly
-        const allDates = [...new Set([...appData.table1.map(r => r._date), ...appData.table4.map(r => r._date)])].filter(Boolean).sort();
-        currentSelectedDate = allDates.length > 0 ? allDates[0] : '';
-      }
-      const picker = document.getElementById('date-picker');
-      if (picker) picker.value = currentSelectedDate;
-    }
-
     function navigateDate(step) {
-      const dates = getDatesForCurrentScope();
+      const dates = getAllGlobalDates();
       if (dates.length > 0) {
         let idx = dates.indexOf(currentSelectedDate);
         if (idx === -1) {
@@ -944,17 +975,18 @@
           if (idx >= dates.length) idx = dates.length - 1;
         }
         currentSelectedDate = dates[idx];
+        syncControlsToDate(currentSelectedDate);
       } else {
+        // Fallback calendar progression if no records exist yet
         let baseDate = currentSelectedDate ? new Date(currentSelectedDate + 'T00:00:00') : new Date();
         baseDate.setDate(baseDate.getDate() + step);
         const yr = baseDate.getFullYear();
         const m = String(baseDate.getMonth() + 1).padStart(2, '0');
         const d = String(baseDate.getDate()).padStart(2, '0');
         currentSelectedDate = `${yr}-${m}-${d}`;
+        syncControlsToDate(currentSelectedDate);
       }
 
-      const picker = document.getElementById('date-picker');
-      if (picker) picker.value = currentSelectedDate;
       handleDateNavigationUpdate();
     }
 
@@ -982,21 +1014,11 @@
         return;
       }
 
-      db.ref("open_data").on("value", (snapshot) => {
-        const val = snapshot.val();
-        if (val) {
-          Object.assign(rawStore, val);
-          localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
-          rebuildAppDataFromStore();
-        }
-      });
-
+      // Check both database trees
       db.ref("weeks_data").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
-          Object.keys(val).forEach(k => {
-            if (!rawStore[k]) rawStore[k] = { ...val[k], name: val[k].name || k };
-          });
+          Object.assign(rawStore, val);
           localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
           rebuildAppDataFromStore();
         }
@@ -1004,6 +1026,15 @@
       }, (err) => {
         console.error("Firebase Read Error:", err);
         updateCloudStatus('disconnected', 'Firebase Error');
+      });
+
+      db.ref("open_data").on("value", (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          Object.assign(rawStore, val);
+          localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
+          rebuildAppDataFromStore();
+        }
       });
 
       db.ref("open_notes").on("value", (snapshot) => {
@@ -1047,35 +1078,26 @@
     }
 
     function getFilteredData() {
-      let t1 = appData.table1;
-      let t2 = appData.table2;
-      let t3 = appData.table3;
-      let t4 = appData.table4;
+      // 1. Daily data (Tables 1 & 4) filters by currentSelectedDate
+      let t1 = appData.table1.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
+      let t4 = appData.table4.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
 
-      if (activeScope !== 'all') {
-        t1 = t1.filter(r => r._scope === activeScope);
-        t2 = t2.filter(r => r._scope === activeScope);
-        t3 = t3.filter(r => r._scope === activeScope);
-        t4 = t4.filter(r => r._scope === activeScope);
-      } else {
-        if (selectedMonthIndex !== -1) {
-          t1 = t1.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
-          t2 = t2.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
-          t3 = t3.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
-          t4 = t4.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
-        }
-        if (selectedWeek) {
-          t1 = t1.filter(r => r._week === selectedWeek);
-          t2 = t2.filter(r => r._week === selectedWeek);
-          t3 = t3.filter(r => r._week === selectedWeek);
-          t4 = t4.filter(r => r._week === selectedWeek);
-        }
-      }
+      // 2. Weekly & Team data (Tables 2 & 3) filters by selected month & week
+      let t2 = appData.table2.filter(r => {
+        const matchM = r._monthIndex === undefined || r._monthIndex === -1 || r._monthIndex === selectedMonthIndex;
+        const matchW = !r._week || r._week === selectedWeek;
+        return matchM && matchW;
+      });
 
-      if (currentSelectedDate) {
-        t1 = t1.filter(r => !r._date || r._date === currentSelectedDate);
-        t4 = t4.filter(r => !r._date || r._date === currentSelectedDate);
-      }
+      let t3 = appData.table3.filter(r => {
+        const matchM = r._monthIndex === undefined || r._monthIndex === -1 || r._monthIndex === selectedMonthIndex;
+        const matchW = !r._week || r._week === selectedWeek;
+        return matchM && matchW;
+      });
+
+      // Fallback: If weekly scope is empty, show whatever is available to prevent blank screens
+      if (t2.length === 0) t2 = appData.table2;
+      if (t3.length === 0) t3 = appData.table3;
 
       return { t1, t2, t3, t4 };
     }
@@ -1085,7 +1107,7 @@
       if (!container) return;
       container.innerHTML = '';
 
-      const dates = getDatesForCurrentScope();
+      const dates = getAllGlobalDates();
       if (dates.length === 0) return;
 
       dates.forEach(dStr => {
@@ -1093,8 +1115,7 @@
         const pill = document.createElement('button');
         pill.onclick = () => {
           currentSelectedDate = dStr;
-          const picker = document.getElementById('date-picker');
-          if (picker) picker.value = currentSelectedDate;
+          syncControlsToDate(currentSelectedDate);
           handleDateNavigationUpdate();
         };
 
@@ -1119,9 +1140,6 @@
 
       const dBadge = document.getElementById('scope-day-badge');
       if (dBadge) dBadge.innerText = `Day: ${dateLabel}`;
-
-      const sBadge = document.getElementById('scope-status-badge');
-      if (sBadge) sBadge.innerText = `Scope: ${monthLabel} - ${weekLabel}`;
 
       const uDay = document.getElementById('unified-day-label');
       if (uDay) uDay.innerText = currentSelectedDate || 'General / All Days';
@@ -1454,7 +1472,6 @@
         `;
 
         badge.querySelector('span').onclick = () => {
-          activeScope = k;
           if (entry.monthIndex !== undefined && entry.monthIndex !== -1) {
             selectedMonthIndex = entry.monthIndex;
             document.getElementById('header-month-select').value = selectedMonthIndex;
@@ -1463,7 +1480,6 @@
             selectedWeek = entry.week;
             document.getElementById('header-week-select').value = selectedWeek;
           }
-          autoFocusDateForActiveWeek();
           handleDateNavigationUpdate();
           switchTab('overview');
         };
@@ -1477,7 +1493,6 @@
               db.ref("open_data/" + k).remove();
               db.ref("weeks_data/" + k).remove();
             }
-            if (activeScope === k) activeScope = 'all';
             rebuildAppDataFromStore();
           }
         };
@@ -1496,7 +1511,7 @@
 
       const tb1 = document.getElementById('tbody-t1');
       if (t1.length === 0) {
-        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>';
+        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
       } else {
         tb1.innerHTML = t1.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
@@ -1512,7 +1527,7 @@
 
       const tb2 = document.getElementById('tbody-t2');
       if (t2.length === 0) {
-        tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No queue records found.</td></tr>';
+        tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No queue records found for this week.</td></tr>';
       } else {
         tb2.innerHTML = t2.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
@@ -1527,7 +1542,7 @@
 
       const tb3 = document.getElementById('tbody-t3');
       if (t3.length === 0) {
-        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No agent records found.</td></tr>';
+        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No agent records found for this week.</td></tr>';
       } else {
         tb3.innerHTML = t3.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
@@ -1546,7 +1561,7 @@
 
       const tb4 = document.getElementById('tbody-t4');
       if (t4.length === 0) {
-        tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No overflow records found.</td></tr>';
+        tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No overflow records found for this day.</td></tr>';
       } else {
         tb4.innerHTML = t4.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
