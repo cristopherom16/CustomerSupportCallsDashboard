@@ -148,12 +148,12 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
-  <!-- Floating Dark/Light Toggle -->
+  <!-- Theme Toggle Button -->
   <button onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
     <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
   </button>
 
-  <!-- Top Navigation Bar -->
+  <!-- Top Navigation Header -->
   <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 py-3 transition-all" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-wrap items-center justify-between gap-4">
       
@@ -171,75 +171,37 @@
             </span>
           </div>
           <span class="text-[11px] font-semibold text-slate-400 tracking-widest uppercase">
-            CALLS DASHBOARD
+            CALLS DASHBOARD (OPEN STORAGE)
           </span>
         </div>
       </div>
 
+      <!-- Scope Filter (Unlimited & Free Tags) -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
-        <!-- Date Picker Controls -->
+        <!-- Date Selector -->
         <div class="flex items-center gap-1">
-          <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition border border-amber-500/20">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
-          </button>
           <input type="date" id="date-picker" onchange="onDatePickerChanged(this.value)" class="bg-slate-900 text-amber-300 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
-          <button onclick="navigateDate(1)" title="Next Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition border border-amber-500/20">
-            <i class="fa-solid fa-chevron-right text-xs"></i>
-          </button>
         </div>
 
-        <button onclick="setToday()" class="text-[11px] font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-2.5 py-1 rounded-md border border-amber-500/30 transition-all">
-          Today
+        <button onclick="clearDateFilter()" class="text-[11px] font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-2.5 py-1 rounded-md border border-amber-500/30 transition-all">
+          All Dates
         </button>
 
         <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
 
-        <!-- Month Filter -->
+        <!-- Stored Dataset Selector -->
         <div class="flex items-center gap-1.5 pl-1">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Month:</span>
-          <select id="header-month-select" onchange="onHeaderMonthChanged(this.value)" class="bg-slate-900 text-amber-400 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
-            <option value="all">All Months</option>
-            <option value="0">January</option>
-            <option value="1">February</option>
-            <option value="2">March</option>
-            <option value="3">April</option>
-            <option value="4">May</option>
-            <option value="5">June</option>
-            <option value="6">July</option>
-            <option value="7">August</option>
-            <option value="8">September</option>
-            <option value="9">October</option>
-            <option value="10">November</option>
-            <option value="11">December</option>
-          </select>
-        </div>
-
-        <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
-
-        <!-- Week Filter -->
-        <div class="flex items-center gap-1.5 pl-1">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Week:</span>
-          <select id="header-week-select" onchange="onHeaderWeekChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
-            <option value="all">All Weeks</option>
-            <option value="Week 1">Week 1</option>
-            <option value="Week 2">Week 2</option>
-            <option value="Week 3">Week 3</option>
-            <option value="Week 4">Week 4</option>
-            <option value="Week 5">Week 5</option>
+          <span class="text-[10px] uppercase font-bold text-slate-400">Batch / Scope:</span>
+          <select id="header-scope-select" onchange="onScopeChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
+            <option value="all">Everything (All Data)</option>
           </select>
         </div>
       </div>
 
-      <!-- Scope Badges -->
+      <!-- Scope Badge -->
       <div class="flex items-center gap-2">
-        <span id="scope-month-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
-          Month: --
-        </span>
-        <span id="scope-week-badge" class="text-xs font-bold text-gold-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
-          Week: --
-        </span>
-        <span id="scope-day-badge" class="text-xs font-bold text-amber-300 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/40 hidden md:inline-block">
-          Day: --
+        <span id="scope-status-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/40">
+          Showing: All Data
         </span>
       </div>
     </div>
@@ -267,7 +229,7 @@
     <i class="fa-solid fa-file-import text-sm"></i> Import Information
   </button>
 
-  <!-- Notification Banner -->
+  <!-- Toast Notification -->
   <div id="toast-banner" class="hidden fixed bottom-20 right-6 z-50 bg-slate-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300">
     <span id="toast-message" class="text-xs font-medium">Notification</span>
     <button onclick="document.getElementById('toast-banner').classList.add('hidden')" class="text-slate-400 hover:text-white ml-2 text-sm">&times;</button>
@@ -275,32 +237,32 @@
 
   <main class="flex-1 w-full py-8 space-y-8 pb-24" style="padding-left: 67px; padding-right: 10mm;">
 
-    <!-- VIEW 1: OVERVIEW & CHARTS -->
+    <!-- TAB 1: OVERVIEW & CHARTS -->
     <div id="view-overview" class="space-y-8">
       <div>
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
-          <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
+          <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Overall Metrics Summary
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
             <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Active Scope</span>
+            <span class="text-[10px] text-slate-500">Stored dataset</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. Queue</span>
             <div id="kpi-abnd-queue" class="text-xl font-extrabold text-rose-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Active Scope</span>
+            <span class="text-[10px] text-slate-500">Stored dataset</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. CSAT</span>
             <div id="kpi-abnd-csat" class="text-xl font-extrabold text-amber-300 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Active Scope</span>
+            <span class="text-[10px] text-slate-500">Stored dataset</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. On Hold</span>
             <div id="kpi-abnd-hold" class="text-xl font-extrabold text-orange-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Active Scope</span>
+            <span class="text-[10px] text-slate-500">Stored dataset</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Inbound Calls</span>
@@ -321,18 +283,14 @@
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
-            <p class="text-xs text-slate-400">Charts 1-4 & 10 reflect the active date. Charts 5-9 reflect the active week.</p>
-          </div>
-          <div class="text-right">
-            <span class="text-xs font-semibold text-slate-400">Active Day:</span>
-            <span class="text-xs font-bold text-amber-300 table-day-label">--</span>
+            <p class="text-xs text-slate-400">Displaying all accumulated data without monthly limits.</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">1. Date & Hour vs. Answered</span>
+              <span class="text-xs font-bold text-amber-400">1. Hourly Answered</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c1"></canvas></div>
@@ -340,7 +298,7 @@
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">2. Date & Hour vs. Abnd. In CSAT</span>
+              <span class="text-xs font-bold text-amber-400">2. Hourly Abnd. in CSAT</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c2"></canvas></div>
@@ -348,7 +306,7 @@
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">3. Date & Hour vs. Abnd. in Queue</span>
+              <span class="text-xs font-bold text-amber-400">3. Hourly Abnd. in Queue</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c3"></canvas></div>
@@ -356,7 +314,7 @@
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">4. Date & Hour vs. Abnd. On Hold</span>
+              <span class="text-xs font-bold text-amber-400">4. Hourly Abnd. On Hold</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c4"></canvas></div>
@@ -364,7 +322,7 @@
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">10. Calls Overflow: Inbound vs Tagged</span>
+              <span class="text-xs font-bold text-amber-400">10. Overflow: Inbound vs Tagged</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c10"></canvas></div>
@@ -372,40 +330,40 @@
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">5. Team vs. Answered & Abandons</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
+              <span class="text-xs font-bold text-amber-400">5. Team Answered & Abandons</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Queues</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c5"></canvas></div>
           </div>
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">6. Teammate vs. Abnd. Inbound Calls</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
+              <span class="text-xs font-bold text-amber-400">6. Teammate vs Abnd. Inbound</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Agents</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c6"></canvas></div>
           </div>
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">7. Teammate vs. Answer Time (Sec)</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
+              <span class="text-xs font-bold text-amber-400">7. Teammate vs Answer Time (Sec)</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Agents</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c7"></canvas></div>
           </div>
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">8. Teammate vs. Talk Time (Minutes)</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
+              <span class="text-xs font-bold text-amber-400">8. Teammate vs Talk Time (Minutes)</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Agents</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c8"></canvas></div>
           </div>
 
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between md:col-span-2 xl:col-span-3">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">9. Teammate vs. Call Duration (Minutes)</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
+              <span class="text-xs font-bold text-amber-400">9. Teammate vs Call Duration (Minutes)</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Agents</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c9"></canvas></div>
           </div>
@@ -414,15 +372,12 @@
 
       <div class="space-y-6 pt-4">
         <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-          <i class="fa-solid fa-table-cells text-amber-500"></i> Operational Data Tables
+          <i class="fa-solid fa-table-cells text-amber-500"></i> Stored Records Tables
         </h2>
 
         <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
-            <div>
-              <h3 class="text-sm font-bold text-amber-400">1. Calls Per Hour</h3>
-              <p class="text-[11px] text-slate-400">Active Day: <span class="table-day-label font-semibold text-amber-300">--</span></p>
-            </div>
+            <h3 class="text-sm font-bold text-amber-400">1. Calls Per Hour</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t1-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
@@ -438,7 +393,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t1" class="divide-y divide-amber-500/20 font-mono">
-                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for selected scope.</td></tr>
+                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
           </div>
@@ -446,10 +401,7 @@
 
         <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
-            <div>
-              <h3 class="text-sm font-bold text-amber-400">2. Calls Per Queue</h3>
-              <p class="text-[11px] text-slate-400">Scope: <span class="table-week-label font-semibold text-gold-400">--</span></p>
-            </div>
+            <h3 class="text-sm font-bold text-amber-400">2. Calls Per Queue</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t2-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
@@ -464,7 +416,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t2" class="divide-y divide-amber-500/20 font-mono">
-                <tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No records found for this scope.</td></tr>
+                <tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
           </div>
@@ -472,10 +424,7 @@
 
         <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
-            <div>
-              <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
-              <p class="text-[11px] text-slate-400">Scope: <span class="table-week-label font-semibold text-gold-400">--</span></p>
-            </div>
+            <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t3-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
@@ -494,7 +443,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono">
-                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No agent records found for this scope.</td></tr>
+                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
           </div>
@@ -502,10 +451,7 @@
 
         <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
-            <div>
-              <h3 class="text-sm font-bold text-amber-400">4. Calls Overflow</h3>
-              <p class="text-[11px] text-slate-400">Active Day: <span class="table-day-label font-semibold text-amber-300">--</span></p>
-            </div>
+            <h3 class="text-sm font-bold text-amber-400">4. Calls Overflow</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t4-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
@@ -518,7 +464,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t4" class="divide-y divide-amber-500/20 font-mono">
-                <tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No overflow records found.</td></tr>
+                <tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
           </div>
@@ -526,56 +472,36 @@
       </div>
     </div>
 
-    <!-- VIEW 2: IMPORT INFORMATION -->
+    <!-- TAB 2: IMPORT INFORMATION -->
     <div id="view-import" class="hidden space-y-6">
       <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-              <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables
+              <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import Data (Any Custom Name)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Paste tables copied directly from Excel or CSV. Data persists directly in Firebase and local storage.
+              Give your data any label (e.g., Batch 1, Week 42, Support Data). No month restrictions.
             </p>
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/30">
-              <span class="text-xs font-bold text-slate-300">Assign To:</span>
-              <select id="target-month-select" class="bg-slate-950 text-xs text-amber-400 font-bold focus:outline-none cursor-pointer border-r border-amber-500/30 pr-2">
-                <option value="0">January</option>
-                <option value="1">February</option>
-                <option value="2">March</option>
-                <option value="3">April</option>
-                <option value="4">May</option>
-                <option value="5">June</option>
-                <option value="6">July</option>
-                <option value="7">August</option>
-                <option value="8">September</option>
-                <option value="9">October</option>
-                <option value="10">November</option>
-                <option value="11">December</option>
-              </select>
-              <select id="target-week-select" class="bg-transparent text-xs text-amber-300 font-bold focus:outline-none cursor-pointer">
-                <option value="Week 1">Week 1</option>
-                <option value="Week 2">Week 2</option>
-                <option value="Week 3">Week 3</option>
-                <option value="Week 4">Week 4</option>
-                <option value="Week 5">Week 5</option>
-              </select>
+              <span class="text-xs font-bold text-slate-300">Dataset Name:</span>
+              <input type="text" id="custom-dataset-name" placeholder="e.g. October Batch 1" class="bg-slate-900 text-xs text-amber-300 font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
             </div>
 
-            <button id="btn-process-save-week" onclick="processAndSaveUnifiedWeek()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-amber-400">
-              <i class="fa-solid fa-bolt text-xs"></i> Process & Save Week
+            <button id="btn-process-save-week" onclick="processAndSaveData()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-amber-400">
+              <i class="fa-solid fa-bolt text-xs"></i> Save to Database
             </button>
           </div>
         </div>
 
         <div class="mt-4 pt-4 border-t border-amber-500/30 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold text-slate-400">Stored Weeks in Firebase:</span>
+            <span class="text-xs font-semibold text-slate-400">Stored Datasets:</span>
             <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
-              <span class="text-xs text-slate-600 italic">No weeks stored yet</span>
+              <span class="text-xs text-slate-600 italic">No datasets loaded yet</span>
             </div>
           </div>
         </div>
@@ -590,7 +516,7 @@
             </div>
             <span id="badge-check-t1" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t1" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Hour table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t1" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Hour..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 flex flex-col justify-between">
@@ -601,7 +527,7 @@
             </div>
             <span id="badge-check-t2" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t2" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Queue table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t2" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Queue..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 flex flex-col justify-between">
@@ -612,7 +538,7 @@
             </div>
             <span id="badge-check-t3" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agents table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agents..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 flex flex-col justify-between">
@@ -623,21 +549,21 @@
             </div>
             <span id="badge-check-t4" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t4" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Overflow table..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t4" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Overflow..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
         </div>
       </div>
     </div>
 
-    <!-- VIEW 3: NOTES & INSIGHTS -->
+    <!-- TAB 3: NOTES & INSIGHTS -->
     <div id="view-notes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 space-y-4">
           <div class="flex justify-between items-center border-b border-amber-500/30 pb-3">
             <div>
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-clock text-amber-500"></i> Daily Notes Per Hour
+                <i class="fa-solid fa-clock text-amber-500"></i> Hourly Operational Notes
               </h3>
-              <p class="text-xs text-slate-400">Notes for date: <span id="unified-day-label" class="font-bold text-amber-300">--</span></p>
+              <p class="text-xs text-slate-400">Target Date: <span id="unified-day-label" class="font-bold text-amber-300">--</span></p>
             </div>
             <button onclick="saveAllHourlyNotes()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition">
               <i class="fa-solid fa-floppy-disk mr-1"></i> Save Day Notes
@@ -651,32 +577,32 @@
           <div class="flex justify-between items-center border-b border-amber-500/30 pb-3">
             <div>
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-lightbulb text-amber-500"></i> Weekly Insights
+                <i class="fa-solid fa-lightbulb text-amber-500"></i> General Insights
               </h3>
-              <p class="text-xs text-slate-400">Scope: <span id="unified-week-label" class="font-bold text-gold-400">--</span></p>
+              <p class="text-xs text-slate-400">Active Scope: <span id="unified-scope-label" class="font-bold text-gold-400">All</span></p>
             </div>
             <button onclick="saveWeeklyInsights()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition">
-              <i class="fa-solid fa-check mr-1"></i> Save Weekly Insights
+              <i class="fa-solid fa-check mr-1"></i> Save Insights
             </button>
           </div>
 
           <div class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Missing Members During the Week</label>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Missing Members / Coverage</label>
               <textarea id="insights-achievements" rows="3" placeholder="Absent team members, leave notes, coverage impacts..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Unexpected Events & Challenges</label>
-              <textarea id="insights-blockers" rows="3" placeholder="System outages, unexpected call spikes, technical issues..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Unexpected Events & Outages</label>
+              <textarea id="insights-blockers" rows="3" placeholder="System outages, unusual spikes, technical issues..." class="w-full bg-slate-950 text-xs text-slate-200 p-2.5 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
             </div>
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-bold text-amber-400">System Recommendations</label>
+                <label class="block text-xs font-bold text-amber-400">Automated SLA Recommendations</label>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
                   <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> AI Generated
                 </span>
               </div>
-              <textarea id="insights-actions" rows="5" readonly placeholder="System calculating SLA recommendations..." class="w-full bg-slate-950/80 text-xs text-amber-300 font-mono p-3 rounded-xl border border-amber-500/30 focus:outline-none leading-relaxed cursor-not-allowed shadow-inner"></textarea>
+              <textarea id="insights-actions" rows="5" readonly placeholder="Analyzing data to generate recommendations..." class="w-full bg-slate-950/80 text-xs text-amber-300 font-mono p-3 rounded-xl border border-amber-500/30 focus:outline-none leading-relaxed cursor-not-allowed shadow-inner"></textarea>
             </div>
           </div>
         </div>
@@ -685,9 +611,6 @@
   </main>
 
   <script>
-    const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthNamesFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -706,27 +629,19 @@
         db = firebase.database();
       }
     } catch (e) {
-      console.error("Firebase Initialization Error:", e);
+      console.error("Firebase init error:", e);
     }
 
-    let appData = {
-      table1: [],
-      table2: [],
-      table3: [],
-      table4: []
-    };
-
-    let rawWeeksStore = {};
+    let appData = { table1: [], table2: [], table3: [], table4: [] };
+    let rawStore = {};
     let localNotesStore = {};
     let localInsightsStore = {};
-    let selectedFilterWeek = 'all';
-    let selectedMonthIndex = 'all';
-    let currentSelectedDate = new Date().toISOString().split('T')[0];
+    let activeScope = 'all';
+    let currentSelectedDate = ''; // Empty means ALL DATES
     let chartInstances = {};
 
     window.onload = function () {
       initTheme();
-      initDateControls();
       loadLocalCacheFirst();
       listenToFirebaseCloudData();
       checkAllFourTablesReady();
@@ -818,26 +733,6 @@
       return -1;
     }
 
-    function formatDateFriendly(dateStr) {
-      if (!dateStr) return '--';
-      const parts = dateStr.split('-').map(Number);
-      if (parts.length !== 3) return dateStr;
-      const d = new Date(parts[0], parts[1] - 1, parts[2]);
-      return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-    }
-
-    function normalizeRowMonth(r) {
-      if (r._monthIndex !== undefined && r._monthIndex !== null && r._monthIndex !== '' && !isNaN(r._monthIndex)) {
-        return parseInt(r._monthIndex, 10);
-      }
-      if (r._date) {
-        const parts = r._date.split('-').map(Number);
-        if (parts.length >= 2 && !isNaN(parts[1])) return parts[1] - 1;
-      }
-      return 0;
-    }
-
-    // Resolves key variances between previous and new imports
     function getVal(row, possibleKeys) {
       for (const k of possibleKeys) {
         if (row[k] !== undefined && row[k] !== null && row[k] !== '') {
@@ -881,20 +776,15 @@
       appData.table3 = [];
       appData.table4 = [];
 
-      Object.keys(rawWeeksStore).forEach((key) => {
-        const entry = rawWeeksStore[key];
+      Object.keys(rawStore).forEach((key) => {
+        const entry = rawStore[key];
         if (!entry) return;
-
-        let entryMonth = entry.monthIndex !== undefined ? parseInt(entry.monthIndex, 10) : undefined;
-        let entryWeek = entry.week || 'Week 1';
 
         const injectMeta = (arr, tType) => {
           if (!Array.isArray(arr)) return [];
           return arr.map(r => {
             let rowCopy = normalizeRowFields(r, tType);
-            if (rowCopy._week === undefined) rowCopy._week = entryWeek;
-            if (rowCopy._monthIndex === undefined && entryMonth !== undefined) rowCopy._monthIndex = entryMonth;
-            rowCopy._monthIndex = normalizeRowMonth(rowCopy);
+            rowCopy._scope = key;
             return rowCopy;
           });
         };
@@ -905,34 +795,60 @@
         if (entry.table4) appData.table4.push(...injectMeta(entry.table4, 4));
       });
 
-      autoFocusAvailableData();
+      updateScopeDropdown();
       handleDateNavigationUpdate();
       renderSavedWeeksBadges();
     }
 
-    function autoFocusAvailableData() {
-      const allDates = [...new Set([...appData.table1.map(r => r._date), ...appData.table4.map(r => r._date)])].filter(Boolean).sort();
-      if (allDates.length > 0 && !allDates.includes(currentSelectedDate)) {
-        currentSelectedDate = allDates[allDates.length - 1];
-        const picker = document.getElementById('date-picker');
-        if (picker) picker.value = currentSelectedDate;
+    function updateScopeDropdown() {
+      const select = document.getElementById('header-scope-select');
+      if (!select) return;
+      const current = select.value;
+      select.innerHTML = '<option value="all">Everything (All Data)</option>';
+
+      Object.keys(rawStore).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.innerText = rawStore[k].name || k;
+        select.appendChild(opt);
+      });
+
+      if (Object.keys(rawStore).includes(current)) {
+        select.value = current;
       }
+    }
+
+    function onScopeChanged(val) {
+      activeScope = val;
+      handleDateNavigationUpdate();
+    }
+
+    function clearDateFilter() {
+      currentSelectedDate = '';
+      const picker = document.getElementById('date-picker');
+      if (picker) picker.value = '';
+      handleDateNavigationUpdate();
+    }
+
+    function onDatePickerChanged(val) {
+      currentSelectedDate = val || '';
+      handleDateNavigationUpdate();
     }
 
     function loadLocalCacheFirst() {
       try {
-        const cachedWeeks = localStorage.getItem('local_raw_weeks');
-        if (cachedWeeks) {
-          rawWeeksStore = JSON.parse(cachedWeeks);
+        const cached = localStorage.getItem('open_calls_raw_store');
+        if (cached) {
+          rawStore = JSON.parse(cached);
           rebuildAppDataFromStore();
         }
-        const cachedNotes = localStorage.getItem('local_daily_notes');
+        const cachedNotes = localStorage.getItem('open_calls_daily_notes');
         if (cachedNotes) localNotesStore = JSON.parse(cachedNotes);
 
-        const cachedInsights = localStorage.getItem('local_weekly_insights');
+        const cachedInsights = localStorage.getItem('open_calls_insights');
         if (cachedInsights) localInsightsStore = JSON.parse(cachedInsights);
       } catch (e) {
-        console.warn("Error loading local storage cache:", e);
+        console.warn("Error reading cache:", e);
       }
     }
 
@@ -943,11 +859,12 @@
         return;
       }
 
-      db.ref("weeks_data").on("value", (snapshot) => {
+      // Sync Batches / Weeks
+      db.ref("open_data").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
-          rawWeeksStore = val;
-          localStorage.setItem('local_raw_weeks', JSON.stringify(rawWeeksStore));
+          rawStore = val;
+          localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
         }
         updateCloudStatus('connected', 'Online');
         rebuildAppDataFromStore();
@@ -956,20 +873,22 @@
         updateCloudStatus('disconnected', 'Firebase Error');
       });
 
-      db.ref("daily_notes").on("value", (snapshot) => {
+      // Sync Daily Notes
+      db.ref("open_notes").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
           localNotesStore = val;
-          localStorage.setItem('local_daily_notes', JSON.stringify(localNotesStore));
+          localStorage.setItem('open_calls_daily_notes', JSON.stringify(localNotesStore));
           initUnifiedHourlyGrid();
         }
       });
 
-      db.ref("weekly_insights").on("value", (snapshot) => {
+      // Sync Insights
+      db.ref("open_insights").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
           localInsightsStore = val;
-          localStorage.setItem('local_weekly_insights', JSON.stringify(localInsightsStore));
+          localStorage.setItem('open_calls_insights', JSON.stringify(localInsightsStore));
           loadSavedWeeklyInsights();
         }
       });
@@ -981,126 +900,48 @@
       if (banner && msgEl) {
         msgEl.innerHTML = msg;
         banner.classList.remove('hidden');
-        setTimeout(() => banner.classList.add('hidden'), 4500);
+        setTimeout(() => banner.classList.add('hidden'), 4000);
       }
     }
 
-    function initDateControls() {
-      const picker = document.getElementById('date-picker');
-      if (picker) picker.value = currentSelectedDate;
+    function getFilteredData() {
+      let t1 = appData.table1;
+      let t2 = appData.table2;
+      let t3 = appData.table3;
+      let t4 = appData.table4;
 
-      const mSelect = document.getElementById('header-month-select');
-      if (mSelect) mSelect.value = selectedMonthIndex;
-
-      const wSelect = document.getElementById('header-week-select');
-      if (wSelect) wSelect.value = selectedFilterWeek;
-    }
-
-    function onHeaderWeekChanged(val) {
-      selectedFilterWeek = val;
-      const targetW = document.getElementById('target-week-select');
-      if (targetW && val !== 'all') targetW.value = val;
-      syncCurrentDateToFilteredScope();
-      handleDateNavigationUpdate();
-    }
-
-    function onHeaderMonthChanged(val) {
-      selectedMonthIndex = val === 'all' ? 'all' : parseInt(val, 10);
-      const targetM = document.getElementById('target-month-select');
-      if (targetM && val !== 'all') targetM.value = selectedMonthIndex;
-      syncCurrentDateToFilteredScope();
-      handleDateNavigationUpdate();
-    }
-
-    function getDatesInScope() {
-      let f1 = appData.table1;
-      let f4 = appData.table4;
-
-      if (selectedMonthIndex !== 'all') {
-        f1 = f1.filter(r => r._monthIndex === selectedMonthIndex);
-        f4 = f4.filter(r => r._monthIndex === selectedMonthIndex);
-      }
-      if (selectedFilterWeek !== 'all') {
-        f1 = f1.filter(r => r._week === selectedFilterWeek);
-        f4 = f4.filter(r => r._week === selectedFilterWeek);
+      if (activeScope !== 'all') {
+        t1 = t1.filter(r => r._scope === activeScope);
+        t2 = t2.filter(r => r._scope === activeScope);
+        t3 = t3.filter(r => r._scope === activeScope);
+        t4 = t4.filter(r => r._scope === activeScope);
       }
 
-      const d1 = f1.map(r => r._date).filter(Boolean);
-      const d4 = f4.map(r => r._date).filter(Boolean);
-      return [...new Set([...d1, ...d4])].sort();
-    }
-
-    function syncCurrentDateToFilteredScope() {
-      const validDates = getDatesInScope();
-      if (validDates.length > 0) {
-        if (!validDates.includes(currentSelectedDate)) {
-          currentSelectedDate = validDates[0];
-          const picker = document.getElementById('date-picker');
-          if (picker) picker.value = currentSelectedDate;
-        }
+      if (currentSelectedDate) {
+        t1 = t1.filter(r => !r._date || r._date === currentSelectedDate);
+        t4 = t4.filter(r => !r._date || r._date === currentSelectedDate);
       }
+
+      return { t1, t2, t3, t4 };
     }
 
     function handleDateNavigationUpdate() {
-      updateScopeLabels();
-      renderWeekDaysPills();
+      const scopeLabel = activeScope === 'all' ? 'All Data' : (rawStore[activeScope]?.name || activeScope);
+      const dateLabel = currentSelectedDate || 'All Dates';
+
+      const sBadge = document.getElementById('scope-status-badge');
+      if (sBadge) sBadge.innerText = `Scope: ${scopeLabel} | Date: ${dateLabel}`;
+
+      const uDay = document.getElementById('unified-day-label');
+      if (uDay) uDay.innerText = currentSelectedDate || 'General / All Days';
+
+      const uScope = document.getElementById('unified-scope-label');
+      if (uScope) uScope.innerText = scopeLabel;
+
       renderAllTables();
       renderAllCharts();
       initUnifiedHourlyGrid();
       loadSavedWeeklyInsights();
-    }
-
-    function updateScopeLabels() {
-      const monthLabel = selectedMonthIndex === 'all' ? 'All Months' : (monthNamesFull[selectedMonthIndex] || 'Month');
-      const weekLabel = selectedFilterWeek === 'all' ? 'All Weeks' : selectedFilterWeek;
-      const friendlyDay = formatDateFriendly(currentSelectedDate);
-
-      const mBadge = document.getElementById('scope-month-badge');
-      if (mBadge) mBadge.innerText = `Month: ${monthLabel}`;
-
-      const wBadge = document.getElementById('scope-week-badge');
-      if (wBadge) wBadge.innerText = `Week: ${weekLabel}`;
-
-      const dBadge = document.getElementById('scope-day-badge');
-      if (dBadge) dBadge.innerText = `Day: ${currentSelectedDate}`;
-
-      document.querySelectorAll('.table-day-label').forEach(el => el.innerText = friendlyDay);
-      document.querySelectorAll('.table-week-label').forEach(el => el.innerText = weekLabel);
-
-      const uDay = document.getElementById('unified-day-label');
-      if (uDay) uDay.innerText = friendlyDay;
-      const uWeek = document.getElementById('unified-week-label');
-      if (uWeek) uWeek.innerText = weekLabel;
-    }
-
-    function renderWeekDaysPills() {
-      const container = document.getElementById('week-days-pills');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const validDates = getDatesInScope();
-      if (validDates.length === 0) return;
-
-      validDates.forEach(dateStr => {
-        const isSelected = dateStr === currentSelectedDate;
-        const dParts = dateStr.split('-').map(Number);
-        const dObj = new Date(dParts[0], dParts[1] - 1, dParts[2]);
-        const dayLabel = dObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
-
-        const pill = document.createElement('button');
-        pill.onclick = () => {
-          currentSelectedDate = dateStr;
-          const picker = document.getElementById('date-picker');
-          if (picker) picker.value = currentSelectedDate;
-          handleDateNavigationUpdate();
-        };
-
-        pill.className = isSelected 
-          ? 'px-3 py-1 text-[11px] font-bold rounded-lg bg-amber-500 text-slate-950 shadow border border-amber-400 transition'
-          : 'px-3 py-1 text-[11px] font-medium rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition';
-        pill.innerText = dayLabel;
-        container.appendChild(pill);
-      });
     }
 
     function switchTab(tabId) {
@@ -1129,42 +970,12 @@
       }
     }
 
-    function navigateDate(days) {
-      const parts = currentSelectedDate.split('-').map(Number);
-      const d = new Date(parts[0], parts[1] - 1, parts[2]);
-      d.setDate(d.getDate() + days);
-      const yr = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      currentSelectedDate = `${yr}-${m}-${day}`;
-      const picker = document.getElementById('date-picker');
-      if (picker) picker.value = currentSelectedDate;
-      handleDateNavigationUpdate();
-    }
-
-    function setToday() {
-      const now = new Date();
-      const yr = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate()).padStart(2, '0');
-      currentSelectedDate = `${yr}-${m}-${day}`;
-      const picker = document.getElementById('date-picker');
-      if (picker) picker.value = currentSelectedDate;
-      handleDateNavigationUpdate();
-    }
-
-    function onDatePickerChanged(val) {
-      if (!val) return;
-      currentSelectedDate = val;
-      handleDateNavigationUpdate();
-    }
-
-    // HOURLY NOTES MANAGEMENT
+    // HOURLY NOTES
     function initUnifiedHourlyGrid() {
       const grid = document.getElementById('unified-hourly-grid');
       if (!grid) return;
 
-      const dateKey = sanitizeKey(currentSelectedDate);
+      const dateKey = sanitizeKey(currentSelectedDate || 'general');
       const savedNotes = (localNotesStore && localNotesStore[dateKey]) || {};
 
       grid.innerHTML = '';
@@ -1186,7 +997,7 @@
     }
 
     function saveAllHourlyNotes() {
-      const dateKey = sanitizeKey(currentSelectedDate);
+      const dateKey = sanitizeKey(currentSelectedDate || 'general');
       const notesObj = {};
 
       document.querySelectorAll('.hourly-note-input').forEach(input => {
@@ -1198,12 +1009,12 @@
 
       if (!localNotesStore) localNotesStore = {};
       localNotesStore[dateKey] = notesObj;
-      localStorage.setItem('local_daily_notes', JSON.stringify(localNotesStore));
+      localStorage.setItem('open_calls_daily_notes', JSON.stringify(localNotesStore));
 
       if (db) {
-        db.ref("daily_notes/" + dateKey).set(notesObj)
+        db.ref("open_notes/" + dateKey).set(notesObj)
           .then(() => {
-            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved to Firebase for <strong>${currentSelectedDate}</strong>!`);
+            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved successfully!`);
           })
           .catch(err => {
             console.error("Notes save error:", err);
@@ -1214,15 +1025,9 @@
       }
     }
 
-    // WEEKLY INSIGHTS MANAGEMENT
-    function getInsightsKey() {
-      const mStr = selectedMonthIndex === 'all' ? 'All' : (monthNamesShort[selectedMonthIndex] || 'Month');
-      const wStr = selectedFilterWeek === 'all' ? 'All' : selectedFilterWeek;
-      return sanitizeKey(`${mStr}_${wStr}`);
-    }
-
+    // INSIGHTS
     function loadSavedWeeklyInsights() {
-      const key = getInsightsKey();
+      const key = sanitizeKey(activeScope || 'general');
       const saved = (localInsightsStore && localInsightsStore[key]) || {};
 
       const ach = document.getElementById('insights-achievements');
@@ -1232,12 +1037,27 @@
       if (ach) ach.value = saved.achievements || '';
       if (blk) blk.value = saved.blockers || '';
 
-      const autoRecommendations = generateAutomatedSlaRecommendations();
-      if (act) act.value = autoRecommendations;
+      const { t1, t3, t4 } = getFilteredData();
+      if (t1.length === 0 && t3.length === 0) {
+        if (act) act.value = "No operational records available for recommendations.";
+        return;
+      }
+
+      const totalAnswered = t1.reduce((sum, r) => sum + cleanNum(r['ANSWERED']), 0);
+      const totalAbndQueue = t1.reduce((sum, r) => sum + cleanNum(r['ABND IN QUEUE']), 0);
+      const totalAbndCsat = t1.reduce((sum, r) => sum + cleanNum(r['ABND IN CSAT RATING']), 0);
+      const totalCalls = totalAnswered + totalAbndQueue + totalAbndCsat;
+      const abandonRate = totalCalls > 0 ? ((totalAbndQueue + totalAbndCsat) / totalCalls) * 100 : 0;
+
+      const recs = [];
+      recs.push(`1. Performance Overview: Abandonment rate is at ${abandonRate.toFixed(1)}%. Maintain coverage during top volume intervals.`);
+      const totalOverflow = t4.reduce((sum, r) => sum + cleanNum(r['INBOUND CALLS']), 0);
+      recs.push(`2. Overflow Handling: Recorded ${totalOverflow} overflow interactions.`);
+      if (act) act.value = recs.join("\n\n");
     }
 
     function saveWeeklyInsights() {
-      const key = getInsightsKey();
+      const key = sanitizeKey(activeScope || 'general');
       const payload = {
         achievements: document.getElementById('insights-achievements')?.value || '',
         blockers: document.getElementById('insights-blockers')?.value || '',
@@ -1247,53 +1067,15 @@
 
       if (!localInsightsStore) localInsightsStore = {};
       localInsightsStore[key] = payload;
-      localStorage.setItem('local_weekly_insights', JSON.stringify(localInsightsStore));
+      localStorage.setItem('open_calls_insights', JSON.stringify(localInsightsStore));
 
       if (db) {
-        db.ref("weekly_insights/" + key).set(payload)
-          .then(() => {
-            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved to Firebase!`);
-          })
-          .catch(err => console.error("Insights save error:", err));
+        db.ref("open_insights/" + key).set(payload)
+          .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved!`))
+          .catch(err => console.error(err));
       } else {
-        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Weekly insights saved in local storage!`);
+        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved locally!`);
       }
-    }
-
-    function generateAutomatedSlaRecommendations() {
-      const matchMonth = (r) => selectedMonthIndex === 'all' || r._monthIndex === selectedMonthIndex;
-      const matchWeek = (r) => selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-
-      const t1Weekly = appData.table1.filter(r => matchMonth(r) && matchWeek(r));
-      const t3Weekly = appData.table3.filter(r => matchMonth(r) && matchWeek(r));
-      const t4Weekly = appData.table4.filter(r => matchMonth(r) && matchWeek(r));
-
-      if (t1Weekly.length === 0 && t3Weekly.length === 0) {
-        return "No sufficient operational data to generate recommendations yet.";
-      }
-
-      const totalAnswered = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANSWERED']), 0);
-      const totalAbndQueue = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND IN QUEUE']), 0);
-      const totalAbndCsat = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ABND IN CSAT RATING']), 0);
-      const totalAbndHold = t1Weekly.reduce((sum, r) => sum + cleanNum(r['ANBD ON HOLD']), 0);
-      const totalCalls = totalAnswered + totalAbndQueue + totalAbndCsat + totalAbndHold;
-      const abandonRate = totalCalls > 0 ? ((totalAbndQueue + totalAbndCsat) / totalCalls) * 100 : 0;
-
-      const recs = [];
-      if (abandonRate > 5 || totalAbndQueue > 15) {
-        recs.push(`1. Staffing Optimization: Abandonment rate reached ${abandonRate.toFixed(1)}%. Reinforce peak intervals with 2 additional agents.`);
-      } else {
-        recs.push(`1. Capacity Alignment: Abandonment rate is healthy (${abandonRate.toFixed(1)}%). Maintain current schedule distribution.`);
-      }
-
-      const totalOverflow = t4Weekly.reduce((sum, r) => sum + cleanNum(r['INBOUND CALLS']), 0);
-      if (totalOverflow > 10) {
-        recs.push(`2. Overflow Management: Detected ${totalOverflow} overflow calls. Enable automatic callback queues to stabilize service level.`);
-      } else {
-        recs.push(`2. Queue Routing: Overflow volume remains within regular operational thresholds.`);
-      }
-
-      return recs.join("\n\n");
     }
 
     // DELIMITED PARSER
@@ -1339,7 +1121,7 @@
       updateBadge('badge-check-t4', t4.length > 0);
     }
 
-    function processAndSaveUnifiedWeek() {
+    function processAndSaveData() {
       try {
         const t1Raw = document.getElementById('paste-input-t1')?.value || '';
         const t2Raw = document.getElementById('paste-input-t2')?.value || '';
@@ -1356,41 +1138,31 @@
           return;
         }
 
-        const targetWeek = document.getElementById('target-week-select').value;
-        const targetMonthIdx = parseInt(document.getElementById('target-month-select').value, 10);
-        const targetMonthLabel = monthNamesShort[targetMonthIdx] || 'Month';
-        const storageKey = sanitizeKey(`${targetMonthLabel}_${targetWeek}`);
+        const inputName = (document.getElementById('custom-dataset-name')?.value || '').trim();
+        const datasetKey = sanitizeKey(inputName || `Batch_${Date.now()}`);
 
-        const existingWeekData = rawWeeksStore[storageKey] || {};
+        const existing = rawStore[datasetKey] || {};
 
-        let newT1 = existingWeekData.table1 ? [...existingWeekData.table1] : [];
-        let newT2 = existingWeekData.table2 ? [...existingWeekData.table2] : [];
-        let newT3 = existingWeekData.table3 ? [...existingWeekData.table3] : [];
-        let newT4 = existingWeekData.table4 ? [...existingWeekData.table4] : [];
-
-        let detectedDate = null;
+        let newT1 = existing.table1 ? [...existing.table1] : [];
+        let newT2 = existing.table2 ? [...existing.table2] : [];
+        let newT3 = existing.table3 ? [...existing.table3] : [];
+        let newT4 = existing.table4 ? [...existing.table4] : [];
 
         if (t1Rows.length > 0) {
-          newT1 = [];
-          t1Rows.forEach((r) => {
+          newT1 = t1Rows.map(r => {
             const dateStr = r[0] || '';
             const dPart = extractDatePart(dateStr);
             const hourNum = extractHourNumber(dateStr);
-            if (dPart && !detectedDate) detectedDate = dPart;
-
-            newT1.push({
+            return {
               'DATE & HOUR': dateStr,
               'ABND IN ROUTING': cleanNum(r[1]),
               'ANSWERED': cleanNum(r[2]),
               'ABND IN CSAT RATING': cleanNum(r[3]),
               'ABND IN QUEUE': cleanNum(r[4]),
               'ANBD ON HOLD': cleanNum(r[5]),
-              '_week': targetWeek,
-              '_monthIndex': targetMonthIdx,
-              '_monthLabel': targetMonthLabel,
-              '_date': dPart || currentSelectedDate,
+              '_date': dPart || '',
               '_hour': hourNum >= 0 ? hourNum : 0
-            });
+            };
           });
         }
 
@@ -1400,10 +1172,7 @@
             'ANSWERED': cleanNum(r[1]),
             'ABND IN CSAT RATING': cleanNum(r[2]),
             'ABND IN QUEUE': cleanNum(r[3]),
-            'ABND ON HOLD': cleanNum(r[4]),
-            '_week': targetWeek,
-            '_monthIndex': targetMonthIdx,
-            '_monthLabel': targetMonthLabel
+            'ABND ON HOLD': cleanNum(r[4])
           }));
         }
 
@@ -1417,38 +1186,27 @@
             'TALK TIME': r[5] || '03:30',
             'CALL DURATION': r[6] || '04:15',
             'AVERAGE HOLD TIME': r[7] || '00:25',
-            'DAYS ATTENDED OUT OF 5': cleanNum(r[8]) || 5,
-            '_week': targetWeek,
-            '_monthIndex': targetMonthIdx,
-            '_monthLabel': targetMonthLabel
+            'DAYS ATTENDED OUT OF 5': cleanNum(r[8]) || 5
           }));
         }
 
         if (t4Rows.length > 0) {
-          newT4 = [];
-          t4Rows.forEach(r => {
+          newT4 = t4Rows.map(r => {
             const dateStr = r[0] || '';
             const dPart = extractDatePart(dateStr);
             const hourNum = extractHourNumber(dateStr);
-            if (dPart && !detectedDate) detectedDate = dPart;
-
-            newT4.push({
+            return {
               'DATE & HOUR': dateStr,
               'INBOUND CALLS': cleanNum(r[1]),
               'TAGGED CONVERSATIONS': cleanNum(r[2]),
-              '_week': targetWeek,
-              '_monthIndex': targetMonthIdx,
-              '_monthLabel': targetMonthLabel,
-              '_date': dPart || currentSelectedDate,
+              '_date': dPart || '',
               '_hour': hourNum >= 0 ? hourNum : 0
-            });
+            };
           });
         }
 
-        const weekPayload = {
-          monthIndex: targetMonthIdx,
-          monthLabel: targetMonthLabel,
-          week: targetWeek,
+        const payload = {
+          name: inputName || datasetKey,
           table1: newT1,
           table2: newT2,
           table3: newT3,
@@ -1456,44 +1214,27 @@
           savedAt: new Date().toISOString()
         };
 
-        rawWeeksStore[storageKey] = weekPayload;
-        localStorage.setItem('local_raw_weeks', JSON.stringify(rawWeeksStore));
+        rawStore[datasetKey] = payload;
+        localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
 
         if (db) {
-          db.ref("weeks_data/" + storageKey).set(weekPayload)
-            .then(() => {
-              showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Saved to Firebase: <strong>${targetMonthLabel} - ${targetWeek}</strong>`);
-            })
-            .catch(err => {
-              console.error("Firebase save error:", err);
-              showToast(`<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Saved locally: ${err.message}`);
-            });
+          db.ref("open_data/" + datasetKey).set(payload)
+            .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Saved to Firebase: <strong>${payload.name}</strong>`))
+            .catch(err => console.error("Firebase error:", err));
         }
 
-        selectedFilterWeek = targetWeek;
-        selectedMonthIndex = targetMonthIdx;
-        const hMonth = document.getElementById('header-month-select');
-        if (hMonth) hMonth.value = selectedMonthIndex;
-        const hWeek = document.getElementById('header-week-select');
-        if (hWeek) hWeek.value = selectedFilterWeek;
-
-        if (detectedDate) {
-          currentSelectedDate = detectedDate;
-          const picker = document.getElementById('date-picker');
-          if (picker) picker.value = currentSelectedDate;
-        }
-
-        if (t1Rows.length > 0) document.getElementById('paste-input-t1').value = '';
-        if (t2Rows.length > 0) document.getElementById('paste-input-t2').value = '';
-        if (t3Rows.length > 0) document.getElementById('paste-input-t3').value = '';
-        if (t4Rows.length > 0) document.getElementById('paste-input-t4').value = '';
-
+        activeScope = datasetKey;
         rebuildAppDataFromStore();
         checkAllFourTablesReady();
         switchTab('overview');
 
+        ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4', 'custom-dataset-name'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+
       } catch (err) {
-        console.error("Processing error:", err);
+        console.error("Save error:", err);
         showToast('<i class="fa-solid fa-circle-exclamation text-rose-400 mr-2"></i>Error: ' + err.message);
       }
     }
@@ -1502,43 +1243,39 @@
       const container = document.getElementById('saved-weeks-badges');
       if (!container) return;
       
-      const keys = Object.keys(rawWeeksStore).sort();
+      const keys = Object.keys(rawStore).sort();
       if (keys.length === 0) {
-        container.innerHTML = '<span class="text-xs text-slate-600 italic">No weeks stored yet</span>';
+        container.innerHTML = '<span class="text-xs text-slate-600 italic">No datasets loaded yet</span>';
         return;
       }
 
       container.innerHTML = '';
       keys.forEach(k => {
-        const entry = rawWeeksStore[k] || {};
-        const displayLabel = entry.monthLabel && entry.week ? `${entry.monthLabel} - ${entry.week}` : k;
+        const entry = rawStore[k] || {};
+        const displayLabel = entry.name || k;
         const badge = document.createElement('div');
         badge.className = 'flex items-center gap-1.5 bg-slate-950 border border-amber-500/40 px-2.5 py-1 rounded-lg text-xs font-bold text-amber-300';
         badge.innerHTML = `
-          <span class="cursor-pointer hover:underline" title="View this week">${displayLabel}</span>
+          <span class="cursor-pointer hover:underline" title="View dataset">${displayLabel}</span>
           <button class="text-rose-400 hover:text-rose-300 ml-1 p-0.5 rounded hover:bg-rose-500/10" title="Delete">&times;</button>
         `;
 
         badge.querySelector('span').onclick = () => {
-          if (entry.monthIndex !== undefined) {
-            selectedMonthIndex = parseInt(entry.monthIndex, 10);
-            const hm = document.getElementById('header-month-select');
-            if (hm) hm.value = selectedMonthIndex;
-          }
-          if (entry.week) {
-            selectedFilterWeek = entry.week;
-            const hw = document.getElementById('header-week-select');
-            if (hw) hw.value = selectedFilterWeek;
-          }
-          syncCurrentDateToFilteredScope();
+          activeScope = k;
+          const select = document.getElementById('header-scope-select');
+          if (select) select.value = k;
           handleDateNavigationUpdate();
           switchTab('overview');
         };
 
         badge.querySelector('button').onclick = (e) => {
           e.stopPropagation();
-          if (confirm(`Delete stored records for "${displayLabel}"?`)) {
-            deleteWeekData(k);
+          if (confirm(`Delete dataset "${displayLabel}"?`)) {
+            delete rawStore[k];
+            localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
+            if (db) db.ref("open_data/" + k).remove();
+            if (activeScope === k) activeScope = 'all';
+            rebuildAppDataFromStore();
           }
         };
 
@@ -1546,38 +1283,19 @@
       });
     }
 
-    function deleteWeekData(storageKey) {
-      delete rawWeeksStore[storageKey];
-      localStorage.setItem('local_raw_weeks', JSON.stringify(rawWeeksStore));
-
-      if (db) {
-        db.ref("weeks_data/" + storageKey).remove()
-          .catch(err => console.error("Firebase deletion error:", err));
-      }
-
-      rebuildAppDataFromStore();
-      showToast(`Week ${storageKey} deleted.`);
-    }
-
     function renderAllTables() {
-      const matchMonth = (r) => selectedMonthIndex === 'all' || r._monthIndex === selectedMonthIndex;
-      const matchWeek = (r) => selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
+      const { t1, t2, t3, t4 } = getFilteredData();
 
-      const t1Data = appData.table1.filter(r => matchMonth(r) && matchWeek(r) && (!r._date || r._date === currentSelectedDate));
-      const t2Data = appData.table2.filter(r => matchMonth(r) && matchWeek(r));
-      const t3Data = appData.table3.filter(r => matchMonth(r) && matchWeek(r));
-      const t4Data = appData.table4.filter(r => matchMonth(r) && matchWeek(r) && (!r._date || r._date === currentSelectedDate));
-
-      document.getElementById('badge-t1-count').innerText = `${t1Data.length} records`;
-      document.getElementById('badge-t2-count').innerText = `${t2Data.length} records`;
-      document.getElementById('badge-t3-count').innerText = `${t3Data.length} records`;
-      document.getElementById('badge-t4-count').innerText = `${t4Data.length} records`;
+      document.getElementById('badge-t1-count').innerText = `${t1.length} records`;
+      document.getElementById('badge-t2-count').innerText = `${t2.length} records`;
+      document.getElementById('badge-t3-count').innerText = `${t3.length} records`;
+      document.getElementById('badge-t4-count').innerText = `${t4.length} records`;
 
       const tb1 = document.getElementById('tbody-t1');
-      if (t1Data.length === 0) {
-        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for selected scope.</td></tr>';
+      if (t1.length === 0) {
+        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>';
       } else {
-        tb1.innerHTML = t1Data.map(r => `
+        tb1.innerHTML = t1.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
             <td class="p-2.5 text-amber-300 border-r border-amber-500/20">${r['DATE & HOUR'] || '--'}</td>
             <td class="p-2.5 border-r border-amber-500/20">${r['ABND IN ROUTING'] ?? 0}</td>
@@ -1590,10 +1308,10 @@
       }
 
       const tb2 = document.getElementById('tbody-t2');
-      if (t2Data.length === 0) {
-        tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No queue records found for this scope.</td></tr>';
+      if (t2.length === 0) {
+        tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No queue records found.</td></tr>';
       } else {
-        tb2.innerHTML = t2Data.map(r => `
+        tb2.innerHTML = t2.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
             <td class="p-2.5 font-bold text-amber-300 font-sans border-r border-amber-500/20">${r['TEAM'] || '--'}</td>
             <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20">${r['ANSWERED'] ?? 0}</td>
@@ -1605,10 +1323,10 @@
       }
 
       const tb3 = document.getElementById('tbody-t3');
-      if (t3Data.length === 0) {
-        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No agent records found for this scope.</td></tr>';
+      if (t3.length === 0) {
+        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No agent records found.</td></tr>';
       } else {
-        tb3.innerHTML = t3Data.map(r => `
+        tb3.innerHTML = t3.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
             <td class="p-2.5 font-bold text-slate-200 font-sans border-r border-amber-500/20">${r['TEAMMATE'] || '--'}</td>
             <td class="p-2.5 text-sky-400 border-r border-amber-500/20">${r['INBOUND CALLS'] ?? 0}</td>
@@ -1624,10 +1342,10 @@
       }
 
       const tb4 = document.getElementById('tbody-t4');
-      if (t4Data.length === 0) {
+      if (t4.length === 0) {
         tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No overflow records found.</td></tr>';
       } else {
-        tb4.innerHTML = t4Data.map(r => `
+        tb4.innerHTML = t4.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
             <td class="p-2.5 text-amber-300 border-r border-amber-500/20">${r['DATE & HOUR'] || '--'}</td>
             <td class="p-2.5 text-sky-400 font-bold border-r border-amber-500/20">${r['INBOUND CALLS'] ?? 0}</td>
@@ -1636,12 +1354,12 @@
         `).join('');
       }
 
-      const sumAnswered = t1Data.reduce((acc, r) => acc + cleanNum(r['ANSWERED']), 0);
-      const sumAbndQueue = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND IN QUEUE']), 0);
-      const sumAbndCsat = t1Data.reduce((acc, r) => acc + cleanNum(r['ABND IN CSAT RATING']), 0);
-      const sumAbndHold = t1Data.reduce((acc, r) => acc + cleanNum(r['ANBD ON HOLD']), 0);
-      const sumInbound = t3Data.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0) + t4Data.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0);
-      const sumTagged = t4Data.reduce((acc, r) => acc + cleanNum(r['TAGGED CONVERSATIONS']), 0);
+      const sumAnswered = t1.reduce((acc, r) => acc + cleanNum(r['ANSWERED']), 0);
+      const sumAbndQueue = t1.reduce((acc, r) => acc + cleanNum(r['ABND IN QUEUE']), 0);
+      const sumAbndCsat = t1.reduce((acc, r) => acc + cleanNum(r['ABND IN CSAT RATING']), 0);
+      const sumAbndHold = t1.reduce((acc, r) => acc + cleanNum(r['ANBD ON HOLD']), 0);
+      const sumInbound = t3.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0) + t4.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0);
+      const sumTagged = t4.reduce((acc, r) => acc + cleanNum(r['TAGGED CONVERSATIONS']), 0);
 
       document.getElementById('kpi-answered').innerText = sumAnswered.toLocaleString();
       document.getElementById('kpi-abnd-queue').innerText = sumAbndQueue.toLocaleString();
@@ -1653,21 +1371,14 @@
 
     function renderAllCharts() {
       const hours24 = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
-
-      const matchMonth = (r) => selectedMonthIndex === 'all' || r._monthIndex === selectedMonthIndex;
-      const matchWeek = (r) => selectedFilterWeek === 'all' || r._week === selectedFilterWeek;
-
-      const t1Daily = appData.table1.filter(r => matchMonth(r) && matchWeek(r) && (!r._date || r._date === currentSelectedDate));
-      const t4Daily = appData.table4.filter(r => matchMonth(r) && matchWeek(r) && (!r._date || r._date === currentSelectedDate));
-      const t2Weekly = appData.table2.filter(r => matchMonth(r) && matchWeek(r));
-      const t3Weekly = appData.table3.filter(r => matchMonth(r) && matchWeek(r));
+      const { t1, t2, t3, t4 } = getFilteredData();
 
       const answeredByHour = new Array(24).fill(0);
       const csatByHour = new Array(24).fill(0);
       const queueByHour = new Array(24).fill(0);
       const holdByHour = new Array(24).fill(0);
 
-      t1Daily.forEach(r => {
+      t1.forEach(r => {
         const h = r._hour !== undefined && r._hour >= 0 && r._hour < 24 ? r._hour : extractHourNumber(r['DATE & HOUR']);
         if (h >= 0 && h < 24) {
           answeredByHour[h] += cleanNum(r['ANSWERED']);
@@ -1680,7 +1391,7 @@
       const overflowInboundByHour = new Array(24).fill(0);
       const overflowTaggedByHour = new Array(24).fill(0);
 
-      t4Daily.forEach(r => {
+      t4.forEach(r => {
         const h = r._hour !== undefined && r._hour >= 0 && r._hour < 24 ? r._hour : extractHourNumber(r['DATE & HOUR']);
         if (h >= 0 && h < 24) {
           overflowInboundByHour[h] += cleanNum(r['INBOUND CALLS']);
@@ -1730,26 +1441,26 @@
 
       makeChart('chart-c1', 'line', hours24, [{ label: 'Answered', data: answeredByHour, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.15)', fill: true, tension: 0.3 }]);
       makeChart('chart-c2', 'line', hours24, [{ label: 'Abnd. In CSAT', data: csatByHour, borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.15)', fill: true, tension: 0.3 }]);
-      makeChart('chart-c3', 'line', hours24, [{ label: 'Abnd. in Queue', data: queueByHour, borderColor: '#f43f5e', backgroundColor: 'rgba(244, 63, 94, 0.15)', fill: true, tension: 0.3 }]);
+      makeChart('chart-c3', 'line', hours24, [{ label: 'Abnd. In Queue', data: queueByHour, borderColor: '#f43f5e', backgroundColor: 'rgba(244, 63, 94, 0.15)', fill: true, tension: 0.3 }]);
       makeChart('chart-c4', 'line', hours24, [{ label: 'Abnd. On Hold', data: holdByHour, borderColor: '#fb923c', backgroundColor: 'rgba(251, 146, 60, 0.15)', fill: true, tension: 0.3 }]);
       makeChart('chart-c10', 'bar', hours24, [
         { label: 'Inbound Calls', data: overflowInboundByHour, backgroundColor: '#38bdf8' },
         { label: 'Tagged Convs', data: overflowTaggedByHour, backgroundColor: '#34d399' }
       ]);
 
-      const teamLabels = t2Weekly.map(r => r['TEAM'] || 'Team');
+      const teamLabels = t2.map(r => r['TEAM'] || 'Team');
       makeChart('chart-c5', 'bar', teamLabels.length ? teamLabels : ['No data'], [
-        { label: 'Answered', data: t2Weekly.map(r => cleanNum(r['ANSWERED'])), backgroundColor: '#10b981' },
-        { label: 'Abnd CSAT', data: t2Weekly.map(r => cleanNum(r['ABND IN CSAT RATING'])), backgroundColor: '#facc15' },
-        { label: 'Abnd Queue', data: t2Weekly.map(r => cleanNum(r['ABND IN QUEUE'])), backgroundColor: '#f43f5e' },
-        { label: 'Abnd Hold', data: t2Weekly.map(r => cleanNum(r['ABND ON HOLD'])), backgroundColor: '#fb923c' }
+        { label: 'Answered', data: t2.map(r => cleanNum(r['ANSWERED'])), backgroundColor: '#10b981' },
+        { label: 'Abnd CSAT', data: t2.map(r => cleanNum(r['ABND IN CSAT RATING'])), backgroundColor: '#facc15' },
+        { label: 'Abnd Queue', data: t2.map(r => cleanNum(r['ABND IN QUEUE'])), backgroundColor: '#f43f5e' },
+        { label: 'Abnd Hold', data: t2.map(r => cleanNum(r['ABND ON HOLD'])), backgroundColor: '#fb923c' }
       ]);
 
-      const agentLabels = t3Weekly.map(r => r['TEAMMATE'] || 'Agent');
-      makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abnd. Inbound Calls', data: t3Weekly.map(r => cleanNum(r['ABND INBOUND CALLS'])), backgroundColor: '#f43f5e' }]);
-      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Sec)', data: t3Weekly.map(r => parseTimeSeconds(r['ANSWER TIME'])), backgroundColor: '#eab308' }]);
-      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))), backgroundColor: '#06b6d4' }]);
-      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3Weekly.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
+      const agentLabels = t3.map(r => r['TEAMMATE'] || 'Agent');
+      makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abnd. Inbound Calls', data: t3.map(r => cleanNum(r['ABND INBOUND CALLS'])), backgroundColor: '#f43f5e' }]);
+      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Sec)', data: t3.map(r => parseTimeSeconds(r['ANSWER TIME'])), backgroundColor: '#eab308' }]);
+      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))), backgroundColor: '#06b6d4' }]);
+      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
     }
   </script>
 </body>
