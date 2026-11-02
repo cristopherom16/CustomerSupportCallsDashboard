@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Firebase SDKs Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -96,6 +97,7 @@
 
   <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 py-3 transition-all" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-wrap items-center justify-between gap-4">
+      
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <i class="fa-solid fa-gauge-high text-xl text-amber-400"></i>
@@ -115,9 +117,9 @@
         </div>
       </div>
 
-      <!-- Date & Scope Navigation Controls -->
+      <!-- Header Month & Week Controls -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
-        <!-- Date Back/Forward Buttons -->
+        <!-- Date Back/Forward Controls -->
         <div class="flex items-center gap-1">
           <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition border border-amber-500/20 cursor-pointer">
             <i class="fa-solid fa-chevron-left text-xs"></i>
@@ -128,29 +130,58 @@
           </button>
         </div>
 
-        <button onclick="clearDateFilter()" class="text-[11px] font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-2.5 py-1 rounded-md border border-amber-500/30 transition-all cursor-pointer">
-          All Dates
-        </button>
+        <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
+
+        <!-- Month Dropdown -->
+        <div class="flex items-center gap-1.5 pl-1">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Month:</span>
+          <select id="header-month-select" onchange="onMonthChanged(this.value)" class="bg-slate-900 text-amber-400 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400 cursor-pointer">
+            <option value="0">January</option>
+            <option value="1">February</option>
+            <option value="2">March</option>
+            <option value="3">April</option>
+            <option value="4">May</option>
+            <option value="5">June</option>
+            <option value="6">July</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">October</option>
+            <option value="10">November</option>
+            <option value="11">December</option>
+          </select>
+        </div>
 
         <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
 
+        <!-- Week Dropdown (Week 1 to Week 5) -->
         <div class="flex items-center gap-1.5 pl-1">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Scope:</span>
-          <select id="header-scope-select" onchange="onScopeChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
-            <option value="all">All Accumulated Data</option>
+          <span class="text-[10px] uppercase font-bold text-slate-400">Week:</span>
+          <select id="header-week-select" onchange="onWeekChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400 cursor-pointer">
+            <option value="Week 1">Week 1</option>
+            <option value="Week 2">Week 2</option>
+            <option value="Week 3">Week 3</option>
+            <option value="Week 4">Week 4</option>
+            <option value="Week 5">Week 5</option>
           </select>
         </div>
       </div>
 
+      <!-- Scope Badges -->
       <div class="flex items-center gap-2">
-        <span id="scope-status-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/40">
-          Showing: All Data
+        <span id="scope-month-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
+          Month: October
+        </span>
+        <span id="scope-week-badge" class="text-xs font-bold text-gold-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
+          Week 1
+        </span>
+        <span id="scope-day-badge" class="text-xs font-bold text-amber-300 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/40 hidden md:inline-block">
+          Day: --
         </span>
       </div>
     </div>
   </header>
 
-  <!-- View Switcher & Date Tabs -->
+  <!-- View Switcher & Day Navigation Pills -->
   <div class="bg-slate-900/60 border-b border-amber-500/30 py-3" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
@@ -167,6 +198,7 @@
     </div>
   </div>
 
+  <!-- Floating Import Button -->
   <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 border border-amber-400 hover:scale-105 active:scale-95 transition-all cursor-pointer">
     <i class="fa-solid fa-file-import text-sm"></i> Import Information
   </button>
@@ -178,32 +210,32 @@
 
   <main class="flex-1 w-full py-8 space-y-8 pb-24" style="padding-left: 67px; padding-right: 10mm;">
 
-    <!-- OVERVIEW TAB -->
+    <!-- TAB 1: OVERVIEW -->
     <div id="view-overview" class="space-y-8">
       <div>
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
-          <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Overall Metrics Summary
+          <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
             <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Filtered view</span>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. Queue</span>
             <div id="kpi-abnd-queue" class="text-xl font-extrabold text-rose-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Filtered view</span>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. CSAT</span>
             <div id="kpi-abnd-csat" class="text-xl font-extrabold text-amber-300 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Filtered view</span>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. On Hold</span>
             <div id="kpi-abnd-hold" class="text-xl font-extrabold text-orange-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Filtered view</span>
+            <span class="text-[10px] text-slate-500">Filtered scope</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Inbound Calls</span>
@@ -224,7 +256,11 @@
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
-            <p class="text-xs text-slate-400">Updated in real-time based on selected date and batch.</p>
+            <p class="text-xs text-slate-400">Charts 1-4 & 10 reflect the active date. Charts 5-9 reflect the active week.</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-semibold text-slate-400">Active Day:</span>
+            <span class="text-xs font-bold text-amber-300 table-day-label">--</span>
           </div>
         </div>
 
@@ -232,7 +268,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">1. Hourly Answered</span>
-              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c1"></canvas></div>
           </div>
@@ -240,7 +276,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">2. Hourly Abnd. in CSAT</span>
-              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c2"></canvas></div>
           </div>
@@ -248,7 +284,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">3. Hourly Abnd. in Queue</span>
-              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c3"></canvas></div>
           </div>
@@ -256,7 +292,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">4. Hourly Abnd. On Hold</span>
-              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c4"></canvas></div>
           </div>
@@ -264,7 +300,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">10. Overflow: Inbound vs Tagged</span>
-              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">0-23h</span>
+              <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c10"></canvas></div>
           </div>
@@ -272,7 +308,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">5. Team Answered & Abandons</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Queues</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c5"></canvas></div>
           </div>
@@ -280,7 +316,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">6. Teammate vs Abnd. Inbound</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Agents</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c6"></canvas></div>
           </div>
@@ -288,7 +324,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">7. Teammate vs Answer Time (Sec)</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Agents</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c7"></canvas></div>
           </div>
@@ -296,7 +332,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">8. Teammate vs Talk Time (Minutes)</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Agents</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c8"></canvas></div>
           </div>
@@ -304,7 +340,7 @@
           <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between md:col-span-2 xl:col-span-3">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">9. Teammate vs Call Duration (Minutes)</span>
-              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Agents</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c9"></canvas></div>
           </div>
@@ -313,7 +349,7 @@
 
       <div class="space-y-6 pt-4">
         <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-          <i class="fa-solid fa-table-cells text-amber-500"></i> Stored Records Tables
+          <i class="fa-solid fa-table-cells text-amber-500"></i> Operational Data Tables
         </h2>
 
         <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
@@ -413,23 +449,43 @@
       </div>
     </div>
 
-    <!-- IMPORT TAB -->
+    <!-- TAB 2: IMPORT -->
     <div id="view-import" class="hidden space-y-6">
       <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
-              <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import Data (Any Custom Name)
+              <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Weekly Tables
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Give your data any label (e.g., Week 1, Batch Support). It saves directly and persistently to Firebase.
+              Select Month and Week to assign your imported data.
             </p>
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/30">
-              <span class="text-xs font-bold text-slate-300">Dataset Name:</span>
-              <input type="text" id="custom-dataset-name" placeholder="e.g. Current Data" class="bg-slate-900 text-xs text-amber-300 font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
+              <span class="text-xs font-bold text-slate-300">Assign To:</span>
+              <select id="target-month-select" class="bg-slate-950 text-xs text-amber-400 font-bold focus:outline-none cursor-pointer border-r border-amber-500/30 pr-2">
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+              </select>
+              <select id="target-week-select" class="bg-transparent text-xs text-amber-300 font-bold focus:outline-none cursor-pointer">
+                <option value="Week 1">Week 1</option>
+                <option value="Week 2">Week 2</option>
+                <option value="Week 3">Week 3</option>
+                <option value="Week 4">Week 4</option>
+                <option value="Week 5">Week 5</option>
+              </select>
             </div>
 
             <button id="btn-process-save-week" onclick="processAndSaveData()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-amber-400">
@@ -495,7 +551,7 @@
       </div>
     </div>
 
-    <!-- NOTES TAB -->
+    <!-- TAB 3: NOTES -->
     <div id="view-notes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 space-y-4">
@@ -520,7 +576,7 @@
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
                 <i class="fa-solid fa-lightbulb text-amber-500"></i> General Insights
               </h3>
-              <p class="text-xs text-slate-400">Scope: <span id="unified-scope-label" class="font-bold text-gold-400">All</span></p>
+              <p class="text-xs text-slate-400">Scope: <span id="unified-scope-label" class="font-bold text-gold-400">--</span></p>
             </div>
             <button onclick="saveWeeklyInsights()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition cursor-pointer">
               <i class="fa-solid fa-check mr-1"></i> Save Insights
@@ -552,6 +608,9 @@
   </main>
 
   <script>
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     const firebaseConfig = {
       apiKey: "AIzaSyDPxfopyNHyM38o4lQVp8kHaj06Kp7ACUY",
       authDomain: "customersupportcallsdashboard.firebaseapp.com",
@@ -577,12 +636,15 @@
     let rawStore = {};
     let localNotesStore = {};
     let localInsightsStore = {};
-    let activeScope = 'all';
+
+    let selectedMonthIndex = 9; // Default to October (index 9)
+    let selectedWeek = 'Week 1';
     let currentSelectedDate = '';
     let chartInstances = {};
 
     window.onload = function () {
       initTheme();
+      initControls();
       loadLocalCacheFirst();
       listenToFirebaseCloudData();
       checkAllFourTablesReady();
@@ -603,6 +665,18 @@
         document.body.classList.add('light-mode');
         if (icon) icon.className = 'fa-solid fa-moon text-lg';
       }
+    }
+
+    function initControls() {
+      const mSel = document.getElementById('header-month-select');
+      const wSel = document.getElementById('header-week-select');
+      const tmSel = document.getElementById('target-month-select');
+      const twSel = document.getElementById('target-week-select');
+
+      if (mSel) mSel.value = selectedMonthIndex;
+      if (wSel) wSel.value = selectedWeek;
+      if (tmSel) tmSel.value = selectedMonthIndex;
+      if (twSel) twSel.value = selectedWeek;
     }
 
     function updateCloudStatus(status, text) {
@@ -663,22 +737,12 @@
         if (/am\b/i.test(str) && hour === 12) hour = 0;
         return hour >= 0 && hour <= 23 ? hour : -1;
       }
-      const singleHour = String(str).match(/\b(\d{1,2})\s*(am|pm)\b/i);
-      if (singleHour) {
-        let hour = parseInt(singleHour[1], 10);
-        const meridian = singleHour[2].toLowerCase();
-        if (meridian === 'pm' && hour < 12) hour += 12;
-        if (meridian === 'am' && hour === 12) hour = 0;
-        return hour >= 0 && hour <= 23 ? hour : -1;
-      }
       return -1;
     }
 
     function getVal(row, possibleKeys) {
       for (const k of possibleKeys) {
-        if (row[k] !== undefined && row[k] !== null && row[k] !== '') {
-          return row[k];
-        }
+        if (row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k];
       }
       return 0;
     }
@@ -692,11 +756,13 @@
         copy['ANBD ON HOLD'] = cleanNum(getVal(r, ['ANBD ON HOLD', 'ABND ON HOLD', 'ABND. ON HOLD', 'Abnd Hold', 'abnd_hold']));
         copy['ABND IN ROUTING'] = cleanNum(getVal(r, ['ABND IN ROUTING', 'ABND. IN ROUTING', 'Abnd Routing']));
       } else if (tableType === 2) {
+        copy['TEAM'] = r['TEAM'] || r['Team'] || 'Team';
         copy['ANSWERED'] = cleanNum(getVal(r, ['ANSWERED', 'Answered']));
         copy['ABND IN QUEUE'] = cleanNum(getVal(r, ['ABND IN QUEUE', 'ABND. IN QUEUE']));
         copy['ABND IN CSAT RATING'] = cleanNum(getVal(r, ['ABND IN CSAT RATING', 'ABND. IN CSAT RATING']));
         copy['ABND ON HOLD'] = cleanNum(getVal(r, ['ABND ON HOLD', 'ANBD ON HOLD', 'ABND. ON HOLD']));
       } else if (tableType === 3) {
+        copy['TEAMMATE'] = r['TEAMMATE'] || r['Teammate'] || r['Agent'] || 'Agent';
         copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls']));
         copy['OUTBOUND CALLS'] = cleanNum(getVal(r, ['OUTBOUND CALLS', 'Outbound Calls']));
         copy['ABND INBOUND CALLS'] = cleanNum(getVal(r, ['ABND INBOUND CALLS', 'Abnd Inbound Calls']));
@@ -704,11 +770,26 @@
         copy['TALK TIME'] = r['TALK TIME'] || r['Talk Time'] || '03:30';
         copy['CALL DURATION'] = r['CALL DURATION'] || r['Call Duration'] || '04:15';
         copy['AVERAGE HOLD TIME'] = r['AVERAGE HOLD TIME'] || r['Average Hold Time'] || '00:25';
+        copy['DAYS ATTENDED OUT OF 5'] = cleanNum(getVal(r, ['DAYS ATTENDED OUT OF 5', 'DAYS ATTENDED', 'Days Attended'])) || 5;
       } else if (tableType === 4) {
         copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls']));
         copy['TAGGED CONVERSATIONS'] = cleanNum(getVal(r, ['TAGGED CONVERSATIONS', 'Tagged Conversations']));
       }
       return copy;
+    }
+
+    function extractMonthIndexFromKey(key) {
+      for (let i = 0; i < monthNamesShort.length; i++) {
+        if (key.toLowerCase().includes(monthNamesShort[i].toLowerCase()) || key.toLowerCase().includes(monthNames[i].toLowerCase())) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    function extractWeekFromKey(key) {
+      const match = key.match(/week[\s_-]?([1-5])/i);
+      return match ? `Week ${match[1]}` : 'Week 1';
     }
 
     function rebuildAppDataFromStore() {
@@ -721,11 +802,22 @@
         const entry = rawStore[key];
         if (!entry) return;
 
+        let entryMonth = entry.monthIndex !== undefined ? parseInt(entry.monthIndex, 10) : extractMonthIndexFromKey(key);
+        let entryWeek = entry.week || extractWeekFromKey(key);
+
         const injectMeta = (arr, tType) => {
           if (!Array.isArray(arr)) return [];
           return arr.map(r => {
             let rowCopy = normalizeRowFields(r, tType);
             rowCopy._scope = key;
+            rowCopy._monthIndex = entryMonth;
+            rowCopy._week = entryWeek;
+
+            // If date is embedded in string
+            if (!rowCopy._date && rowCopy['DATE & HOUR']) {
+              rowCopy._date = extractDatePart(rowCopy['DATE & HOUR']) || '';
+              rowCopy._hour = extractHourNumber(rowCopy['DATE & HOUR']);
+            }
             return rowCopy;
           });
         };
@@ -737,9 +829,25 @@
       });
 
       updateScopeDropdown();
-      autoFocusAvailableData();
+      autoFocusDateForActiveWeek();
       handleDateNavigationUpdate();
       renderSavedWeeksBadges();
+    }
+
+    function onMonthChanged(val) {
+      selectedMonthIndex = parseInt(val, 10);
+      const tm = document.getElementById('target-month-select');
+      if (tm) tm.value = selectedMonthIndex;
+      autoFocusDateForActiveWeek();
+      handleDateNavigationUpdate();
+    }
+
+    function onWeekChanged(val) {
+      selectedWeek = val;
+      const tw = document.getElementById('target-week-select');
+      if (tw) tw.value = selectedWeek;
+      autoFocusDateForActiveWeek();
+      handleDateNavigationUpdate();
     }
 
     function updateScopeDropdown() {
@@ -762,7 +870,17 @@
 
     function onScopeChanged(val) {
       activeScope = val;
-      autoFocusAvailableData();
+      if (val !== 'all' && rawStore[val]) {
+        if (rawStore[val].monthIndex !== undefined && rawStore[val].monthIndex !== -1) {
+          selectedMonthIndex = rawStore[val].monthIndex;
+          document.getElementById('header-month-select').value = selectedMonthIndex;
+        }
+        if (rawStore[val].week) {
+          selectedWeek = rawStore[val].week;
+          document.getElementById('header-week-select').value = selectedWeek;
+        }
+      }
+      autoFocusDateForActiveWeek();
       handleDateNavigationUpdate();
     }
 
@@ -778,54 +896,66 @@
       handleDateNavigationUpdate();
     }
 
-    // DATE NAVIGATION LOGIC (BACK / FORWARD)
-    function getAllAvailableDates() {
+    function getDatesForCurrentScope() {
       let t1 = appData.table1;
       let t4 = appData.table4;
+
       if (activeScope !== 'all') {
         t1 = t1.filter(r => r._scope === activeScope);
         t4 = t4.filter(r => r._scope === activeScope);
+      } else {
+        if (selectedMonthIndex !== -1) {
+          t1 = t1.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
+          t4 = t4.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
+        }
+        if (selectedWeek) {
+          t1 = t1.filter(r => r._week === selectedWeek);
+          t4 = t4.filter(r => r._week === selectedWeek);
+        }
       }
+
       const d1 = t1.map(r => r._date).filter(Boolean);
       const d4 = t4.map(r => r._date).filter(Boolean);
       return [...new Set([...d1, ...d4])].sort();
     }
 
+    function autoFocusDateForActiveWeek() {
+      const dates = getDatesForCurrentScope();
+      if (dates.length > 0) {
+        currentSelectedDate = dates[0];
+      } else {
+        // Fallback to all dates if none match exactly
+        const allDates = [...new Set([...appData.table1.map(r => r._date), ...appData.table4.map(r => r._date)])].filter(Boolean).sort();
+        currentSelectedDate = allDates.length > 0 ? allDates[0] : '';
+      }
+      const picker = document.getElementById('date-picker');
+      if (picker) picker.value = currentSelectedDate;
+    }
+
     function navigateDate(step) {
-      const dates = getAllAvailableDates();
-      if (dates.length === 0) {
-        // Fallback to standard calendar day shift if no date records are present
+      const dates = getDatesForCurrentScope();
+      if (dates.length > 0) {
+        let idx = dates.indexOf(currentSelectedDate);
+        if (idx === -1) {
+          idx = step > 0 ? 0 : dates.length - 1;
+        } else {
+          idx += step;
+          if (idx < 0) idx = 0;
+          if (idx >= dates.length) idx = dates.length - 1;
+        }
+        currentSelectedDate = dates[idx];
+      } else {
         let baseDate = currentSelectedDate ? new Date(currentSelectedDate + 'T00:00:00') : new Date();
         baseDate.setDate(baseDate.getDate() + step);
         const yr = baseDate.getFullYear();
         const m = String(baseDate.getMonth() + 1).padStart(2, '0');
         const d = String(baseDate.getDate()).padStart(2, '0');
         currentSelectedDate = `${yr}-${m}-${d}`;
-      } else {
-        // Move through the actual uploaded dates
-        let currentIndex = dates.indexOf(currentSelectedDate);
-        if (currentIndex === -1) {
-          currentIndex = step > 0 ? 0 : dates.length - 1;
-        } else {
-          currentIndex += step;
-          if (currentIndex < 0) currentIndex = 0;
-          if (currentIndex >= dates.length) currentIndex = dates.length - 1;
-        }
-        currentSelectedDate = dates[currentIndex];
       }
 
       const picker = document.getElementById('date-picker');
       if (picker) picker.value = currentSelectedDate;
       handleDateNavigationUpdate();
-    }
-
-    function autoFocusAvailableData() {
-      const dates = getAllAvailableDates();
-      if (dates.length > 0 && !dates.includes(currentSelectedDate)) {
-        currentSelectedDate = dates[0];
-        const picker = document.getElementById('date-picker');
-        if (picker) picker.value = currentSelectedDate;
-      }
     }
 
     function loadLocalCacheFirst() {
@@ -852,7 +982,6 @@
         return;
       }
 
-      // Check current open_data structure
       db.ref("open_data").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
@@ -862,14 +991,11 @@
         }
       });
 
-      // Check legacy weeks_data structure to recover all previously stored data
       db.ref("weeks_data").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
           Object.keys(val).forEach(k => {
-            if (!rawStore[k]) {
-              rawStore[k] = { ...val[k], name: val[k].name || k };
-            }
+            if (!rawStore[k]) rawStore[k] = { ...val[k], name: val[k].name || k };
           });
           localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
           rebuildAppDataFromStore();
@@ -931,6 +1057,19 @@
         t2 = t2.filter(r => r._scope === activeScope);
         t3 = t3.filter(r => r._scope === activeScope);
         t4 = t4.filter(r => r._scope === activeScope);
+      } else {
+        if (selectedMonthIndex !== -1) {
+          t1 = t1.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
+          t2 = t2.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
+          t3 = t3.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
+          t4 = t4.filter(r => r._monthIndex === selectedMonthIndex || r._monthIndex === -1);
+        }
+        if (selectedWeek) {
+          t1 = t1.filter(r => r._week === selectedWeek);
+          t2 = t2.filter(r => r._week === selectedWeek);
+          t3 = t3.filter(r => r._week === selectedWeek);
+          t4 = t4.filter(r => r._week === selectedWeek);
+        }
       }
 
       if (currentSelectedDate) {
@@ -946,7 +1085,7 @@
       if (!container) return;
       container.innerHTML = '';
 
-      const dates = getAllAvailableDates();
+      const dates = getDatesForCurrentScope();
       if (dates.length === 0) return;
 
       dates.forEach(dStr => {
@@ -968,17 +1107,29 @@
     }
 
     function handleDateNavigationUpdate() {
-      const scopeLabel = activeScope === 'all' ? 'All Data' : (rawStore[activeScope]?.name || activeScope);
-      const dateLabel = currentSelectedDate || 'All Dates';
+      const monthLabel = monthNames[selectedMonthIndex] || 'All';
+      const weekLabel = selectedWeek || 'Week 1';
+      const dateLabel = currentSelectedDate || 'All Days';
+
+      const mBadge = document.getElementById('scope-month-badge');
+      if (mBadge) mBadge.innerText = `Month: ${monthLabel}`;
+
+      const wBadge = document.getElementById('scope-week-badge');
+      if (wBadge) wBadge.innerText = weekLabel;
+
+      const dBadge = document.getElementById('scope-day-badge');
+      if (dBadge) dBadge.innerText = `Day: ${dateLabel}`;
 
       const sBadge = document.getElementById('scope-status-badge');
-      if (sBadge) sBadge.innerText = `Scope: ${scopeLabel} | Date: ${dateLabel}`;
+      if (sBadge) sBadge.innerText = `Scope: ${monthLabel} - ${weekLabel}`;
 
       const uDay = document.getElementById('unified-day-label');
       if (uDay) uDay.innerText = currentSelectedDate || 'General / All Days';
 
       const uScope = document.getElementById('unified-scope-label');
-      if (uScope) uScope.innerText = scopeLabel;
+      if (uScope) uScope.innerText = `${monthLabel} - ${weekLabel}`;
+
+      document.querySelectorAll('.table-day-label').forEach(el => el.innerText = currentSelectedDate || 'All Days');
 
       renderWeekDaysPills();
       renderAllTables();
@@ -1004,9 +1155,7 @@
         activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
       }
 
-      if (tabId === 'overview') {
-        setTimeout(() => renderAllCharts(), 60);
-      }
+      if (tabId === 'overview') setTimeout(() => renderAllCharts(), 60);
       if (tabId === 'notes') {
         initUnifiedHourlyGrid();
         loadSavedWeeklyInsights();
@@ -1044,9 +1193,7 @@
 
       document.querySelectorAll('.hourly-note-input').forEach(input => {
         const hour = input.getAttribute('data-hour');
-        if (hour && input.value.trim()) {
-          notesObj[hour] = input.value.trim();
-        }
+        if (hour && input.value.trim()) notesObj[hour] = input.value.trim();
       });
 
       if (!localNotesStore) localNotesStore = {};
@@ -1064,7 +1211,7 @@
     }
 
     function loadSavedWeeklyInsights() {
-      const key = sanitizeKey(activeScope || 'general');
+      const key = sanitizeKey(`${monthNamesShort[selectedMonthIndex] || 'Month'}_${selectedWeek}`);
       const saved = (localInsightsStore && localInsightsStore[key]) || {};
 
       const ach = document.getElementById('insights-achievements');
@@ -1094,7 +1241,7 @@
     }
 
     function saveWeeklyInsights() {
-      const key = sanitizeKey(activeScope || 'general');
+      const key = sanitizeKey(`${monthNamesShort[selectedMonthIndex] || 'Month'}_${selectedWeek}`);
       const payload = {
         achievements: document.getElementById('insights-achievements')?.value || '',
         blockers: document.getElementById('insights-blockers')?.value || '',
@@ -1131,9 +1278,7 @@
         const lineStr = lines[i].trim();
         if (!lineStr) continue;
         const vals = lineStr.split(delimiter).map(v => v.trim().replace(/^"|"$/g, ''));
-        if (vals.length > 0 && vals.some(v => v !== '')) {
-          parsedRows.push(vals);
-        }
+        if (vals.length > 0 && vals.some(v => v !== '')) parsedRows.push(vals);
       }
       return parsedRows;
     }
@@ -1174,10 +1319,12 @@
           return;
         }
 
-        const inputName = (document.getElementById('custom-dataset-name')?.value || '').trim();
-        const datasetKey = sanitizeKey(inputName || `Batch_${Date.now()}`);
+        const targetMIdx = parseInt(document.getElementById('target-month-select').value, 10);
+        const targetW = document.getElementById('target-week-select').value;
+        const targetMLabel = monthNamesShort[targetMIdx] || 'Month';
+        const storageKey = sanitizeKey(`${targetMLabel}_${targetW}`);
 
-        const existing = rawStore[datasetKey] || {};
+        const existing = rawStore[storageKey] || {};
 
         let newT1 = existing.table1 ? [...existing.table1] : [];
         let newT2 = existing.table2 ? [...existing.table2] : [];
@@ -1246,7 +1393,9 @@
         }
 
         const payload = {
-          name: inputName || datasetKey,
+          name: `${targetMLabel} - ${targetW}`,
+          monthIndex: targetMIdx,
+          week: targetW,
           table1: newT1,
           table2: newT2,
           table3: newT3,
@@ -1254,20 +1403,25 @@
           savedAt: new Date().toISOString()
         };
 
-        rawStore[datasetKey] = payload;
+        rawStore[storageKey] = payload;
         localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
 
         if (db) {
-          db.ref("open_data/" + datasetKey).set(payload)
+          db.ref("weeks_data/" + storageKey).set(payload)
             .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Saved to Firebase: <strong>${payload.name}</strong>`))
             .catch(err => console.error("Firebase error:", err));
         }
+
+        selectedMonthIndex = targetMIdx;
+        selectedWeek = targetW;
+        document.getElementById('header-month-select').value = selectedMonthIndex;
+        document.getElementById('header-week-select').value = selectedWeek;
 
         rebuildAppDataFromStore();
         checkAllFourTablesReady();
         switchTab('overview');
 
-        ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4', 'custom-dataset-name'].forEach(id => {
+        ['paste-input-t1', 'paste-input-t2', 'paste-input-t3', 'paste-input-t4'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.value = '';
         });
@@ -1301,9 +1455,15 @@
 
         badge.querySelector('span').onclick = () => {
           activeScope = k;
-          const select = document.getElementById('header-scope-select');
-          if (select) select.value = k;
-          autoFocusAvailableData();
+          if (entry.monthIndex !== undefined && entry.monthIndex !== -1) {
+            selectedMonthIndex = entry.monthIndex;
+            document.getElementById('header-month-select').value = selectedMonthIndex;
+          }
+          if (entry.week) {
+            selectedWeek = entry.week;
+            document.getElementById('header-week-select').value = selectedWeek;
+          }
+          autoFocusDateForActiveWeek();
           handleDateNavigationUpdate();
           switchTab('overview');
         };
