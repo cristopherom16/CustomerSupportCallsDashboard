@@ -115,19 +115,27 @@
         </div>
       </div>
 
+      <!-- Date & Scope Navigation Controls -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
+        <!-- Date Back/Forward Buttons -->
         <div class="flex items-center gap-1">
+          <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition border border-amber-500/20 cursor-pointer">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+          </button>
           <input type="date" id="date-picker" onchange="onDatePickerChanged(this.value)" class="bg-slate-900 text-amber-300 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
+          <button onclick="navigateDate(1)" title="Next Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition border border-amber-500/20 cursor-pointer">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
         </div>
 
-        <button onclick="clearDateFilter()" class="text-[11px] font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-2.5 py-1 rounded-md border border-amber-500/30 transition-all">
+        <button onclick="clearDateFilter()" class="text-[11px] font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-2.5 py-1 rounded-md border border-amber-500/30 transition-all cursor-pointer">
           All Dates
         </button>
 
         <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
 
         <div class="flex items-center gap-1.5 pl-1">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Dataset Scope:</span>
+          <span class="text-[10px] uppercase font-bold text-slate-400">Scope:</span>
           <select id="header-scope-select" onchange="onScopeChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
             <option value="all">All Accumulated Data</option>
           </select>
@@ -142,13 +150,14 @@
     </div>
   </header>
 
+  <!-- View Switcher & Date Tabs -->
   <div class="bg-slate-900/60 border-b border-amber-500/30 py-3" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-        <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition">
+        <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition cursor-pointer">
           <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
         </button>
-        <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition">
+        <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition cursor-pointer">
           <i class="fa-solid fa-book-open text-sm"></i> Notes & Insights
         </button>
       </div>
@@ -158,7 +167,7 @@
     </div>
   </div>
 
-  <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 border border-amber-400 hover:scale-105 active:scale-95 transition-all">
+  <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 border border-amber-400 hover:scale-105 active:scale-95 transition-all cursor-pointer">
     <i class="fa-solid fa-file-import text-sm"></i> Import Information
   </button>
 
@@ -169,7 +178,7 @@
 
   <main class="flex-1 w-full py-8 space-y-8 pb-24" style="padding-left: 67px; padding-right: 10mm;">
 
-    <!-- VIEW 1: OVERVIEW -->
+    <!-- OVERVIEW TAB -->
     <div id="view-overview" class="space-y-8">
       <div>
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
@@ -179,22 +188,22 @@
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
             <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Stored dataset</span>
+            <span class="text-[10px] text-slate-500">Filtered view</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. Queue</span>
             <div id="kpi-abnd-queue" class="text-xl font-extrabold text-rose-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Stored dataset</span>
+            <span class="text-[10px] text-slate-500">Filtered view</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. CSAT</span>
             <div id="kpi-abnd-csat" class="text-xl font-extrabold text-amber-300 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Stored dataset</span>
+            <span class="text-[10px] text-slate-500">Filtered view</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. On Hold</span>
             <div id="kpi-abnd-hold" class="text-xl font-extrabold text-orange-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Stored dataset</span>
+            <span class="text-[10px] text-slate-500">Filtered view</span>
           </div>
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Inbound Calls</span>
@@ -215,7 +224,7 @@
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
-            <p class="text-xs text-slate-400">All data loaded from your database.</p>
+            <p class="text-xs text-slate-400">Updated in real-time based on selected date and batch.</p>
           </div>
         </div>
 
@@ -404,7 +413,7 @@
       </div>
     </div>
 
-    <!-- VIEW 2: IMPORT -->
+    <!-- IMPORT TAB -->
     <div id="view-import" class="hidden space-y-6">
       <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -413,7 +422,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import Data (Any Custom Name)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Give your data any label (e.g., Support Team, Batch 1). No monthly restrictions.
+              Give your data any label (e.g., Week 1, Batch Support). It saves directly and persistently to Firebase.
             </p>
           </div>
 
@@ -486,7 +495,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: NOTES -->
+    <!-- NOTES TAB -->
     <div id="view-notes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 space-y-4">
@@ -497,7 +506,7 @@
               </h3>
               <p class="text-xs text-slate-400">Target Date: <span id="unified-day-label" class="font-bold text-amber-300">--</span></p>
             </div>
-            <button onclick="saveAllHourlyNotes()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition">
+            <button onclick="saveAllHourlyNotes()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition cursor-pointer">
               <i class="fa-solid fa-floppy-disk mr-1"></i> Save Day Notes
             </button>
           </div>
@@ -513,7 +522,7 @@
               </h3>
               <p class="text-xs text-slate-400">Scope: <span id="unified-scope-label" class="font-bold text-gold-400">All</span></p>
             </div>
-            <button onclick="saveWeeklyInsights()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition">
+            <button onclick="saveWeeklyInsights()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition cursor-pointer">
               <i class="fa-solid fa-check mr-1"></i> Save Insights
             </button>
           </div>
@@ -728,6 +737,7 @@
       });
 
       updateScopeDropdown();
+      autoFocusAvailableData();
       handleDateNavigationUpdate();
       renderSavedWeeksBadges();
     }
@@ -752,6 +762,7 @@
 
     function onScopeChanged(val) {
       activeScope = val;
+      autoFocusAvailableData();
       handleDateNavigationUpdate();
     }
 
@@ -765,6 +776,56 @@
     function onDatePickerChanged(val) {
       currentSelectedDate = val || '';
       handleDateNavigationUpdate();
+    }
+
+    // DATE NAVIGATION LOGIC (BACK / FORWARD)
+    function getAllAvailableDates() {
+      let t1 = appData.table1;
+      let t4 = appData.table4;
+      if (activeScope !== 'all') {
+        t1 = t1.filter(r => r._scope === activeScope);
+        t4 = t4.filter(r => r._scope === activeScope);
+      }
+      const d1 = t1.map(r => r._date).filter(Boolean);
+      const d4 = t4.map(r => r._date).filter(Boolean);
+      return [...new Set([...d1, ...d4])].sort();
+    }
+
+    function navigateDate(step) {
+      const dates = getAllAvailableDates();
+      if (dates.length === 0) {
+        // Fallback to standard calendar day shift if no date records are present
+        let baseDate = currentSelectedDate ? new Date(currentSelectedDate + 'T00:00:00') : new Date();
+        baseDate.setDate(baseDate.getDate() + step);
+        const yr = baseDate.getFullYear();
+        const m = String(baseDate.getMonth() + 1).padStart(2, '0');
+        const d = String(baseDate.getDate()).padStart(2, '0');
+        currentSelectedDate = `${yr}-${m}-${d}`;
+      } else {
+        // Move through the actual uploaded dates
+        let currentIndex = dates.indexOf(currentSelectedDate);
+        if (currentIndex === -1) {
+          currentIndex = step > 0 ? 0 : dates.length - 1;
+        } else {
+          currentIndex += step;
+          if (currentIndex < 0) currentIndex = 0;
+          if (currentIndex >= dates.length) currentIndex = dates.length - 1;
+        }
+        currentSelectedDate = dates[currentIndex];
+      }
+
+      const picker = document.getElementById('date-picker');
+      if (picker) picker.value = currentSelectedDate;
+      handleDateNavigationUpdate();
+    }
+
+    function autoFocusAvailableData() {
+      const dates = getAllAvailableDates();
+      if (dates.length > 0 && !dates.includes(currentSelectedDate)) {
+        currentSelectedDate = dates[0];
+        const picker = document.getElementById('date-picker');
+        if (picker) picker.value = currentSelectedDate;
+      }
     }
 
     function loadLocalCacheFirst() {
@@ -784,7 +845,6 @@
       }
     }
 
-    // LISTENS TO BOTH OLD AND NEW FIREBASE PATHS
     function listenToFirebaseCloudData() {
       if (!db) {
         updateCloudStatus('disconnected', 'Local Mode');
@@ -792,7 +852,7 @@
         return;
       }
 
-      // Check primary path
+      // Check current open_data structure
       db.ref("open_data").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
@@ -802,7 +862,7 @@
         }
       });
 
-      // Check legacy path so existing previously saved weeks are restored
+      // Check legacy weeks_data structure to recover all previously stored data
       db.ref("weeks_data").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
@@ -820,7 +880,6 @@
         updateCloudStatus('disconnected', 'Firebase Error');
       });
 
-      // Listen to both note paths
       db.ref("open_notes").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
@@ -841,7 +900,6 @@
         }
       });
 
-      // Listen to insights
       db.ref("open_insights").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
@@ -883,6 +941,32 @@
       return { t1, t2, t3, t4 };
     }
 
+    function renderWeekDaysPills() {
+      const container = document.getElementById('week-days-pills');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const dates = getAllAvailableDates();
+      if (dates.length === 0) return;
+
+      dates.forEach(dStr => {
+        const isSelected = dStr === currentSelectedDate;
+        const pill = document.createElement('button');
+        pill.onclick = () => {
+          currentSelectedDate = dStr;
+          const picker = document.getElementById('date-picker');
+          if (picker) picker.value = currentSelectedDate;
+          handleDateNavigationUpdate();
+        };
+
+        pill.className = isSelected 
+          ? 'px-3 py-1 text-[11px] font-bold rounded-lg bg-amber-500 text-slate-950 shadow border border-amber-400 transition cursor-pointer'
+          : 'px-3 py-1 text-[11px] font-medium rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition cursor-pointer';
+        pill.innerText = dStr;
+        container.appendChild(pill);
+      });
+    }
+
     function handleDateNavigationUpdate() {
       const scopeLabel = activeScope === 'all' ? 'All Data' : (rawStore[activeScope]?.name || activeScope);
       const dateLabel = currentSelectedDate || 'All Dates';
@@ -896,6 +980,7 @@
       const uScope = document.getElementById('unified-scope-label');
       if (uScope) uScope.innerText = scopeLabel;
 
+      renderWeekDaysPills();
       renderAllTables();
       renderAllCharts();
       initUnifiedHourlyGrid();
@@ -908,7 +993,7 @@
         const btn = document.getElementById(`tab-btn-${t}`);
         if (view) view.classList.add('hidden');
         if (btn && t !== 'import') {
-          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition';
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition cursor-pointer';
         }
       });
 
@@ -916,7 +1001,7 @@
       const activeBtn = document.getElementById(`tab-btn-${tabId}`);
       if (activeView) activeView.classList.remove('hidden');
       if (activeBtn && tabId !== 'import') {
-        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition';
+        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
       }
 
       if (tabId === 'overview') {
@@ -1072,7 +1157,6 @@
       updateBadge('badge-check-t4', t4.length > 0);
     }
 
-    // SAVES AND APPENDS TO EXISTING RECORDS
     function processAndSaveData() {
       try {
         const t1Raw = document.getElementById('paste-input-t1')?.value || '';
@@ -1212,13 +1296,14 @@
         badge.className = 'flex items-center gap-1.5 bg-slate-950 border border-amber-500/40 px-2.5 py-1 rounded-lg text-xs font-bold text-amber-300';
         badge.innerHTML = `
           <span class="cursor-pointer hover:underline" title="View dataset">${displayLabel}</span>
-          <button class="text-rose-400 hover:text-rose-300 ml-1 p-0.5 rounded hover:bg-rose-500/10" title="Delete">&times;</button>
+          <button class="text-rose-400 hover:text-rose-300 ml-1 p-0.5 rounded hover:bg-rose-500/10 cursor-pointer" title="Delete">&times;</button>
         `;
 
         badge.querySelector('span').onclick = () => {
           activeScope = k;
           const select = document.getElementById('header-scope-select');
           if (select) select.value = k;
+          autoFocusAvailableData();
           handleDateNavigationUpdate();
           switchTab('overview');
         };
