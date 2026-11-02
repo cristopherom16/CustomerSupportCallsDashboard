@@ -4,16 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Customer Support - Calls Dashboard</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Firebase SDKs Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -21,22 +16,10 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
           colors: {
-            gold: {
-              300: '#FDE047',
-              400: '#FACC15',
-              500: '#EAB308',
-              600: '#CA8A04',
-              700: '#A16207',
-            },
-            amberBrand: {
-              400: '#fbbf24',
-              500: '#f59e0b',
-              600: '#d97706',
-            }
+            gold: { 300: '#FDE047', 400: '#FACC15', 500: '#EAB308', 600: '#CA8A04', 700: '#A16207' },
+            amberBrand: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
           }
         }
       }
@@ -53,7 +36,6 @@
       --text-muted: #94a3b8;
       --input-bg: #0f172a;
     }
-
     body.light-mode {
       --bg-color: #f8fafc;
       --card-bg: #ffffff;
@@ -63,14 +45,12 @@
       --text-muted: #475569;
       --input-bg: #ffffff;
     }
-
     body {
       font-family: 'Inter', sans-serif;
       background-color: var(--bg-color);
       color: var(--text-main);
       transition: background-color 0.3s, color 0.3s;
     }
-
     body.light-mode header,
     body.light-mode .bg-slate-900\/90,
     body.light-mode .bg-slate-900\/80,
@@ -82,81 +62,40 @@
       background-color: var(--card-bg) !important;
       color: var(--text-main) !important;
     }
-
     body.light-mode .text-slate-300,
     body.light-mode .text-slate-200,
-    body.light-mode .text-white {
-      color: var(--text-main) !important;
-    }
-
+    body.light-mode .text-white { color: var(--text-main) !important; }
     body.light-mode .text-slate-400,
-    body.light-mode .text-slate-500 {
-      color: var(--text-muted) !important;
-    }
-
+    body.light-mode .text-slate-500 { color: var(--text-muted) !important; }
     body.light-mode input,
     body.light-mode select,
     body.light-mode textarea {
       background-color: var(--input-bg) !important;
       color: var(--text-main) !important;
     }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0f172a;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #d97706;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #eab308;
-    }
-    .gold-gradient-btn {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    }
-    .gold-gradient-btn:hover {
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    }
-
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
+    .gold-gradient-btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .gold-gradient-btn:hover { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
     .theme-toggle-btn {
-      position: fixed;
-      bottom: 24px;
-      left: 24px;
-      z-index: 50;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
+      position: fixed; bottom: 24px; left: 24px; z-index: 50;
+      width: 42px; height: 42px; border-radius: 50%;
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      color: #0b0f19;
-      border: 2px solid #fbbf24;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
-      transition: transform 0.2s, background 0.2s;
-    }
-    .theme-toggle-btn:hover {
-      transform: scale(1.1);
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #0b0f19; border: 2px solid #fbbf24;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
-  <!-- Theme Toggle Button -->
   <button onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
     <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
   </button>
 
-  <!-- Top Navigation Header -->
   <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 py-3 transition-all" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-wrap items-center justify-between gap-4">
-      
       <div class="flex items-center gap-3.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <i class="fa-solid fa-gauge-high text-xl text-amber-400"></i>
@@ -171,14 +110,12 @@
             </span>
           </div>
           <span class="text-[11px] font-semibold text-slate-400 tracking-widest uppercase">
-            CALLS DASHBOARD (OPEN STORAGE)
+            CALLS DASHBOARD
           </span>
         </div>
       </div>
 
-      <!-- Scope Filter (Unlimited & Free Tags) -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
-        <!-- Date Selector -->
         <div class="flex items-center gap-1">
           <input type="date" id="date-picker" onchange="onDatePickerChanged(this.value)" class="bg-slate-900 text-amber-300 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
         </div>
@@ -189,16 +126,14 @@
 
         <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
 
-        <!-- Stored Dataset Selector -->
         <div class="flex items-center gap-1.5 pl-1">
-          <span class="text-[10px] uppercase font-bold text-slate-400">Batch / Scope:</span>
+          <span class="text-[10px] uppercase font-bold text-slate-400">Dataset Scope:</span>
           <select id="header-scope-select" onchange="onScopeChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
-            <option value="all">Everything (All Data)</option>
+            <option value="all">All Accumulated Data</option>
           </select>
         </div>
       </div>
 
-      <!-- Scope Badge -->
       <div class="flex items-center gap-2">
         <span id="scope-status-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/40">
           Showing: All Data
@@ -207,7 +142,6 @@
     </div>
   </header>
 
-  <!-- Navigation View Tabs & Days Pills -->
   <div class="bg-slate-900/60 border-b border-amber-500/30 py-3" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
@@ -224,12 +158,10 @@
     </div>
   </div>
 
-  <!-- Floating Import Button -->
   <button id="tab-btn-import" onclick="switchTab('import')" class="fixed bottom-6 right-6 z-40 px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2.5 text-slate-950 gold-gradient-btn shadow-2xl shadow-amber-500/30 border border-amber-400 hover:scale-105 active:scale-95 transition-all">
     <i class="fa-solid fa-file-import text-sm"></i> Import Information
   </button>
 
-  <!-- Toast Notification -->
   <div id="toast-banner" class="hidden fixed bottom-20 right-6 z-50 bg-slate-900 border border-amber-500/50 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300">
     <span id="toast-message" class="text-xs font-medium">Notification</span>
     <button onclick="document.getElementById('toast-banner').classList.add('hidden')" class="text-slate-400 hover:text-white ml-2 text-sm">&times;</button>
@@ -237,7 +169,7 @@
 
   <main class="flex-1 w-full py-8 space-y-8 pb-24" style="padding-left: 67px; padding-right: 10mm;">
 
-    <!-- TAB 1: OVERVIEW & CHARTS -->
+    <!-- VIEW 1: OVERVIEW -->
     <div id="view-overview" class="space-y-8">
       <div>
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
@@ -283,7 +215,7 @@
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
-            <p class="text-xs text-slate-400">Displaying all accumulated data without monthly limits.</p>
+            <p class="text-xs text-slate-400">All data loaded from your database.</p>
           </div>
         </div>
 
@@ -472,7 +404,7 @@
       </div>
     </div>
 
-    <!-- TAB 2: IMPORT INFORMATION -->
+    <!-- VIEW 2: IMPORT -->
     <div id="view-import" class="hidden space-y-6">
       <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -481,14 +413,14 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import Data (Any Custom Name)
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Give your data any label (e.g., Batch 1, Week 42, Support Data). No month restrictions.
+              Give your data any label (e.g., Support Team, Batch 1). No monthly restrictions.
             </p>
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/30">
               <span class="text-xs font-bold text-slate-300">Dataset Name:</span>
-              <input type="text" id="custom-dataset-name" placeholder="e.g. October Batch 1" class="bg-slate-900 text-xs text-amber-300 font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
+              <input type="text" id="custom-dataset-name" placeholder="e.g. Current Data" class="bg-slate-900 text-xs text-amber-300 font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
             </div>
 
             <button id="btn-process-save-week" onclick="processAndSaveData()" class="px-5 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 text-slate-950 gold-gradient-btn shadow-lg shadow-amber-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95 border border-amber-400">
@@ -499,7 +431,7 @@
 
         <div class="mt-4 pt-4 border-t border-amber-500/30 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold text-slate-400">Stored Datasets:</span>
+            <span class="text-xs font-semibold text-slate-400">Stored Datasets in Firebase:</span>
             <div id="saved-weeks-badges" class="flex flex-wrap items-center gap-1.5">
               <span class="text-xs text-slate-600 italic">No datasets loaded yet</span>
             </div>
@@ -554,7 +486,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: NOTES & INSIGHTS -->
+    <!-- VIEW 3: NOTES -->
     <div id="view-notes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 space-y-4">
@@ -579,7 +511,7 @@
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
                 <i class="fa-solid fa-lightbulb text-amber-500"></i> General Insights
               </h3>
-              <p class="text-xs text-slate-400">Active Scope: <span id="unified-scope-label" class="font-bold text-gold-400">All</span></p>
+              <p class="text-xs text-slate-400">Scope: <span id="unified-scope-label" class="font-bold text-gold-400">All</span></p>
             </div>
             <button onclick="saveWeeklyInsights()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition">
               <i class="fa-solid fa-check mr-1"></i> Save Insights
@@ -637,7 +569,7 @@
     let localNotesStore = {};
     let localInsightsStore = {};
     let activeScope = 'all';
-    let currentSelectedDate = ''; // Empty means ALL DATES
+    let currentSelectedDate = '';
     let chartInstances = {};
 
     window.onload = function () {
@@ -804,7 +736,7 @@
       const select = document.getElementById('header-scope-select');
       if (!select) return;
       const current = select.value;
-      select.innerHTML = '<option value="all">Everything (All Data)</option>';
+      select.innerHTML = '<option value="all">All Accumulated Data</option>';
 
       Object.keys(rawStore).forEach(k => {
         const opt = document.createElement('option');
@@ -837,21 +769,22 @@
 
     function loadLocalCacheFirst() {
       try {
-        const cached = localStorage.getItem('open_calls_raw_store');
+        const cached = localStorage.getItem('open_calls_raw_store') || localStorage.getItem('local_raw_weeks');
         if (cached) {
           rawStore = JSON.parse(cached);
           rebuildAppDataFromStore();
         }
-        const cachedNotes = localStorage.getItem('open_calls_daily_notes');
+        const cachedNotes = localStorage.getItem('open_calls_daily_notes') || localStorage.getItem('local_daily_notes');
         if (cachedNotes) localNotesStore = JSON.parse(cachedNotes);
 
-        const cachedInsights = localStorage.getItem('open_calls_insights');
+        const cachedInsights = localStorage.getItem('open_calls_insights') || localStorage.getItem('local_weekly_insights');
         if (cachedInsights) localInsightsStore = JSON.parse(cachedInsights);
       } catch (e) {
         console.warn("Error reading cache:", e);
       }
     }
 
+    // LISTENS TO BOTH OLD AND NEW FIREBASE PATHS
     function listenToFirebaseCloudData() {
       if (!db) {
         updateCloudStatus('disconnected', 'Local Mode');
@@ -859,35 +792,60 @@
         return;
       }
 
-      // Sync Batches / Weeks
+      // Check primary path
       db.ref("open_data").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
-          rawStore = val;
+          Object.assign(rawStore, val);
           localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
+          rebuildAppDataFromStore();
+        }
+      });
+
+      // Check legacy path so existing previously saved weeks are restored
+      db.ref("weeks_data").on("value", (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          Object.keys(val).forEach(k => {
+            if (!rawStore[k]) {
+              rawStore[k] = { ...val[k], name: val[k].name || k };
+            }
+          });
+          localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
+          rebuildAppDataFromStore();
         }
         updateCloudStatus('connected', 'Online');
-        rebuildAppDataFromStore();
       }, (err) => {
         console.error("Firebase Read Error:", err);
         updateCloudStatus('disconnected', 'Firebase Error');
       });
 
-      // Sync Daily Notes
+      // Listen to both note paths
       db.ref("open_notes").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
-          localNotesStore = val;
+          Object.assign(localNotesStore, val);
           localStorage.setItem('open_calls_daily_notes', JSON.stringify(localNotesStore));
           initUnifiedHourlyGrid();
         }
       });
 
-      // Sync Insights
+      db.ref("daily_notes").on("value", (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          Object.keys(val).forEach(k => {
+            if (!localNotesStore[k]) localNotesStore[k] = val[k];
+          });
+          localStorage.setItem('open_calls_daily_notes', JSON.stringify(localNotesStore));
+          initUnifiedHourlyGrid();
+        }
+      });
+
+      // Listen to insights
       db.ref("open_insights").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
-          localInsightsStore = val;
+          Object.assign(localInsightsStore, val);
           localStorage.setItem('open_calls_insights', JSON.stringify(localInsightsStore));
           loadSavedWeeklyInsights();
         }
@@ -970,7 +928,6 @@
       }
     }
 
-    // HOURLY NOTES
     function initUnifiedHourlyGrid() {
       const grid = document.getElementById('unified-hourly-grid');
       if (!grid) return;
@@ -1012,20 +969,15 @@
       localStorage.setItem('open_calls_daily_notes', JSON.stringify(localNotesStore));
 
       if (db) {
-        db.ref("open_notes/" + dateKey).set(notesObj)
-          .then(() => {
-            showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved successfully!`);
-          })
-          .catch(err => {
-            console.error("Notes save error:", err);
-            showToast(`<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Saved locally: ${err.message}`);
-          });
+        db.ref("open_notes/" + dateKey).set(notesObj);
+        db.ref("daily_notes/" + dateKey).set(notesObj)
+          .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved successfully!`))
+          .catch(err => showToast(`<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Saved locally: ${err.message}`));
       } else {
         showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved in local storage!`);
       }
     }
 
-    // INSIGHTS
     function loadSavedWeeklyInsights() {
       const key = sanitizeKey(activeScope || 'general');
       const saved = (localInsightsStore && localInsightsStore[key]) || {};
@@ -1078,7 +1030,6 @@
       }
     }
 
-    // DELIMITED PARSER
     function parseDelimitedTable(rawText) {
       if (!rawText || !rawText.trim()) return [];
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
@@ -1121,6 +1072,7 @@
       updateBadge('badge-check-t4', t4.length > 0);
     }
 
+    // SAVES AND APPENDS TO EXISTING RECORDS
     function processAndSaveData() {
       try {
         const t1Raw = document.getElementById('paste-input-t1')?.value || '';
@@ -1149,7 +1101,7 @@
         let newT4 = existing.table4 ? [...existing.table4] : [];
 
         if (t1Rows.length > 0) {
-          newT1 = t1Rows.map(r => {
+          const mappedT1 = t1Rows.map(r => {
             const dateStr = r[0] || '';
             const dPart = extractDatePart(dateStr);
             const hourNum = extractHourNumber(dateStr);
@@ -1164,20 +1116,22 @@
               '_hour': hourNum >= 0 ? hourNum : 0
             };
           });
+          newT1.push(...mappedT1);
         }
 
         if (t2Rows.length > 0) {
-          newT2 = t2Rows.map(r => ({
+          const mappedT2 = t2Rows.map(r => ({
             'TEAM': String(r[0] || 'Team').trim(),
             'ANSWERED': cleanNum(r[1]),
             'ABND IN CSAT RATING': cleanNum(r[2]),
             'ABND IN QUEUE': cleanNum(r[3]),
             'ABND ON HOLD': cleanNum(r[4])
           }));
+          newT2.push(...mappedT2);
         }
 
         if (t3Rows.length > 0) {
-          newT3 = t3Rows.map(r => ({
+          const mappedT3 = t3Rows.map(r => ({
             'TEAMMATE': String(r[0] || 'Agent').trim(),
             'INBOUND CALLS': cleanNum(r[1]),
             'OUTBOUND CALLS': cleanNum(r[2]),
@@ -1188,10 +1142,11 @@
             'AVERAGE HOLD TIME': r[7] || '00:25',
             'DAYS ATTENDED OUT OF 5': cleanNum(r[8]) || 5
           }));
+          newT3.push(...mappedT3);
         }
 
         if (t4Rows.length > 0) {
-          newT4 = t4Rows.map(r => {
+          const mappedT4 = t4Rows.map(r => {
             const dateStr = r[0] || '';
             const dPart = extractDatePart(dateStr);
             const hourNum = extractHourNumber(dateStr);
@@ -1203,6 +1158,7 @@
               '_hour': hourNum >= 0 ? hourNum : 0
             };
           });
+          newT4.push(...mappedT4);
         }
 
         const payload = {
@@ -1223,7 +1179,6 @@
             .catch(err => console.error("Firebase error:", err));
         }
 
-        activeScope = datasetKey;
         rebuildAppDataFromStore();
         checkAllFourTablesReady();
         switchTab('overview');
@@ -1273,7 +1228,10 @@
           if (confirm(`Delete dataset "${displayLabel}"?`)) {
             delete rawStore[k];
             localStorage.setItem('open_calls_raw_store', JSON.stringify(rawStore));
-            if (db) db.ref("open_data/" + k).remove();
+            if (db) {
+              db.ref("open_data/" + k).remove();
+              db.ref("weeks_data/" + k).remove();
+            }
             if (activeScope === k) activeScope = 'all';
             rebuildAppDataFromStore();
           }
