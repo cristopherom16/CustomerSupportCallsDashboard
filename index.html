@@ -117,7 +117,7 @@
         </div>
       </div>
 
-      <!-- Header Month & Week Controls -->
+      <!-- Controls -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
         <!-- Date Back/Forward Controls -->
         <div class="flex items-center gap-1">
@@ -153,7 +153,7 @@
 
         <div class="h-4 w-px bg-amber-500/40 my-auto hidden sm:block"></div>
 
-        <!-- Week Dropdown (Week 1 to Week 5) -->
+        <!-- Week Dropdown -->
         <div class="flex items-center gap-1.5 pl-1">
           <span class="text-[10px] uppercase font-bold text-slate-400">Week:</span>
           <select id="header-week-select" onchange="onWeekChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400 cursor-pointer">
@@ -574,7 +574,7 @@
           <div class="flex justify-between items-center border-b border-amber-500/30 pb-3">
             <div>
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-lightbulb text-amber-500"></i> General Insights
+                <i class="fa-solid fa-lightbulb text-amber-500"></i> Weekly Insights
               </h3>
               <p class="text-xs text-slate-400">Scope: <span id="unified-scope-label" class="font-bold text-gold-400">--</span></p>
             </div>
@@ -758,37 +758,37 @@
     function normalizeRowFields(r, tableType) {
       const copy = { ...r };
       if (tableType === 1) {
-        copy['ANSWERED'] = cleanNum(getVal(r, ['ANSWERED', 'Answered', 'answered']));
-        copy['ABND IN QUEUE'] = cleanNum(getVal(r, ['ABND IN QUEUE', 'ABND. IN QUEUE', 'Abnd Queue', 'abnd_queue']));
+        copy['ANSWERED'] = cleanNum(getVal(r, ['ANSWERED', 'Answered', 'answered', 'Answered Calls']));
+        copy['ABND IN QUEUE'] = cleanNum(getVal(r, ['ABND IN QUEUE', 'ABND. IN QUEUE', 'Abnd Queue', 'abnd_queue', 'Abandoned In Queue']));
         copy['ABND IN CSAT RATING'] = cleanNum(getVal(r, ['ABND IN CSAT RATING', 'ABND. IN CSAT RATING', 'Abnd CSAT', 'abnd_csat']));
-        copy['ANBD ON HOLD'] = cleanNum(getVal(r, ['ANBD ON HOLD', 'ABND ON HOLD', 'ABND. ON HOLD', 'Abnd Hold', 'abnd_hold']));
+        copy['ANBD ON HOLD'] = cleanNum(getVal(r, ['ANBD ON HOLD', 'ABND ON HOLD', 'ABND. ON HOLD', 'Abnd Hold', 'abnd_hold', 'Abandoned On Hold']));
         copy['ABND IN ROUTING'] = cleanNum(getVal(r, ['ABND IN ROUTING', 'ABND. IN ROUTING', 'Abnd Routing']));
       } else if (tableType === 2) {
-        copy['TEAM'] = r['TEAM'] || r['Team'] || 'Team';
-        copy['ANSWERED'] = cleanNum(getVal(r, ['ANSWERED', 'Answered']));
-        copy['ABND IN QUEUE'] = cleanNum(getVal(r, ['ABND IN QUEUE', 'ABND. IN QUEUE']));
-        copy['ABND IN CSAT RATING'] = cleanNum(getVal(r, ['ABND IN CSAT RATING', 'ABND. IN CSAT RATING']));
-        copy['ABND ON HOLD'] = cleanNum(getVal(r, ['ABND ON HOLD', 'ANBD ON HOLD', 'ABND. ON HOLD']));
+        copy['TEAM'] = r['TEAM'] || r['Team'] || r['team'] || 'Team';
+        copy['ANSWERED'] = cleanNum(getVal(r, ['ANSWERED', 'Answered', 'answered']));
+        copy['ABND IN QUEUE'] = cleanNum(getVal(r, ['ABND IN QUEUE', 'ABND. IN QUEUE', 'Abnd Queue']));
+        copy['ABND IN CSAT RATING'] = cleanNum(getVal(r, ['ABND IN CSAT RATING', 'ABND. IN CSAT RATING', 'Abnd CSAT']));
+        copy['ABND ON HOLD'] = cleanNum(getVal(r, ['ABND ON HOLD', 'ANBD ON HOLD', 'ABND. ON HOLD', 'Abnd Hold']));
       } else if (tableType === 3) {
-        copy['TEAMMATE'] = r['TEAMMATE'] || r['Teammate'] || r['Agent'] || 'Agent';
-        copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls']));
-        copy['OUTBOUND CALLS'] = cleanNum(getVal(r, ['OUTBOUND CALLS', 'Outbound Calls']));
-        copy['ABND INBOUND CALLS'] = cleanNum(getVal(r, ['ABND INBOUND CALLS', 'Abnd Inbound Calls']));
+        copy['TEAMMATE'] = r['TEAMMATE'] || r['Teammate'] || r['Agent'] || r['teammate'] || 'Agent';
+        copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls', 'inbound_calls']));
+        copy['OUTBOUND CALLS'] = cleanNum(getVal(r, ['OUTBOUND CALLS', 'Outbound Calls', 'outbound_calls']));
+        copy['ABND INBOUND CALLS'] = cleanNum(getVal(r, ['ABND INBOUND CALLS', 'Abnd Inbound Calls', 'abnd_inbound']));
         copy['ANSWER TIME'] = r['ANSWER TIME'] || r['Answer Time'] || '00:15';
         copy['TALK TIME'] = r['TALK TIME'] || r['Talk Time'] || '03:30';
         copy['CALL DURATION'] = r['CALL DURATION'] || r['Call Duration'] || '04:15';
         copy['AVERAGE HOLD TIME'] = r['AVERAGE HOLD TIME'] || r['Average Hold Time'] || '00:25';
         copy['DAYS ATTENDED OUT OF 5'] = cleanNum(getVal(r, ['DAYS ATTENDED OUT OF 5', 'DAYS ATTENDED', 'Days Attended'])) || 5;
       } else if (tableType === 4) {
-        copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls']));
-        copy['TAGGED CONVERSATIONS'] = cleanNum(getVal(r, ['TAGGED CONVERSATIONS', 'Tagged Conversations']));
+        copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls', 'inbound_calls']));
+        copy['TAGGED CONVERSATIONS'] = cleanNum(getVal(r, ['TAGGED CONVERSATIONS', 'Tagged Conversations', 'tagged_conversations']));
       }
       return copy;
     }
 
     function extractMonthIndexFromKey(key) {
       if (!key) return -1;
-      const lower = key.toLowerCase();
+      const lower = String(key).toLowerCase();
       for (let i = 0; i < monthNamesShort.length; i++) {
         if (lower.includes(monthNamesShort[i].toLowerCase()) || lower.includes(monthNames[i].toLowerCase())) {
           return i;
@@ -799,8 +799,15 @@
 
     function extractWeekFromKey(key) {
       if (!key) return 'Week 1';
-      const match = key.match(/week[\s_-]?([1-5])/i);
+      const match = String(key).match(/week[\s_-]?([1-5])/i);
       return match ? `Week ${match[1]}` : 'Week 1';
+    }
+
+    function toPureArray(val) {
+      if (!val) return [];
+      if (Array.isArray(val)) return val;
+      if (typeof val === 'object') return Object.values(val);
+      return [];
     }
 
     function rebuildAppDataFromStore() {
@@ -822,19 +829,19 @@
 
         let entryWeek = entry.week || extractWeekFromKey(key);
 
-        const injectMeta = (arr, tType) => {
-          if (!Array.isArray(arr)) return [];
+        const injectMeta = (rawVal, tType) => {
+          const arr = toPureArray(rawVal);
           return arr.map(r => {
             let rowCopy = normalizeRowFields(r, tType);
             rowCopy._scope = key;
 
-            // Extract date and hour
-            if (!rowCopy._date && rowCopy['DATE & HOUR']) {
-              rowCopy._date = extractDatePart(rowCopy['DATE & HOUR']) || '';
-              rowCopy._hour = extractHourNumber(rowCopy['DATE & HOUR']);
+            // Normalize Date & Hour
+            const dateHourStr = rowCopy['DATE & HOUR'] || rowCopy['Date & Hour'] || rowCopy['date_hour'] || '';
+            if (!rowCopy._date && dateHourStr) {
+              rowCopy._date = extractDatePart(dateHourStr) || '';
+              rowCopy._hour = extractHourNumber(dateHourStr);
             }
 
-            // Derive month from date if available
             if (rowCopy._date) {
               const p = rowCopy._date.split('-').map(Number);
               if (p.length >= 2 && !isNaN(p[1])) {
@@ -857,7 +864,6 @@
         if (entry.table4) appData.table4.push(...injectMeta(entry.table4, 4));
       });
 
-      updateScopeDropdown();
       ensureInitialScopeSync();
       handleDateNavigationUpdate();
       renderSavedWeeksBadges();
@@ -890,7 +896,6 @@
       const tm = document.getElementById('target-month-select');
       if (tm) tm.value = selectedMonthIndex;
       
-      // Auto-jump to first date matching this month
       const dates = getAllGlobalDates().filter(d => {
         const parts = d.split('-').map(Number);
         return parts[1] - 1 === selectedMonthIndex;
@@ -911,52 +916,12 @@
       handleDateNavigationUpdate();
     }
 
-    function updateScopeDropdown() {
-      const select = document.getElementById('header-scope-select');
-      if (!select) return;
-      const current = select.value;
-      select.innerHTML = '<option value="all">All Accumulated Data</option>';
-
-      Object.keys(rawStore).forEach(k => {
-        const opt = document.createElement('option');
-        opt.value = k;
-        opt.innerText = rawStore[k].name || k;
-        select.appendChild(opt);
-      });
-
-      if (Object.keys(rawStore).includes(current)) {
-        select.value = current;
-      }
-    }
-
-    function onScopeChanged(val) {
-      if (val !== 'all' && rawStore[val]) {
-        if (rawStore[val].monthIndex !== undefined && rawStore[val].monthIndex !== -1) {
-          selectedMonthIndex = rawStore[val].monthIndex;
-          document.getElementById('header-month-select').value = selectedMonthIndex;
-        } else {
-          const mi = extractMonthIndexFromKey(val);
-          if (mi !== -1) {
-            selectedMonthIndex = mi;
-            document.getElementById('header-month-select').value = selectedMonthIndex;
-          }
-        }
-        if (rawStore[val].week) {
-          selectedWeek = rawStore[val].week;
-          document.getElementById('header-week-select').value = selectedWeek;
-        }
-      }
-      ensureInitialScopeSync();
-      handleDateNavigationUpdate();
-    }
-
     function onDatePickerChanged(val) {
       currentSelectedDate = val || '';
       syncControlsToDate(currentSelectedDate);
       handleDateNavigationUpdate();
     }
 
-    // GLOBAL UNRESTRICTED DATES LIST (Solves arrow navigation bug)
     function getAllGlobalDates() {
       const d1 = appData.table1.map(r => r._date).filter(Boolean);
       const d4 = appData.table4.map(r => r._date).filter(Boolean);
@@ -977,7 +942,6 @@
         currentSelectedDate = dates[idx];
         syncControlsToDate(currentSelectedDate);
       } else {
-        // Fallback calendar progression if no records exist yet
         let baseDate = currentSelectedDate ? new Date(currentSelectedDate + 'T00:00:00') : new Date();
         baseDate.setDate(baseDate.getDate() + step);
         const yr = baseDate.getFullYear();
@@ -986,7 +950,6 @@
         currentSelectedDate = `${yr}-${m}-${d}`;
         syncControlsToDate(currentSelectedDate);
       }
-
       handleDateNavigationUpdate();
     }
 
@@ -1014,7 +977,6 @@
         return;
       }
 
-      // Check both database trees
       db.ref("weeks_data").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
@@ -1057,6 +1019,15 @@
         }
       });
 
+      db.ref("weekly_insights").on("value", (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          Object.assign(localInsightsStore, val);
+          localStorage.setItem('open_calls_insights', JSON.stringify(localInsightsStore));
+          loadSavedWeeklyInsights();
+        }
+      });
+
       db.ref("open_insights").on("value", (snapshot) => {
         const val = snapshot.val();
         if (val) {
@@ -1078,24 +1049,38 @@
     }
 
     function getFilteredData() {
-      // 1. Daily data (Tables 1 & 4) filters by currentSelectedDate
+      // 1. Daily rows (Tables 1 & 4)
       let t1 = appData.table1.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
       let t4 = appData.table4.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
 
-      // 2. Weekly & Team data (Tables 2 & 3) filters by selected month & week
+      // If strict filter is empty, fallback to active month
+      if (t1.length === 0) {
+        t1 = appData.table1.filter(r => r._monthIndex === selectedMonthIndex);
+      }
+      if (t4.length === 0) {
+        t4 = appData.table4.filter(r => r._monthIndex === selectedMonthIndex);
+      }
+
+      // 2. Weekly & Team data (Tables 2 & 3)
       let t2 = appData.table2.filter(r => {
         const matchM = r._monthIndex === undefined || r._monthIndex === -1 || r._monthIndex === selectedMonthIndex;
-        const matchW = !r._week || r._week === selectedWeek;
+        const matchW = !r._week || r._week.toLowerCase() === selectedWeek.toLowerCase();
         return matchM && matchW;
       });
 
       let t3 = appData.table3.filter(r => {
         const matchM = r._monthIndex === undefined || r._monthIndex === -1 || r._monthIndex === selectedMonthIndex;
-        const matchW = !r._week || r._week === selectedWeek;
+        const matchW = !r._week || r._week.toLowerCase() === selectedWeek.toLowerCase();
         return matchM && matchW;
       });
 
-      // Fallback: If weekly scope is empty, show whatever is available to prevent blank screens
+      if (t2.length === 0) {
+        t2 = appData.table2.filter(r => r._monthIndex === selectedMonthIndex);
+      }
+      if (t3.length === 0) {
+        t3 = appData.table3.filter(r => r._monthIndex === selectedMonthIndex);
+      }
+
       if (t2.length === 0) t2 = appData.table2;
       if (t3.length === 0) t3 = appData.table3;
 
@@ -1228,9 +1213,37 @@
       }
     }
 
+    // MULTI-PATTERN LOOKUP FOR WEEKLY INSIGHTS
+    function getPossibleInsightKeys() {
+      const mShort = monthNamesShort[selectedMonthIndex] || '';
+      const mFull = monthNames[selectedMonthIndex] || '';
+      const wClean = selectedWeek;
+      const wUnder = selectedWeek.replace(/\s+/g, '_');
+
+      return [
+        `insights_${mShort}_${wClean}`,
+        `insights_${mShort}_${wUnder}`,
+        `insights_${mFull}_${wClean}`,
+        `insights_${mFull}_${wUnder}`,
+        `${mShort}_${wClean}`,
+        `${mShort}_${wUnder}`,
+        `${mFull}_${wClean}`,
+        `${mFull}_${wUnder}`
+      ];
+    }
+
     function loadSavedWeeklyInsights() {
-      const key = sanitizeKey(`${monthNamesShort[selectedMonthIndex] || 'Month'}_${selectedWeek}`);
-      const saved = (localInsightsStore && localInsightsStore[key]) || {};
+      const candidateKeys = getPossibleInsightKeys();
+      let saved = {};
+
+      if (localInsightsStore) {
+        for (const k of candidateKeys) {
+          if (localInsightsStore[k]) {
+            saved = localInsightsStore[k];
+            break;
+          }
+        }
+      }
 
       const ach = document.getElementById('insights-achievements');
       const blk = document.getElementById('insights-blockers');
@@ -1259,7 +1272,7 @@
     }
 
     function saveWeeklyInsights() {
-      const key = sanitizeKey(`${monthNamesShort[selectedMonthIndex] || 'Month'}_${selectedWeek}`);
+      const primaryKey = `insights_${monthNamesShort[selectedMonthIndex] || 'Month'}_${selectedWeek}`;
       const payload = {
         achievements: document.getElementById('insights-achievements')?.value || '',
         blockers: document.getElementById('insights-blockers')?.value || '',
@@ -1268,11 +1281,12 @@
       };
 
       if (!localInsightsStore) localInsightsStore = {};
-      localInsightsStore[key] = payload;
+      localInsightsStore[primaryKey] = payload;
       localStorage.setItem('open_calls_insights', JSON.stringify(localInsightsStore));
 
       if (db) {
-        db.ref("open_insights/" + key).set(payload)
+        db.ref("weekly_insights/" + primaryKey).set(payload);
+        db.ref("open_insights/" + primaryKey).set(payload)
           .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved!`))
           .catch(err => console.error(err));
       } else {
@@ -1344,10 +1358,10 @@
 
         const existing = rawStore[storageKey] || {};
 
-        let newT1 = existing.table1 ? [...existing.table1] : [];
-        let newT2 = existing.table2 ? [...existing.table2] : [];
-        let newT3 = existing.table3 ? [...existing.table3] : [];
-        let newT4 = existing.table4 ? [...existing.table4] : [];
+        let newT1 = toPureArray(existing.table1);
+        let newT2 = toPureArray(existing.table2);
+        let newT3 = toPureArray(existing.table3);
+        let newT4 = toPureArray(existing.table4);
 
         if (t1Rows.length > 0) {
           const mappedT1 = t1Rows.map(r => {
@@ -1365,7 +1379,7 @@
               '_hour': hourNum >= 0 ? hourNum : 0
             };
           });
-          newT1.push(...mappedT1);
+          newT1 = mappedT1;
         }
 
         if (t2Rows.length > 0) {
@@ -1376,7 +1390,7 @@
             'ABND IN QUEUE': cleanNum(r[3]),
             'ABND ON HOLD': cleanNum(r[4])
           }));
-          newT2.push(...mappedT2);
+          newT2 = mappedT2;
         }
 
         if (t3Rows.length > 0) {
@@ -1391,7 +1405,7 @@
             'AVERAGE HOLD TIME': r[7] || '00:25',
             'DAYS ATTENDED OUT OF 5': cleanNum(r[8]) || 5
           }));
-          newT3.push(...mappedT3);
+          newT3 = mappedT3;
         }
 
         if (t4Rows.length > 0) {
@@ -1407,7 +1421,7 @@
               '_hour': hourNum >= 0 ? hourNum : 0
             };
           });
-          newT4.push(...mappedT4);
+          newT4 = mappedT4;
         }
 
         const payload = {
@@ -1475,6 +1489,12 @@
           if (entry.monthIndex !== undefined && entry.monthIndex !== -1) {
             selectedMonthIndex = entry.monthIndex;
             document.getElementById('header-month-select').value = selectedMonthIndex;
+          } else {
+            const mi = extractMonthIndexFromKey(k);
+            if (mi !== -1) {
+              selectedMonthIndex = mi;
+              document.getElementById('header-month-select').value = selectedMonthIndex;
+            }
           }
           if (entry.week) {
             selectedWeek = entry.week;
