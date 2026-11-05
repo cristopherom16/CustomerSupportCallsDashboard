@@ -214,6 +214,56 @@
 
     <!-- TAB 1: OVERVIEW -->
     <div id="view-overview" class="space-y-8">
+      
+      <!-- Quick View Filter Bar -->
+      <div class="bg-slate-900/90 border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-amber-500/20 pb-2.5">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-amber-400 text-sm"></i>
+            <span class="text-xs font-black uppercase text-amber-400 tracking-wider">Filtro de Visualización Rápida</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetVisibility(true)" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500 hover:text-slate-950 transition cursor-pointer">
+              <i class="fa-solid fa-eye mr-1"></i> Mostrar Todo
+            </button>
+            <button onclick="resetVisibility(false)" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:text-rose-400 hover:border-rose-500/40 transition cursor-pointer">
+              <i class="fa-solid fa-eye-slash mr-1"></i> Ocultar Todo
+            </button>
+          </div>
+        </div>
+
+        <!-- Charts Selector Filters -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <i class="fa-solid fa-chart-simple mr-1 text-amber-400"></i> Gráficas Visibles:
+            </span>
+            <div class="flex gap-2">
+              <button onclick="setAllChartsVisibility(true)" class="text-[10px] text-amber-400 hover:underline">Ver todas</button>
+              <span class="text-slate-600 text-xs">|</span>
+              <button onclick="setAllChartsVisibility(false)" class="text-[10px] text-slate-400 hover:text-rose-400">Ocultar todas</button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1.5" id="charts-filter-pills"></div>
+        </div>
+
+        <!-- Tables Selector Filters -->
+        <div class="pt-2 border-t border-amber-500/10">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <i class="fa-solid fa-table-list mr-1 text-amber-400"></i> Tablas Visibles:
+            </span>
+            <div class="flex gap-2">
+              <button onclick="setAllTablesVisibility(true)" class="text-[10px] text-amber-400 hover:underline">Ver todas</button>
+              <span class="text-slate-600 text-xs">|</span>
+              <button onclick="setAllTablesVisibility(false)" class="text-[10px] text-slate-400 hover:text-rose-400">Ocultar todas</button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1.5" id="tables-filter-pills"></div>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
       <div>
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
           <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
@@ -252,7 +302,8 @@
         </div>
       </div>
 
-      <div>
+      <!-- Performance Visualizations Section -->
+      <div id="section-charts-container">
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
@@ -266,8 +317,8 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+        <div id="charts-grid-wrapper" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <div id="card-chart-c1" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">1. Hourly Answered</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
@@ -275,7 +326,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c1"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div id="card-chart-c2" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">2. Hourly Abnd. in CSAT</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
@@ -283,7 +334,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c2"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div id="card-chart-c3" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">3. Hourly Abnd. in Queue</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
@@ -291,7 +342,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c3"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div id="card-chart-c4" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">4. Hourly Abnd. On Hold</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
@@ -299,7 +350,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c4"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div id="card-chart-c10" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">10. Overflow: Inbound vs Tagged</span>
               <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Daily (0-23h)</span>
@@ -307,7 +358,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c10"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div id="card-chart-c5" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">5. Team Answered & Abandons</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
@@ -315,7 +366,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c5"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div id="card-chart-c6" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">6. Teammate vs Abnd. Inbound</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
@@ -323,7 +374,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c6"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div id="card-chart-c7" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">7. Teammate vs Answer Time (Sec)</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
@@ -331,7 +382,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c7"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div id="card-chart-c8" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">8. Teammate vs Talk Time (Minutes)</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
@@ -339,7 +390,7 @@
             <div class="h-56 w-full relative"><canvas id="chart-c8"></canvas></div>
           </div>
 
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between md:col-span-2 xl:col-span-3">
+          <div id="card-chart-c9" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between md:col-span-2 xl:col-span-3">
             <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-bold text-amber-400">9. Teammate vs Call Duration (Minutes)</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Weekly</span>
@@ -349,12 +400,14 @@
         </div>
       </div>
 
-      <div class="space-y-6 pt-4">
+      <!-- Operational Data Tables Section -->
+      <div id="section-tables-container" class="space-y-6 pt-4">
         <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
           <i class="fa-solid fa-table-cells text-amber-500"></i> Operational Data Tables
         </h2>
 
-        <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
+        <!-- Table 1 Card -->
+        <div id="card-table-t1" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <h3 class="text-sm font-bold text-amber-400">1. Calls Per Hour</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t1-count">0 records</span>
@@ -378,7 +431,8 @@
           </div>
         </div>
 
-        <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
+        <!-- Table 2 Card -->
+        <div id="card-table-t2" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <h3 class="text-sm font-bold text-amber-400">2. Calls Per Queue</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t2-count">0 records</span>
@@ -401,7 +455,8 @@
           </div>
         </div>
 
-        <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
+        <!-- Table 3 Card -->
+        <div id="card-table-t3" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t3-count">0 records</span>
@@ -428,7 +483,8 @@
           </div>
         </div>
 
-        <div class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
+        <!-- Table 4 Card -->
+        <div id="card-table-t4" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
             <h3 class="text-sm font-bold text-amber-400">4. Calls Overflow</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t4-count">0 records</span>
@@ -644,13 +700,170 @@
     let currentSelectedDate = '';
     let chartInstances = {};
 
+    // DEFINICIÓN DE GRÁFICAS Y TABLAS PARA VISIBILIDAD DINÁMICA
+    const chartDefinitions = [
+      { id: 'chart-c1', cardId: 'card-chart-c1', label: '1. Hourly Answered' },
+      { id: 'chart-c2', cardId: 'card-chart-c2', label: '2. Abnd. CSAT' },
+      { id: 'chart-c3', cardId: 'card-chart-c3', label: '3. Abnd. Queue' },
+      { id: 'chart-c4', cardId: 'card-chart-c4', label: '4. Abnd. Hold' },
+      { id: 'chart-c10', cardId: 'card-chart-c10', label: '10. Inbound vs Tagged' },
+      { id: 'chart-c5', cardId: 'card-chart-c5', label: '5. Team Answered' },
+      { id: 'chart-c6', cardId: 'card-chart-c6', label: '6. Agent Abnd' },
+      { id: 'chart-c7', cardId: 'card-chart-c7', label: '7. Answer Time' },
+      { id: 'chart-c8', cardId: 'card-chart-c8', label: '8. Talk Time' },
+      { id: 'chart-c9', cardId: 'card-chart-c9', label: '9. Call Duration' }
+    ];
+
+    const tableDefinitions = [
+      { id: 'card-table-t1', label: '1. Calls Per Hour' },
+      { id: 'card-table-t2', label: '2. Calls Per Queue' },
+      { id: 'card-table-t3', label: '3. Calls Per Agents' },
+      { id: 'card-table-t4', label: '4. Calls Overflow' }
+    ];
+
+    let visibilityState = {
+      charts: {
+        'chart-c1': true,
+        'chart-c2': true,
+        'chart-c3': true,
+        'chart-c4': true,
+        'chart-c10': true,
+        'chart-c5': true,
+        'chart-c6': true,
+        'chart-c7': true,
+        'chart-c8': true,
+        'chart-c9': true
+      },
+      tables: {
+        'card-table-t1': true,
+        'card-table-t2': true,
+        'card-table-t3': true,
+        'card-table-t4': true
+      }
+    };
+
     window.onload = function () {
       initTheme();
       initControls();
+      loadVisibilityState();
       loadLocalCacheFirst();
       listenToFirebaseCloudData();
       checkAllFourTablesReady();
+      renderVisibilityPills();
+      applyVisibilityDOM();
     };
+
+    function loadVisibilityState() {
+      try {
+        const saved = localStorage.getItem('calls_dashboard_visibility');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.charts) visibilityState.charts = { ...visibilityState.charts, ...parsed.charts };
+          if (parsed.tables) visibilityState.tables = { ...visibilityState.tables, ...parsed.tables };
+        }
+      } catch (e) {
+        console.warn("Could not load visibility state:", e);
+      }
+    }
+
+    function saveVisibilityState() {
+      safeSetLocal('calls_dashboard_visibility', visibilityState);
+    }
+
+    function toggleChartVisibility(chartId) {
+      visibilityState.charts[chartId] = !visibilityState.charts[chartId];
+      saveVisibilityState();
+      renderVisibilityPills();
+      applyVisibilityDOM();
+      renderAllCharts();
+    }
+
+    function toggleTableVisibility(tableCardId) {
+      visibilityState.tables[tableCardId] = !visibilityState.tables[tableCardId];
+      saveVisibilityState();
+      renderVisibilityPills();
+      applyVisibilityDOM();
+    }
+
+    function setAllChartsVisibility(show) {
+      Object.keys(visibilityState.charts).forEach(k => visibilityState.charts[k] = show);
+      saveVisibilityState();
+      renderVisibilityPills();
+      applyVisibilityDOM();
+      renderAllCharts();
+    }
+
+    function setAllTablesVisibility(show) {
+      Object.keys(visibilityState.tables).forEach(k => visibilityState.tables[k] = show);
+      saveVisibilityState();
+      renderVisibilityPills();
+      applyVisibilityDOM();
+    }
+
+    function resetVisibility(showAll) {
+      setAllChartsVisibility(showAll);
+      setAllTablesVisibility(showAll);
+    }
+
+    function renderVisibilityPills() {
+      const cContainer = document.getElementById('charts-filter-pills');
+      if (cContainer) {
+        cContainer.innerHTML = '';
+        chartDefinitions.forEach(def => {
+          const isVisible = visibilityState.charts[def.id];
+          const pill = document.createElement('button');
+          pill.onclick = () => toggleChartVisibility(def.id);
+          pill.className = isVisible
+            ? 'px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/50 hover:bg-amber-500 hover:text-slate-950 transition cursor-pointer flex items-center gap-1.5'
+            : 'px-2.5 py-1 text-[11px] font-medium rounded-lg bg-slate-950 text-slate-500 border border-slate-800 hover:text-slate-300 hover:border-slate-700 transition cursor-pointer flex items-center gap-1.5 opacity-60';
+          
+          pill.innerHTML = `<i class="fa-solid ${isVisible ? 'fa-check text-[10px]' : 'fa-xmark text-[10px]'}"></i> ${def.label}`;
+          cContainer.appendChild(pill);
+        });
+      }
+
+      const tContainer = document.getElementById('tables-filter-pills');
+      if (tContainer) {
+        tContainer.innerHTML = '';
+        tableDefinitions.forEach(def => {
+          const isVisible = visibilityState.tables[def.id];
+          const pill = document.createElement('button');
+          pill.onclick = () => toggleTableVisibility(def.id);
+          pill.className = isVisible
+            ? 'px-2.5 py-1 text-[11px] font-bold rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 hover:bg-emerald-500 hover:text-slate-950 transition cursor-pointer flex items-center gap-1.5'
+            : 'px-2.5 py-1 text-[11px] font-medium rounded-lg bg-slate-950 text-slate-500 border border-slate-800 hover:text-slate-300 hover:border-slate-700 transition cursor-pointer flex items-center gap-1.5 opacity-60';
+
+          pill.innerHTML = `<i class="fa-solid ${isVisible ? 'fa-check text-[10px]' : 'fa-xmark text-[10px]'}"></i> ${def.label}`;
+          tContainer.appendChild(pill);
+        });
+      }
+    }
+
+    function applyVisibilityDOM() {
+      // Aplicar a gráficas
+      chartDefinitions.forEach(def => {
+        const el = document.getElementById(def.cardId);
+        if (el) {
+          if (visibilityState.charts[def.id]) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+
+      // Aplicar a tablas
+      tableDefinitions.forEach(def => {
+        const el = document.getElementById(def.id);
+        if (el) {
+          if (visibilityState.tables[def.id]) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+    }
 
     function toggleTheme() {
       const isLight = document.body.classList.toggle('light-mode');
@@ -693,12 +906,11 @@
       }
     }
 
-    // SAFE LOCAL STORAGE WRITE (Prevents QuotaExceededError crashes)
     function safeSetLocal(key, val) {
       try {
         localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val));
       } catch (e) {
-        // Ignored silently when quota exceeded
+        // Ignorado si se excede la cuota
       }
     }
 
@@ -1142,6 +1354,7 @@
 
       renderWeekDaysPills();
       renderAllTables();
+      applyVisibilityDOM();
       renderAllCharts();
       initUnifiedHourlyGrid();
       loadSavedWeeklyInsights();
@@ -1164,7 +1377,10 @@
         activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
       }
 
-      if (tabId === 'overview') setTimeout(() => renderAllCharts(), 60);
+      if (tabId === 'overview') {
+        applyVisibilityDOM();
+        setTimeout(() => renderAllCharts(), 60);
+      }
       if (tabId === 'notes') {
         initUnifiedHourlyGrid();
         loadSavedWeeklyInsights();
@@ -1641,6 +1857,15 @@
       });
 
       const makeChart = (canvasId, type, labels, datasets, extraOpts = {}) => {
+        // Optimización: Si la gráfica está oculta por el usuario, no se dibuja
+        if (!visibilityState.charts[canvasId]) {
+          if (chartInstances[canvasId]) {
+            chartInstances[canvasId].destroy();
+            delete chartInstances[canvasId];
+          }
+          return;
+        }
+
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
         
