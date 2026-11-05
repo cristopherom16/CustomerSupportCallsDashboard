@@ -215,55 +215,7 @@
     <!-- TAB 1: OVERVIEW -->
     <div id="view-overview" class="space-y-8">
       
-      <!-- Quick View Filter Bar -->
-      <div class="bg-slate-900/90 border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3.5">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-amber-500/20 pb-2.5">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-sliders text-amber-400 text-sm"></i>
-            <span class="text-xs font-black uppercase text-amber-400 tracking-wider">Filtro de Visualización Rápida</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="resetVisibility(true)" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500 hover:text-slate-950 transition cursor-pointer">
-              <i class="fa-solid fa-eye mr-1"></i> Mostrar Todo
-            </button>
-            <button onclick="resetVisibility(false)" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:text-rose-400 hover:border-rose-500/40 transition cursor-pointer">
-              <i class="fa-solid fa-eye-slash mr-1"></i> Ocultar Todo
-            </button>
-          </div>
-        </div>
-
-        <!-- Charts Selector Filters -->
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              <i class="fa-solid fa-chart-simple mr-1 text-amber-400"></i> Gráficas Visibles:
-            </span>
-            <div class="flex gap-2">
-              <button onclick="setAllChartsVisibility(true)" class="text-[10px] text-amber-400 hover:underline">Ver todas</button>
-              <span class="text-slate-600 text-xs">|</span>
-              <button onclick="setAllChartsVisibility(false)" class="text-[10px] text-slate-400 hover:text-rose-400">Ocultar todas</button>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-1.5" id="charts-filter-pills"></div>
-        </div>
-
-        <!-- Tables Selector Filters -->
-        <div class="pt-2 border-t border-amber-500/10">
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              <i class="fa-solid fa-table-list mr-1 text-amber-400"></i> Tablas Visibles:
-            </span>
-            <div class="flex gap-2">
-              <button onclick="setAllTablesVisibility(true)" class="text-[10px] text-amber-400 hover:underline">Ver todas</button>
-              <span class="text-slate-600 text-xs">|</span>
-              <button onclick="setAllTablesVisibility(false)" class="text-[10px] text-slate-400 hover:text-rose-400">Ocultar todas</button>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-1.5" id="tables-filter-pills"></div>
-        </div>
-      </div>
-
-      <!-- KPI Summary Cards -->
+      <!-- Daily Metrics Summary -->
       <div>
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
           <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
@@ -299,6 +251,54 @@
             <div id="kpi-tagged" class="text-xl font-extrabold text-emerald-400 mt-1">0</div>
             <span class="text-[10px] text-slate-500">Overflow count</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Quick View Filter Bar (Placed right below Daily Metrics Summary) -->
+      <div class="bg-slate-900/90 border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-amber-500/20 pb-2.5">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-amber-400 text-sm"></i>
+            <span class="text-xs font-black uppercase text-amber-400 tracking-wider">Quick View Filter</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetVisibility(true)" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500 hover:text-slate-950 transition cursor-pointer">
+              <i class="fa-solid fa-eye mr-1"></i> Show All
+            </button>
+            <button onclick="resetVisibility(false)" class="text-[11px] font-bold px-3 py-1 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:text-rose-400 hover:border-rose-500/40 transition cursor-pointer">
+              <i class="fa-solid fa-eye-slash mr-1"></i> Hide All
+            </button>
+          </div>
+        </div>
+
+        <!-- Charts Selector Filters -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <i class="fa-solid fa-chart-simple mr-1 text-amber-400"></i> Visible Charts:
+            </span>
+            <div class="flex gap-2">
+              <button onclick="setAllChartsVisibility(true)" class="text-[10px] text-amber-400 hover:underline">Show All Charts</button>
+              <span class="text-slate-600 text-xs">|</span>
+              <button onclick="setAllChartsVisibility(false)" class="text-[10px] text-slate-400 hover:text-rose-400">Hide All Charts</button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1.5" id="charts-filter-pills"></div>
+        </div>
+
+        <!-- Tables Selector Filters -->
+        <div class="pt-2 border-t border-amber-500/10">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <i class="fa-solid fa-table-list mr-1 text-amber-400"></i> Visible Tables:
+            </span>
+            <div class="flex gap-2">
+              <button onclick="setAllTablesVisibility(true)" class="text-[10px] text-amber-400 hover:underline">Show All Tables</button>
+              <span class="text-slate-600 text-xs">|</span>
+              <button onclick="setAllTablesVisibility(false)" class="text-[10px] text-slate-400 hover:text-rose-400">Hide All Tables</button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1.5" id="tables-filter-pills"></div>
         </div>
       </div>
 
@@ -700,7 +700,7 @@
     let currentSelectedDate = '';
     let chartInstances = {};
 
-    // DEFINICIÓN DE GRÁFICAS Y TABLAS PARA VISIBILIDAD DINÁMICA
+    // Dynamic visibility definitions (Charts and Tables)
     const chartDefinitions = [
       { id: 'chart-c1', cardId: 'card-chart-c1', label: '1. Hourly Answered' },
       { id: 'chart-c2', cardId: 'card-chart-c2', label: '2. Abnd. CSAT' },
@@ -840,7 +840,7 @@
     }
 
     function applyVisibilityDOM() {
-      // Aplicar a gráficas
+      // Toggle Charts Visibility
       chartDefinitions.forEach(def => {
         const el = document.getElementById(def.cardId);
         if (el) {
@@ -852,7 +852,7 @@
         }
       });
 
-      // Aplicar a tablas
+      // Toggle Tables Visibility
       tableDefinitions.forEach(def => {
         const el = document.getElementById(def.id);
         if (el) {
@@ -906,11 +906,12 @@
       }
     }
 
+    // Safe Local Storage write
     function safeSetLocal(key, val) {
       try {
         localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val));
       } catch (e) {
-        // Ignorado si se excede la cuota
+        // Ignored silently when quota exceeded
       }
     }
 
@@ -1857,7 +1858,7 @@
       });
 
       const makeChart = (canvasId, type, labels, datasets, extraOpts = {}) => {
-        // Optimización: Si la gráfica está oculta por el usuario, no se dibuja
+        // Destroy and skip rendering if the chart card is hidden
         if (!visibilityState.charts[canvasId]) {
           if (chartInstances[canvasId]) {
             chartInstances[canvasId].destroy();
