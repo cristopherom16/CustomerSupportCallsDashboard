@@ -32,27 +32,33 @@
       --bg-color: #0b0f19;
       --card-bg: #1c2234;
       --card-inner-bg: #0f172a;
-      --border-color: rgba(245, 158, 11, 0.3);
       --text-main: #e2e8f0;
       --text-muted: #94a3b8;
       --input-bg: #0f172a;
     }
-    body.light-mode {
-      --bg-color: #fef9c3; /* Egg yellow background */
-      --card-bg: #fef08a;  /* Egg yellow cards */
-      --card-inner-bg: #fde047;
-      --border-color: rgba(217, 119, 6, 0.5);
-      --text-main: #0b0f19;
-      --text-muted: #78350f;
-      --input-bg: #fef3c7; /* Amber-tinted egg yellow input */
+
+    html {
+      /* Aumenta el tamaño de la letra global del dashboard a Arial 14 */
+      font-size: 18.66px !important; /* Equivalente a 14pt (Arial 14) */
     }
+
     body {
       font-family: Arial, Helvetica, sans-serif;
-      font-size: 16px; /* Arial 12pt equivalent */
       background-color: var(--bg-color);
       color: var(--text-main);
       transition: background-color 0.3s, color 0.3s;
     }
+
+    /* Light Theme Settings - Amarillo Claro y Ambar con bordes Azul Obscuro */
+    body.light-mode {
+      --bg-color: #fef3c7; /* Amarillo Claro para el fondo */
+      --card-bg: #fcd34d;  /* Amarillo Ambar para las cards */
+      --card-inner-bg: #fbbf24;
+      --text-main: #0f172a;
+      --text-muted: #1e3a8a;
+      --input-bg: #fef3c7; /* Fondo de inputs Amarillo Claro */
+    }
+    
     body.light-mode header,
     body.light-mode .bg-slate-900\/90,
     body.light-mode .bg-slate-900\/80,
@@ -74,8 +80,13 @@
     body.light-mode textarea {
       background-color: var(--input-bg) !important;
       color: var(--text-main) !important;
-      border-color: #f59e0b !important;
     }
+    
+    /* Todos los bordes Azul Obscuro en Light Mode */
+    body.light-mode * {
+      border-color: #1e3a8a !important; 
+    }
+
     table, table th, table td {
       text-align: center !important;
     }
@@ -424,7 +435,7 @@
         </div>
       </div>
 
-      <!-- Operational Data Tables Section (All centered cells) -->
+      <!-- Operational Data Tables Section -->
       <div id="section-tables-container" class="space-y-6 pt-4">
         <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
           <i class="fa-solid fa-table-cells text-amber-500"></i> Operational Data Tables
@@ -1865,8 +1876,8 @@
         }
 
         const isLight = document.body.classList.contains('light-mode');
-        const gridColor = isLight ? 'rgba(217, 119, 6, 0.2)' : 'rgba(245, 158, 11, 0.2)';
-        const tickColor = isLight ? '#78350f' : '#64748b';
+        const gridColor = isLight ? '#1e3a8a' : 'rgba(245, 158, 11, 0.2)';
+        const tickColor = isLight ? '#1e3a8a' : '#64748b';
 
         chartInstances[canvasId] = new Chart(canvas.getContext('2d'), {
           type: type,
@@ -1920,7 +1931,6 @@
       makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
     }
 
-    // Function to generate and download comprehensive Excel report
     function downloadExcelReport() {
       try {
         if (typeof XLSX === 'undefined') {
@@ -1934,7 +1944,6 @@
         const activeWeek = selectedWeek;
         const activeDay = currentSelectedDate || 'All Days';
 
-        // 1. Summary Sheet
         const summaryRows = [
           ["CUSTOMER SUPPORT - CALLS DASHBOARD REPORT"],
           ["Month Scope:", activeMonth],
@@ -1953,7 +1962,6 @@
         const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
         XLSX.utils.book_append_sheet(wb, wsSummary, "Dashboard Summary");
 
-        // 2. Table 1: Calls Per Hour
         if (t1.length > 0) {
           const t1Data = t1.map(r => ({
             "DATE & HOUR": r['DATE & HOUR'] || '',
@@ -1967,7 +1975,6 @@
           XLSX.utils.book_append_sheet(wb, wsT1, "Calls Per Hour");
         }
 
-        // 3. Table 2: Calls Per Queue
         if (t2.length > 0) {
           const t2Data = t2.map(r => ({
             "TEAM": r['TEAM'] || '',
@@ -1980,7 +1987,6 @@
           XLSX.utils.book_append_sheet(wb, wsT2, "Calls Per Queue");
         }
 
-        // 4. Table 3: Calls Per Agents
         if (t3.length > 0) {
           const t3Data = t3.map(r => ({
             "TEAMMATE": r['TEAMMATE'] || '',
@@ -1997,7 +2003,6 @@
           XLSX.utils.book_append_sheet(wb, wsT3, "Calls Per Agents");
         }
 
-        // 5. Table 4: Calls Overflow
         if (t4.length > 0) {
           const t4Data = t4.map(r => ({
             "DATE & HOUR": r['DATE & HOUR'] || '',
@@ -2008,7 +2013,6 @@
           XLSX.utils.book_append_sheet(wb, wsT4, "Calls Overflow");
         }
 
-        // 6. Notes & Insights
         const notesRows = [
           ["HOURLY OPERATIONAL NOTES (" + (currentSelectedDate || 'General Scope') + ")"],
           ["Hour", "Operational Note"]
