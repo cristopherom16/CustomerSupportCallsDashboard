@@ -95,42 +95,43 @@
     <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
   </button>
 
-  <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 py-3 transition-all" style="padding-left: 67px; padding-right: 10mm;">
-    <div class="w-full flex flex-wrap items-center justify-between gap-4">
+  <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 py-4 transition-all" style="padding-left: 67px; padding-right: 10mm;">
+    <div class="w-full flex flex-col items-center justify-center gap-4">
       
-      <div class="flex items-center gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-slate-900/95 border border-amber-500/40 flex items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
-          <i class="fa-solid fa-gauge-high text-xl text-amber-400"></i>
+      <!-- Titulo Centrado y Mas Grande -->
+      <div class="flex items-center justify-center gap-4">
+        <div class="hidden sm:flex w-12 h-12 rounded-xl bg-slate-900/95 border border-amber-500/40 items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
+          <i class="fa-solid fa-gauge-high text-2xl text-amber-400"></i>
         </div>
-        <div>
+        <div class="flex flex-col items-center text-center gap-1.5">
+          <h1 class="text-3xl sm:text-4xl font-black tracking-widest text-amber-400 uppercase leading-none">
+            CUSTOMER SUPPORT
+          </h1>
           <div class="flex items-center gap-2">
-            <h1 class="text-base sm:text-lg font-black tracking-wider text-amber-400 uppercase leading-none">
-              CUSTOMER SUPPORT
-            </h1>
+            <span class="text-xs font-semibold text-slate-400 tracking-widest uppercase">
+              CALLS DASHBOARD (CLOUD STORAGE UNLIMITED)
+            </span>
             <span id="cloud-status-badge" class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
               Connecting...
             </span>
           </div>
-          <span class="text-[11px] font-semibold text-slate-400 tracking-widest uppercase">
-            CALLS DASHBOARD (CLOUD STORAGE UNLIMITED)
-          </span>
         </div>
       </div>
 
-      <!-- Header Controls -->
-      <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-slate-950/80 px-3 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
+      <!-- Header Controls: Botones amarillos con texto azul obscuro -->
+      <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-slate-950/80 px-4 py-2 rounded-2xl border border-amber-500/30 shadow-inner">
         <!-- Date Back/Forward Controls -->
         <div class="flex items-center gap-1">
-          <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition border border-amber-500/20 cursor-pointer">
+          <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
             <i class="fa-solid fa-chevron-left text-xs"></i>
           </button>
-          <input type="date" id="date-picker" onchange="onDatePickerChanged(this.value)" class="bg-slate-900 text-amber-300 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400">
-          <button onclick="navigateDate(1)" title="Next Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 transition border border-amber-500/20 cursor-pointer">
+          <input type="date" id="date-picker" onchange="onDatePickerChanged(this.value)" class="bg-amber-500 text-blue-950 text-xs font-bold px-2 py-1 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
+          <button onclick="navigateDate(1)" title="Next Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
             <i class="fa-solid fa-chevron-right text-xs"></i>
           </button>
         </div>
 
-        <button onclick="setToday()" class="text-[11px] font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-2.5 py-1 rounded-md border border-amber-500/30 transition-all cursor-pointer">
+        <button onclick="setToday()" class="text-[11px] font-extrabold bg-amber-500 text-blue-950 hover:bg-amber-400 px-3 py-1 rounded-md border border-amber-600 transition-all cursor-pointer">
           Today
         </button>
 
@@ -139,7 +140,7 @@
         <!-- Month Dropdown -->
         <div class="flex items-center gap-1.5 pl-1">
           <span class="text-[10px] uppercase font-bold text-slate-400">Month:</span>
-          <select id="header-month-select" onchange="onMonthChanged(this.value)" class="bg-slate-900 text-amber-400 text-xs font-bold px-2 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400 cursor-pointer">
+          <select id="header-month-select" onchange="onMonthChanged(this.value)" class="bg-amber-500 text-blue-950 text-xs font-bold px-2 py-1 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
             <option value="0">January</option>
             <option value="1">February</option>
             <option value="2">March</option>
@@ -160,7 +161,7 @@
         <!-- Week Dropdown -->
         <div class="flex items-center gap-1.5 pl-1">
           <span class="text-[10px] uppercase font-bold text-slate-400">Week:</span>
-          <select id="header-week-select" onchange="onWeekChanged(this.value)" class="bg-slate-900 text-gold-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-500/40 focus:outline-none focus:border-amber-400 cursor-pointer">
+          <select id="header-week-select" onchange="onWeekChanged(this.value)" class="bg-amber-500 text-blue-950 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
             <option value="Week 1">Week 1</option>
             <option value="Week 2">Week 2</option>
             <option value="Week 3">Week 3</option>
@@ -171,7 +172,7 @@
       </div>
 
       <!-- Scope Badges -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center justify-center gap-2">
         <span id="scope-month-badge" class="text-xs font-bold text-amber-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-amber-500/40">
           Month: --
         </span>
@@ -188,15 +189,16 @@
   <div class="bg-slate-900/60 border-b border-amber-500/30 py-3" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-        <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition cursor-pointer">
+        <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer">
           <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
         </button>
-        <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition cursor-pointer">
+        <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer">
           <i class="fa-solid fa-book-open text-sm"></i> Notes & Insights
         </button>
       </div>
 
-      <div id="week-days-pills" class="flex flex-wrap items-center gap-1.5 py-1 self-start md:self-center">
+      <!-- Hidden week days pills as requested -->
+      <div id="week-days-pills" class="hidden">
       </div>
     </div>
   </div>
@@ -1367,7 +1369,7 @@
         const btn = document.getElementById(`tab-btn-${t}`);
         if (view) view.classList.add('hidden');
         if (btn && t !== 'import') {
-          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition cursor-pointer';
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer';
         }
       });
 
@@ -1375,7 +1377,7 @@
       const activeBtn = document.getElementById(`tab-btn-${tabId}`);
       if (activeView) activeView.classList.remove('hidden');
       if (activeBtn && tabId !== 'import') {
-        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
+        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
       }
 
       if (tabId === 'overview') {
