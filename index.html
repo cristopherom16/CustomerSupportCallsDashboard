@@ -6,7 +6,10 @@
   <title>Customer Support - Calls Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- ExcelJS, JSZip & FileSaver for full Excel + Charts bundle download -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Firebase SDKs Compat -->
@@ -38,8 +41,7 @@
     }
 
     html {
-      /* Aumenta el tamaño de la letra global del dashboard a Arial 14 */
-      font-size: 18.66px !important; /* Equivalente a 14pt (Arial 14) */
+      font-size: 18.66px !important; /* Arial 14pt */
     }
 
     body {
@@ -49,14 +51,14 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Light Theme Settings - Amarillo Claro y Ambar con bordes Azul Obscuro */
+    /* Light Theme Settings - Fondo Amarillo Claro, Cards Amarillo Ambar, Bordes y Textos Amarillos convertidos en Azul Obscuro */
     body.light-mode {
-      --bg-color: #fef3c7; /* Amarillo Claro para el fondo */
-      --card-bg: #fcd34d;  /* Amarillo Ambar para las cards */
+      --bg-color: #fef3c7; /* Light yellow background */
+      --card-bg: #fcd34d;  /* Amber yellow cards */
       --card-inner-bg: #fbbf24;
-      --text-main: #0f172a;
+      --text-main: #1e3a8a; /* Dark Blue */
       --text-muted: #1e3a8a;
-      --input-bg: #fef3c7; /* Fondo de inputs Amarillo Claro */
+      --input-bg: #fef3c7;
     }
     
     body.light-mode header,
@@ -68,21 +70,51 @@
     body.light-mode .bg-slate-950\/80,
     body.light-mode .bg-slate-950\/90 {
       background-color: var(--card-bg) !important;
-      color: var(--text-main) !important;
+      color: #1e3a8a !important;
     }
+
+    /* Todas las letras y elementos amarillos convertidos a Azul Obscuro en Light Mode */
+    body.light-mode [class*="text-amber"],
+    body.light-mode [class*="text-gold"],
+    body.light-mode [class*="text-yellow"],
+    body.light-mode h1,
+    body.light-mode h2,
+    body.light-mode h3,
     body.light-mode .text-slate-300,
     body.light-mode .text-slate-200,
-    body.light-mode .text-white { color: var(--text-main) !important; }
+    body.light-mode .text-white,
     body.light-mode .text-slate-400,
-    body.light-mode .text-slate-500 { color: var(--text-muted) !important; }
+    body.light-mode .text-slate-500,
+    body.light-mode .table-day-label,
+    body.light-mode #kpi-answered,
+    body.light-mode #kpi-abnd-csat,
+    body.light-mode #scope-month-badge,
+    body.light-mode #scope-week-badge,
+    body.light-mode #scope-day-badge,
+    body.light-mode #cloud-status-badge,
+    body.light-mode #unified-day-label,
+    body.light-mode #unified-scope-label {
+      color: #1e3a8a !important;
+    }
+
+    body.light-mode i[class*="text-amber"],
+    body.light-mode i[class*="text-gold"],
+    body.light-mode i[class*="text-yellow"] {
+      color: #1e3a8a !important;
+    }
+
     body.light-mode input,
     body.light-mode select,
     body.light-mode textarea {
       background-color: var(--input-bg) !important;
-      color: var(--text-main) !important;
+      color: #1e3a8a !important;
+    }
+
+    body.light-mode h1 {
+      text-decoration-color: #1e3a8a !important;
     }
     
-    /* Todos los bordes Azul Obscuro en Light Mode */
+    /* Bordes Azul Obscuro en Light Mode */
     body.light-mode * {
       border-color: #1e3a8a !important; 
     }
@@ -119,8 +151,8 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
-  <!-- Excel Report Download Button -->
-  <button onclick="downloadExcelReport()" class="excel-export-btn" title="Download Excel Report">
+  <!-- Excel Report & Charts Download Button -->
+  <button onclick="downloadExcelReport()" class="excel-export-btn" title="Download Excel Report & Charts">
     <i class="fa-solid fa-file-excel text-lg"></i>
   </button>
 
@@ -1887,20 +1919,20 @@
             maintainAspectRatio: false,
             animation: false,
             plugins: {
-              legend: { labels: { color: tickColor, font: { size: 10, family: 'Arial' } } },
+              legend: { labels: { color: tickColor, font: { size: 11, family: 'Arial', weight: 'bold' } } },
               tooltip: {
-                backgroundColor: isLight ? '#fef08a' : '#0f172a',
-                bodyColor: isLight ? '#0b0f19' : '#f8fafc',
-                titleColor: isLight ? '#0b0f19' : '#f8fafc',
-                borderColor: '#f59e0b',
+                backgroundColor: isLight ? '#fcd34d' : '#0f172a',
+                bodyColor: isLight ? '#1e3a8a' : '#f8fafc',
+                titleColor: isLight ? '#1e3a8a' : '#f8fafc',
+                borderColor: isLight ? '#1e3a8a' : '#f59e0b',
                 borderWidth: 1,
                 bodyFont: { family: 'Arial' },
                 titleFont: { family: 'Arial', weight: 'bold' }
               }
             },
             scales: {
-              x: { ticks: { color: tickColor, font: { size: 9, family: 'Arial' } }, grid: { color: gridColor } },
-              y: { beginAtZero: true, ticks: { color: tickColor, font: { size: 9, family: 'Arial' } }, grid: { color: gridColor } }
+              x: { ticks: { color: tickColor, font: { size: 10, family: 'Arial' } }, grid: { color: gridColor } },
+              y: { beginAtZero: true, ticks: { color: tickColor, font: { size: 10, family: 'Arial' } }, grid: { color: gridColor } }
             },
             ...extraOpts
           }
@@ -1931,113 +1963,217 @@
       makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
     }
 
-    function downloadExcelReport() {
+    // Function to generate and download Excel workbook WITH embedded charts + package of chart image files
+    async function downloadExcelReport() {
       try {
-        if (typeof XLSX === 'undefined') {
-          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Excel library not loaded.');
+        showToast('<i class="fa-solid fa-spinner fa-spin text-amber-400 mr-2"></i>Generating Excel report and capturing charts...');
+
+        if (typeof ExcelJS === 'undefined' || typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
+          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Export engine still loading. Please retry in a second.');
           return;
         }
 
-        const wb = XLSX.utils.book_new();
+        const wb = new ExcelJS.Workbook();
+        wb.creator = 'Customer Support Calls Dashboard';
+        wb.created = new Date();
+
+        const zip = new JSZip();
+        const chartsFolder = zip.folder("Charts_Visualizations");
+
         const { t1, t2, t3, t4 } = getFilteredData();
-        const activeMonth = monthNames[selectedMonthIndex] || '';
-        const activeWeek = selectedWeek;
+        const activeMonth = monthNames[selectedMonthIndex] || 'All';
+        const activeWeek = selectedWeek || 'Week 1';
         const activeDay = currentSelectedDate || 'All Days';
 
-        const summaryRows = [
-          ["CUSTOMER SUPPORT - CALLS DASHBOARD REPORT"],
-          ["Month Scope:", activeMonth],
-          ["Week Scope:", activeWeek],
-          ["Active Day:", activeDay],
-          ["Export Timestamp:", new Date().toLocaleString()],
-          [],
-          ["METRIC", "VALUE", "NOTES"],
-          ["Total Answered", document.getElementById('kpi-answered')?.innerText || "0", "Filtered scope"],
-          ["Abnd. Queue", document.getElementById('kpi-abnd-queue')?.innerText || "0", "Filtered scope"],
-          ["Abnd. CSAT", document.getElementById('kpi-abnd-csat')?.innerText || "0", "Filtered scope"],
-          ["Abnd. On Hold", document.getElementById('kpi-abnd-hold')?.innerText || "0", "Filtered scope"],
-          ["Inbound Calls", document.getElementById('kpi-inbound')?.innerText || "0", "Agents + Overflow"],
-          ["Tagged Convs", document.getElementById('kpi-tagged')?.innerText || "0", "Overflow count"]
+        // 1. Sheet: Summary & KPIs
+        const wsSummary = wb.addWorksheet('Summary');
+        wsSummary.columns = [
+          { header: 'Scope / Metric', key: 'c1', width: 30 },
+          { header: 'Value', key: 'c2', width: 22 },
+          { header: 'Notes', key: 'c3', width: 32 }
         ];
-        const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
-        XLSX.utils.book_append_sheet(wb, wsSummary, "Dashboard Summary");
 
-        if (t1.length > 0) {
-          const t1Data = t1.map(r => ({
-            "DATE & HOUR": r['DATE & HOUR'] || '',
-            "ABND. IN ROUTING": r['ABND IN ROUTING'] ?? 0,
-            "ANSWERED": r['ANSWERED'] ?? 0,
-            "ABND. IN CSAT RATING": r['ABND IN CSAT RATING'] ?? 0,
-            "ABND. IN QUEUE": r['ABND IN QUEUE'] ?? 0,
-            "ABND. ON HOLD": r['ANBD ON HOLD'] ?? 0
-          }));
-          const wsT1 = XLSX.utils.json_to_sheet(t1Data);
-          XLSX.utils.book_append_sheet(wb, wsT1, "Calls Per Hour");
-        }
+        wsSummary.addRow(['CUSTOMER SUPPORT - CALLS DASHBOARD REPORT', '', '']);
+        wsSummary.addRow(['Month Scope', activeMonth, '']);
+        wsSummary.addRow(['Week Scope', activeWeek, '']);
+        wsSummary.addRow(['Active Day', activeDay, '']);
+        wsSummary.addRow(['Export Timestamp', new Date().toLocaleString(), '']);
+        wsSummary.addRow(['', '', '']);
+        wsSummary.addRow(['METRIC', 'VALUE', 'NOTES']);
+        wsSummary.addRow(['Total Answered', document.getElementById('kpi-answered')?.innerText || "0", 'Filtered scope']);
+        wsSummary.addRow(['Abnd. Queue', document.getElementById('kpi-abnd-queue')?.innerText || "0", 'Filtered scope']);
+        wsSummary.addRow(['Abnd. CSAT', document.getElementById('kpi-abnd-csat')?.innerText || "0", 'Filtered scope']);
+        wsSummary.addRow(['Abnd. On Hold', document.getElementById('kpi-abnd-hold')?.innerText || "0", 'Filtered scope']);
+        wsSummary.addRow(['Inbound Calls', document.getElementById('kpi-inbound')?.innerText || "0", 'Agents + Overflow']);
+        wsSummary.addRow(['Tagged Convs', document.getElementById('kpi-tagged')?.innerText || "0", 'Overflow count']);
 
-        if (t2.length > 0) {
-          const t2Data = t2.map(r => ({
-            "TEAM": r['TEAM'] || '',
-            "ANSWERED": r['ANSWERED'] ?? 0,
-            "ABND. IN CSAT RATING": r['ABND IN CSAT RATING'] ?? 0,
-            "ABND. IN QUEUE": r['ABND IN QUEUE'] ?? 0,
-            "ABND. ON HOLD": r['ABND ON HOLD'] ?? 0
-          }));
-          const wsT2 = XLSX.utils.json_to_sheet(t2Data);
-          XLSX.utils.book_append_sheet(wb, wsT2, "Calls Per Queue");
-        }
-
-        if (t3.length > 0) {
-          const t3Data = t3.map(r => ({
-            "TEAMMATE": r['TEAMMATE'] || '',
-            "INBOUND CALLS": r['INBOUND CALLS'] ?? 0,
-            "OUTBOUND CALLS": r['OUTBOUND CALLS'] ?? 0,
-            "ABND. INBOUND CALLS": r['ABND INBOUND CALLS'] ?? 0,
-            "ANSWER TIME": r['ANSWER TIME'] || '',
-            "TALK TIME": r['TALK TIME'] || '',
-            "CALL DURATION": r['CALL DURATION'] || '',
-            "AVERAGE HOLD TIME": r['AVERAGE HOLD TIME'] || '',
-            "DAYS ATTENDED": r['DAYS ATTENDED OUT OF 5'] ?? 5
-          }));
-          const wsT3 = XLSX.utils.json_to_sheet(t3Data);
-          XLSX.utils.book_append_sheet(wb, wsT3, "Calls Per Agents");
-        }
-
-        if (t4.length > 0) {
-          const t4Data = t4.map(r => ({
-            "DATE & HOUR": r['DATE & HOUR'] || '',
-            "INBOUND CALLS": r['INBOUND CALLS'] ?? 0,
-            "TAGGED CONVERSATIONS": r['TAGGED CONVERSATIONS'] ?? 0
-          }));
-          const wsT4 = XLSX.utils.json_to_sheet(t4Data);
-          XLSX.utils.book_append_sheet(wb, wsT4, "Calls Overflow");
-        }
-
-        const notesRows = [
-          ["HOURLY OPERATIONAL NOTES (" + (currentSelectedDate || 'General Scope') + ")"],
-          ["Hour", "Operational Note"]
+        // 2. Sheet: Visual Charts (Embed all 10 generated charts directly in the Excel file)
+        const wsCharts = wb.addWorksheet('Visual Charts');
+        wsCharts.columns = [
+          { width: 4 },
+          { width: 88 }
         ];
+
+        let chartRowOffset = 2;
+        chartDefinitions.forEach((def, index) => {
+          const canvas = document.getElementById(def.id);
+          if (canvas) {
+            const dataUrl = canvas.toDataURL('image/png');
+
+            // Set Title cell
+            const cell = wsCharts.getCell(`B${chartRowOffset}`);
+            cell.value = `${def.label}`;
+            cell.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FF1E3A8A' } };
+
+            // Embed into worksheet
+            const imageId = wb.addImage({
+              base64: dataUrl,
+              extension: 'png'
+            });
+
+            wsCharts.addImage(imageId, {
+              tl: { col: 1, row: chartRowOffset },
+              ext: { width: 620, height: 320 }
+            });
+
+            chartRowOffset += 18;
+
+            // Also add high-res PNG to ZIP package
+            const cleanFileName = `${String(index + 1).padStart(2, '0')}_${def.label.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
+            const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+            chartsFolder.file(cleanFileName, base64Data, { base64: true });
+          }
+        });
+
+        // 3. Sheet: Table 1 (Calls Per Hour)
+        const wsT1 = wb.addWorksheet('Calls Per Hour');
+        wsT1.columns = [
+          { header: 'DATE & HOUR', key: 'c1', width: 22 },
+          { header: 'ABND. IN ROUTING', key: 'c2', width: 20 },
+          { header: 'ANSWERED', key: 'c3', width: 16 },
+          { header: 'ABND. IN CSAT RATING', key: 'c4', width: 24 },
+          { header: 'ABND. IN QUEUE', key: 'c5', width: 18 },
+          { header: 'ANBD. ON HOLD', key: 'c6', width: 18 }
+        ];
+        t1.forEach(r => {
+          wsT1.addRow({
+            c1: r['DATE & HOUR'] || '--',
+            c2: r['ABND IN ROUTING'] ?? 0,
+            c3: r['ANSWERED'] ?? 0,
+            c4: r['ABND IN CSAT RATING'] ?? 0,
+            c5: r['ABND IN QUEUE'] ?? 0,
+            c6: r['ANBD ON HOLD'] ?? 0
+          });
+        });
+
+        // 4. Sheet: Table 2 (Calls Per Queue)
+        const wsT2 = wb.addWorksheet('Calls Per Queue');
+        wsT2.columns = [
+          { header: 'TEAM', key: 'c1', width: 25 },
+          { header: 'ANSWERED', key: 'c2', width: 18 },
+          { header: 'ABND. IN CSAT RATING', key: 'c3', width: 24 },
+          { header: 'ABND. IN QUEUE', key: 'c4', width: 18 },
+          { header: 'ABND. ON HOLD', key: 'c5', width: 18 }
+        ];
+        t2.forEach(r => {
+          wsT2.addRow({
+            c1: r['TEAM'] || '--',
+            c2: r['ANSWERED'] ?? 0,
+            c3: r['ABND IN CSAT RATING'] ?? 0,
+            c4: r['ABND IN QUEUE'] ?? 0,
+            c5: r['ABND ON HOLD'] ?? 0
+          });
+        });
+
+        // 5. Sheet: Table 3 (Calls Per Agents)
+        const wsT3 = wb.addWorksheet('Calls Per Agents');
+        wsT3.columns = [
+          { header: 'TEAMMATE', key: 'c1', width: 22 },
+          { header: 'INBOUND CALLS', key: 'c2', width: 18 },
+          { header: 'OUTBOUND CALLS', key: 'c3', width: 18 },
+          { header: 'ABND. INBOUND CALLS', key: 'c4', width: 24 },
+          { header: 'ANSWER TIME', key: 'c5', width: 16 },
+          { header: 'TALK TIME', key: 'c6', width: 16 },
+          { header: 'CALL DURATION', key: 'c7', width: 16 },
+          { header: 'AVERAGE HOLD TIME', key: 'c8', width: 20 },
+          { header: 'DAYS ATTENDED', key: 'c9', width: 16 }
+        ];
+        t3.forEach(r => {
+          wsT3.addRow({
+            c1: r['TEAMMATE'] || '--',
+            c2: r['INBOUND CALLS'] ?? 0,
+            c3: r['OUTBOUND CALLS'] ?? 0,
+            c4: r['ABND INBOUND CALLS'] ?? 0,
+            c5: r['ANSWER TIME'] || '--',
+            c6: r['TALK TIME'] || '--',
+            c7: r['CALL DURATION'] || '--',
+            c8: r['AVERAGE HOLD TIME'] || '--',
+            c9: r['DAYS ATTENDED OUT OF 5'] ?? 5
+          });
+        });
+
+        // 6. Sheet: Table 4 (Calls Overflow)
+        const wsT4 = wb.addWorksheet('Calls Overflow');
+        wsT4.columns = [
+          { header: 'DATE & HOUR', key: 'c1', width: 22 },
+          { header: 'INBOUND CALLS', key: 'c2', width: 18 },
+          { header: 'TAGGED CONVERSATIONS', key: 'c3', width: 24 }
+        ];
+        t4.forEach(r => {
+          wsT4.addRow({
+            c1: r['DATE & HOUR'] || '--',
+            c2: r['INBOUND CALLS'] ?? 0,
+            c3: r['TAGGED CONVERSATIONS'] ?? 0
+          });
+        });
+
+        // 7. Sheet: Notes & Insights
+        const wsNotes = wb.addWorksheet('Notes & Insights');
+        wsNotes.columns = [
+          { header: 'Scope / Time', key: 'c1', width: 25 },
+          { header: 'Details / Operational Note', key: 'c2', width: 75 }
+        ];
+        wsNotes.addRow(['HOURLY OPERATIONAL NOTES', activeDay]);
         const dateKey = sanitizeKey(currentSelectedDate || 'general');
         const savedNotes = (localNotesStore && localNotesStore[dateKey]) || {};
         for (let h = 0; h < 24; h++) {
           const hourStr = `${String(h).padStart(2, '0')}:00`;
-          notesRows.push([hourStr, savedNotes[hourStr] || '']);
+          wsNotes.addRow([hourStr, savedNotes[hourStr] || '']);
         }
-        notesRows.push([]);
-        notesRows.push(["WEEKLY INSIGHTS"]);
-        notesRows.push(["Missing Members / Coverage:", document.getElementById('insights-achievements')?.value || '']);
-        notesRows.push(["Unexpected Events & Outages:", document.getElementById('insights-blockers')?.value || '']);
-        notesRows.push(["Automated SLA Recommendations:", document.getElementById('insights-actions')?.value || '']);
+        wsNotes.addRow(['', '']);
+        wsNotes.addRow(['WEEKLY INSIGHTS', '']);
+        wsNotes.addRow(['Missing Members / Coverage', document.getElementById('insights-achievements')?.value || '']);
+        wsNotes.addRow(['Unexpected Events & Outages', document.getElementById('insights-blockers')?.value || '']);
+        wsNotes.addRow(['Automated SLA Recommendations', document.getElementById('insights-actions')?.value || '']);
 
-        const wsNotes = XLSX.utils.aoa_to_sheet(notesRows);
-        XLSX.utils.book_append_sheet(wb, wsNotes, "Notes & Insights");
+        // Align all tables center
+        [wsSummary, wsT1, wsT2, wsT3, wsT4, wsNotes].forEach(ws => {
+          ws.eachRow((row, rowNumber) => {
+            row.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+            if (rowNumber === 1 && ws !== wsSummary && ws !== wsNotes) {
+              row.font = { name: 'Arial', size: 11, bold: true };
+            }
+          });
+        });
 
-        const fileName = `Calls_Dashboard_Report_${activeMonth}_${activeWeek}_${activeDay}.xlsx`.replace(/\s+/g, '_');
-        XLSX.writeFile(wb, fileName);
-        showToast('<i class="fa-solid fa-file-excel text-emerald-400 mr-2"></i>Excel report downloaded successfully!');
+        const fileBase = `Calls_Dashboard_Report_${activeMonth}_${activeWeek}_${activeDay}`.replace(/[\s\/-]+/g, '_');
+
+        // Write Excel buffer
+        const excelBuffer = await wb.xlsx.writeBuffer();
+        const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        
+        // 1. Trigger Download of the Excel file (with embedded charts)
+        saveAs(excelBlob, `${fileBase}.xlsx`);
+
+        // 2. Add Excel file to ZIP and trigger download of the Charts package
+        zip.file(`${fileBase}.xlsx`, excelBlob);
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        saveAs(zipBlob, `${fileBase}_Charts_Package.zip`);
+
+        showToast('<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Excel report (with charts embedded) and Charts ZIP downloaded successfully!');
       } catch (err) {
-        console.error("Excel generation error:", err);
-        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Error exporting Excel: ' + err.message);
+        console.error("Export error:", err);
+        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Error exporting: ' + err.message);
       }
     }
   </script>
