@@ -6,8 +6,8 @@
   <title>Customer Support - Calls Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Firebase SDKs Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -17,7 +17,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          fontFamily: { sans: ['Arial', 'sans-serif'] },
           colors: {
             gold: { 300: '#FDE047', 400: '#FACC15', 500: '#EAB308', 600: '#CA8A04', 700: '#A16207' },
             amberBrand: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
@@ -38,16 +38,17 @@
       --input-bg: #0f172a;
     }
     body.light-mode {
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --card-inner-bg: #f1f5f9;
-      --border-color: rgba(217, 119, 6, 0.4);
-      --text-main: #0f172a;
-      --text-muted: #475569;
-      --input-bg: #ffffff;
+      --bg-color: #fef9c3; /* Egg yellow background */
+      --card-bg: #fef08a;  /* Egg yellow cards */
+      --card-inner-bg: #fde047;
+      --border-color: rgba(217, 119, 6, 0.5);
+      --text-main: #0b0f19;
+      --text-muted: #78350f;
+      --input-bg: #fef3c7; /* Amber-tinted egg yellow input */
     }
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px; /* Arial 12pt equivalent */
       background-color: var(--bg-color);
       color: var(--text-main);
       transition: background-color 0.3s, color 0.3s;
@@ -73,6 +74,10 @@
     body.light-mode textarea {
       background-color: var(--input-bg) !important;
       color: var(--text-main) !important;
+      border-color: #f59e0b !important;
+    }
+    table, table th, table td {
+      text-align: center !important;
     }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
@@ -86,11 +91,29 @@
       color: #0b0f19; border: 2px solid #fbbf24;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+      transition: transform 0.2s;
     }
+    .theme-toggle-btn:hover { transform: scale(1.08); }
+    .excel-export-btn {
+      position: fixed; bottom: 76px; left: 24px; z-index: 50;
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #0b0f19; border: 2px solid #fbbf24;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+      transition: transform 0.2s;
+    }
+    .excel-export-btn:hover { transform: scale(1.08); }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black relative">
 
+  <!-- Excel Report Download Button -->
+  <button onclick="downloadExcelReport()" class="excel-export-btn" title="Download Excel Report">
+    <i class="fa-solid fa-file-excel text-lg"></i>
+  </button>
+
+  <!-- Theme Toggle Button -->
   <button onclick="toggleTheme()" class="theme-toggle-btn" title="Toggle Light/Dark Mode">
     <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
   </button>
@@ -98,16 +121,16 @@
   <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 py-4 transition-all" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-col items-center justify-center gap-4">
       
-      <!-- Titulo Centrado y Mas Grande -->
+      <!-- Sublined and Centered Dashboard Title -->
       <div class="flex items-center justify-center gap-4">
         <div class="hidden sm:flex w-12 h-12 rounded-xl bg-slate-900/95 border border-amber-500/40 items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <i class="fa-solid fa-gauge-high text-2xl text-amber-400"></i>
         </div>
         <div class="flex flex-col items-center text-center gap-1.5">
-          <h1 class="text-3xl sm:text-4xl font-black tracking-widest text-amber-400 uppercase leading-none">
+          <h1 class="text-3xl sm:text-4xl font-black tracking-widest text-amber-400 uppercase leading-none underline decoration-amber-500 underline-offset-8">
             CUSTOMER SUPPORT
           </h1>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 mt-1">
             <span class="text-xs font-semibold text-slate-400 tracking-widest uppercase">
               CALLS DASHBOARD (CLOUD STORAGE UNLIMITED)
             </span>
@@ -118,7 +141,7 @@
         </div>
       </div>
 
-      <!-- Header Controls: Botones amarillos con texto azul obscuro -->
+      <!-- Header Controls: Amber yellow background with dark blue text -->
       <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-slate-950/80 px-4 py-2 rounded-2xl border border-amber-500/30 shadow-inner">
         <!-- Date Back/Forward Controls -->
         <div class="flex items-center gap-1">
@@ -189,15 +212,14 @@
   <div class="bg-slate-900/60 border-b border-amber-500/30 py-3" style="padding-left: 67px; padding-right: 10mm;">
     <div class="w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-        <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer">
+        <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-3 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer">
           <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
         </button>
-        <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer">
+        <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-3 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer">
           <i class="fa-solid fa-book-open text-sm"></i> Notes & Insights
         </button>
       </div>
 
-      <!-- Hidden week days pills as requested -->
       <div id="week-days-pills" class="hidden">
       </div>
     </div>
@@ -222,7 +244,7 @@
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
           <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
         </h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-center">
           <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
             <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
             <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
@@ -256,7 +278,7 @@
         </div>
       </div>
 
-      <!-- Quick View Filter Bar (Placed right below Daily Metrics Summary) -->
+      <!-- Quick View Filter Bar -->
       <div class="bg-slate-900/90 border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3.5">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-amber-500/20 pb-2.5">
           <div class="flex items-center gap-2">
@@ -402,7 +424,7 @@
         </div>
       </div>
 
-      <!-- Operational Data Tables Section -->
+      <!-- Operational Data Tables Section (All centered cells) -->
       <div id="section-tables-container" class="space-y-6 pt-4">
         <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
           <i class="fa-solid fa-table-cells text-amber-500"></i> Operational Data Tables
@@ -415,18 +437,18 @@
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t1-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="w-full text-center text-xs border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20">DATE & HOUR</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ABND. IN ROUTING</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ANSWERED</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ABND. IN CSAT RATING</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ABND. IN QUEUE</th>
-                  <th class="p-2.5">ANBD. ON HOLD</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">DATE & HOUR</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN ROUTING</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWERED</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN CSAT RATING</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN QUEUE</th>
+                  <th class="p-2.5 text-center">ANBD. ON HOLD</th>
                 </tr>
               </thead>
-              <tbody id="tbody-t1" class="divide-y divide-amber-500/20 font-mono">
+              <tbody id="tbody-t1" class="divide-y divide-amber-500/20 font-mono text-center">
                 <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
@@ -440,17 +462,17 @@
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t2-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="w-full text-center text-xs border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20">TEAM</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ANSWERED</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ABND. IN CSAT RATING</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ABND. IN QUEUE</th>
-                  <th class="p-2.5">ABND. ON HOLD</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">TEAM</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWERED</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN CSAT RATING</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN QUEUE</th>
+                  <th class="p-2.5 text-center">ABND. ON HOLD</th>
                 </tr>
               </thead>
-              <tbody id="tbody-t2" class="divide-y divide-amber-500/20 font-mono">
+              <tbody id="tbody-t2" class="divide-y divide-amber-500/20 font-mono text-center">
                 <tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
@@ -464,21 +486,21 @@
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t3-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="w-full text-center text-xs border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20">TEAMMATE</th>
-                  <th class="p-2.5 border-r border-amber-500/20">INBOUND CALLS</th>
-                  <th class="p-2.5 border-r border-amber-500/20">OUTBOUND CALLS</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ABND. INBOUND CALLS</th>
-                  <th class="p-2.5 border-r border-amber-500/20">ANSWER TIME</th>
-                  <th class="p-2.5 border-r border-amber-500/20">TALK TIME</th>
-                  <th class="p-2.5 border-r border-amber-500/20">CALL DURATION</th>
-                  <th class="p-2.5 border-r border-amber-500/20">AVERAGE HOLD TIME</th>
-                  <th class="p-2.5">DAYS ATTENDED</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">TEAMMATE</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">INBOUND CALLS</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">OUTBOUND CALLS</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. INBOUND CALLS</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWER TIME</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">TALK TIME</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">CALL DURATION</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">AVERAGE HOLD TIME</th>
+                  <th class="p-2.5 text-center">DAYS ATTENDED</th>
                 </tr>
               </thead>
-              <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono">
+              <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono text-center">
                 <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
@@ -492,15 +514,15 @@
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t4-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="w-full text-center text-xs border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20">DATE & HOUR</th>
-                  <th class="p-2.5 border-r border-amber-500/20">INBOUND CALLS</th>
-                  <th class="p-2.5">TAGGED CONVERSATIONS</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">DATE & HOUR</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">INBOUND CALLS</th>
+                  <th class="p-2.5 text-center">TAGGED CONVERSATIONS</th>
                 </tr>
               </thead>
-              <tbody id="tbody-t4" class="divide-y divide-amber-500/20 font-mono">
+              <tbody id="tbody-t4" class="divide-y divide-amber-500/20 font-mono text-center">
                 <tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
               </tbody>
             </table>
@@ -697,12 +719,11 @@
     let localNotesStore = {};
     let localInsightsStore = {};
 
-    let selectedMonthIndex = 9; // October default
+    let selectedMonthIndex = 9;
     let selectedWeek = 'Week 1';
     let currentSelectedDate = '';
     let chartInstances = {};
 
-    // Dynamic visibility definitions (Charts and Tables)
     const chartDefinitions = [
       { id: 'chart-c1', cardId: 'card-chart-c1', label: '1. Hourly Answered' },
       { id: 'chart-c2', cardId: 'card-chart-c2', label: '2. Abnd. CSAT' },
@@ -842,7 +863,6 @@
     }
 
     function applyVisibilityDOM() {
-      // Toggle Charts Visibility
       chartDefinitions.forEach(def => {
         const el = document.getElementById(def.cardId);
         if (el) {
@@ -854,7 +874,6 @@
         }
       });
 
-      // Toggle Tables Visibility
       tableDefinitions.forEach(def => {
         const el = document.getElementById(def.id);
         if (el) {
@@ -908,12 +927,10 @@
       }
     }
 
-    // Safe Local Storage write
     function safeSetLocal(key, val) {
       try {
         localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val));
       } catch (e) {
-        // Ignored silently when quota exceeded
       }
     }
 
@@ -1275,7 +1292,6 @@
     }
 
     function getFilteredData() {
-      // 1. Daily rows (Tables 1 & 4)
       let t1 = appData.table1.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
       let t4 = appData.table4.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
 
@@ -1286,7 +1302,6 @@
         t4 = appData.table4.filter(r => r._monthIndex === selectedMonthIndex);
       }
 
-      // 2. Weekly rows (Tables 2 & 3)
       let t2 = appData.table2.filter(r => {
         const matchM = r._monthIndex === undefined || r._monthIndex === -1 || r._monthIndex === selectedMonthIndex;
         const matchW = !r._week || r._week.toLowerCase() === selectedWeek.toLowerCase();
@@ -1306,31 +1321,6 @@
       if (t3.length === 0) t3 = appData.table3;
 
       return { t1, t2, t3, t4 };
-    }
-
-    function renderWeekDaysPills() {
-      const container = document.getElementById('week-days-pills');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const dates = getAllGlobalDates();
-      if (dates.length === 0) return;
-
-      dates.forEach(dStr => {
-        const isSelected = dStr === currentSelectedDate;
-        const pill = document.createElement('button');
-        pill.onclick = () => {
-          currentSelectedDate = dStr;
-          syncControlsToDate(currentSelectedDate);
-          handleDateNavigationUpdate();
-        };
-
-        pill.className = isSelected 
-          ? 'px-3 py-1 text-[11px] font-bold rounded-lg bg-amber-500 text-slate-950 shadow border border-amber-400 transition cursor-pointer'
-          : 'px-3 py-1 text-[11px] font-medium rounded-lg bg-slate-900 text-slate-300 hover:text-amber-400 hover:bg-slate-800 border border-amber-500/20 transition cursor-pointer';
-        pill.innerText = dStr;
-        container.appendChild(pill);
-      });
     }
 
     function handleDateNavigationUpdate() {
@@ -1355,7 +1345,6 @@
 
       document.querySelectorAll('.table-day-label').forEach(el => el.innerText = currentSelectedDate || 'All Days');
 
-      renderWeekDaysPills();
       renderAllTables();
       applyVisibilityDOM();
       renderAllCharts();
@@ -1369,7 +1358,7 @@
         const btn = document.getElementById(`tab-btn-${t}`);
         if (view) view.classList.add('hidden');
         if (btn && t !== 'import') {
-          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer';
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-3 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer';
         }
       });
 
@@ -1377,7 +1366,7 @@
       const activeBtn = document.getElementById(`tab-btn-${tabId}`);
       if (activeView) activeView.classList.remove('hidden');
       if (activeBtn && tabId !== 'import') {
-        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-start gap-3 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
+        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-3 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
       }
 
       if (tabId === 'overview') {
@@ -1403,13 +1392,13 @@
         const noteText = savedNotes[hourStr] || '';
 
         const item = document.createElement('div');
-        item.className = 'bg-slate-950 p-2.5 rounded-xl border border-amber-500/30 space-y-1';
+        item.className = 'bg-slate-950 p-2.5 rounded-xl border border-amber-500/30 space-y-1 text-center';
         item.innerHTML = `
           <div class="flex justify-between items-center text-[11px] font-bold text-amber-400">
             <span><i class="fa-regular fa-clock mr-1 text-amber-500/70"></i>${hourStr}</span>
             <span class="text-[10px] text-slate-500 font-mono">Hour ${h}</span>
           </div>
-          <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-amber-500/30 focus:outline-none focus:border-amber-400">
+          <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-amber-500/30 focus:outline-none focus:border-amber-400 text-center">
         `;
         grid.appendChild(item);
       }
@@ -1756,13 +1745,13 @@
         tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
       } else {
         tb1.innerHTML = t1.map(r => `
-          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20">${r['DATE & HOUR'] || '--'}</td>
-            <td class="p-2.5 border-r border-amber-500/20">${r['ABND IN ROUTING'] ?? 0}</td>
-            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20">${r['ABND IN CSAT RATING'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20">${r['ABND IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400">${r['ANBD ON HOLD'] ?? 0}</td>
+          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['DATE & HOUR'] || '--'}</td>
+            <td class="p-2.5 border-r border-amber-500/20 text-center">${r['ABND IN ROUTING'] ?? 0}</td>
+            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT RATING'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="p-2.5 text-orange-400 text-center">${r['ANBD ON HOLD'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -1772,12 +1761,12 @@
         tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No queue records found for this week.</td></tr>';
       } else {
         tb2.innerHTML = t2.map(r => `
-          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
-            <td class="p-2.5 font-bold text-amber-300 font-sans border-r border-amber-500/20">${r['TEAM'] || '--'}</td>
-            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20">${r['ABND IN CSAT RATING'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20">${r['ABND IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400">${r['ABND ON HOLD'] ?? 0}</td>
+          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
+            <td class="p-2.5 font-bold text-amber-300 font-sans border-r border-amber-500/20 text-center">${r['TEAM'] || '--'}</td>
+            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT RATING'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="p-2.5 text-orange-400 text-center">${r['ABND ON HOLD'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -1787,16 +1776,16 @@
         tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No agent records found for this week.</td></tr>';
       } else {
         tb3.innerHTML = t3.map(r => `
-          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
-            <td class="p-2.5 font-bold text-slate-200 font-sans border-r border-amber-500/20">${r['TEAMMATE'] || '--'}</td>
-            <td class="p-2.5 text-sky-400 border-r border-amber-500/20">${r['INBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 border-r border-amber-500/20">${r['OUTBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20">${r['ABND INBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20">${r['ANSWER TIME'] || '--'}</td>
-            <td class="p-2.5 border-r border-amber-500/20">${r['TALK TIME'] || '--'}</td>
-            <td class="p-2.5 text-emerald-400 border-r border-amber-500/20">${r['CALL DURATION'] || '--'}</td>
-            <td class="p-2.5 text-orange-400 border-r border-amber-500/20">${r['AVERAGE HOLD TIME'] || '--'}</td>
-            <td class="p-2.5 font-sans">${r['DAYS ATTENDED OUT OF 5'] ?? 5}</td>
+          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
+            <td class="p-2.5 font-bold text-slate-200 font-sans border-r border-amber-500/20 text-center">${r['TEAMMATE'] || '--'}</td>
+            <td class="p-2.5 text-sky-400 border-r border-amber-500/20 text-center">${r['INBOUND CALLS'] ?? 0}</td>
+            <td class="p-2.5 border-r border-amber-500/20 text-center">${r['OUTBOUND CALLS'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND INBOUND CALLS'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ANSWER TIME'] || '--'}</td>
+            <td class="p-2.5 border-r border-amber-500/20 text-center">${r['TALK TIME'] || '--'}</td>
+            <td class="p-2.5 text-emerald-400 border-r border-amber-500/20 text-center">${r['CALL DURATION'] || '--'}</td>
+            <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['AVERAGE HOLD TIME'] || '--'}</td>
+            <td class="p-2.5 font-sans text-center">${r['DAYS ATTENDED OUT OF 5'] ?? 5}</td>
           </tr>
         `).join('');
       }
@@ -1806,10 +1795,10 @@
         tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No overflow records found for this day.</td></tr>';
       } else {
         tb4.innerHTML = t4.map(r => `
-          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10">
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20">${r['DATE & HOUR'] || '--'}</td>
-            <td class="p-2.5 text-sky-400 font-bold border-r border-amber-500/20">${r['INBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-emerald-400 font-bold">${r['TAGGED CONVERSATIONS'] ?? 0}</td>
+          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['DATE & HOUR'] || '--'}</td>
+            <td class="p-2.5 text-sky-400 font-bold border-r border-amber-500/20 text-center">${r['INBOUND CALLS'] ?? 0}</td>
+            <td class="p-2.5 text-emerald-400 font-bold text-center">${r['TAGGED CONVERSATIONS'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -1860,7 +1849,6 @@
       });
 
       const makeChart = (canvasId, type, labels, datasets, extraOpts = {}) => {
-        // Destroy and skip rendering if the chart card is hidden
         if (!visibilityState.charts[canvasId]) {
           if (chartInstances[canvasId]) {
             chartInstances[canvasId].destroy();
@@ -1877,8 +1865,8 @@
         }
 
         const isLight = document.body.classList.contains('light-mode');
-        const gridColor = isLight ? 'rgba(217, 119, 6, 0.15)' : 'rgba(245, 158, 11, 0.2)';
-        const tickColor = isLight ? '#475569' : '#64748b';
+        const gridColor = isLight ? 'rgba(217, 119, 6, 0.2)' : 'rgba(245, 158, 11, 0.2)';
+        const tickColor = isLight ? '#78350f' : '#64748b';
 
         chartInstances[canvasId] = new Chart(canvas.getContext('2d'), {
           type: type,
@@ -1888,20 +1876,20 @@
             maintainAspectRatio: false,
             animation: false,
             plugins: {
-              legend: { labels: { color: tickColor, font: { size: 10, family: 'Inter' } } },
+              legend: { labels: { color: tickColor, font: { size: 10, family: 'Arial' } } },
               tooltip: {
-                backgroundColor: isLight ? '#ffffff' : '#0f172a',
-                bodyColor: isLight ? '#0f172a' : '#f8fafc',
-                titleColor: isLight ? '#0f172a' : '#f8fafc',
+                backgroundColor: isLight ? '#fef08a' : '#0f172a',
+                bodyColor: isLight ? '#0b0f19' : '#f8fafc',
+                titleColor: isLight ? '#0b0f19' : '#f8fafc',
                 borderColor: '#f59e0b',
                 borderWidth: 1,
-                bodyFont: { family: 'Inter' },
-                titleFont: { family: 'Inter', weight: 'bold' }
+                bodyFont: { family: 'Arial' },
+                titleFont: { family: 'Arial', weight: 'bold' }
               }
             },
             scales: {
-              x: { ticks: { color: tickColor, font: { size: 9, family: 'Inter' } }, grid: { color: gridColor } },
-              y: { beginAtZero: true, ticks: { color: tickColor, font: { size: 9, family: 'Inter' } }, grid: { color: gridColor } }
+              x: { ticks: { color: tickColor, font: { size: 9, family: 'Arial' } }, grid: { color: gridColor } },
+              y: { beginAtZero: true, ticks: { color: tickColor, font: { size: 9, family: 'Arial' } }, grid: { color: gridColor } }
             },
             ...extraOpts
           }
@@ -1930,6 +1918,123 @@
       makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Sec)', data: t3.map(r => parseTimeSeconds(r['ANSWER TIME'])), backgroundColor: '#eab308' }]);
       makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))), backgroundColor: '#06b6d4' }]);
       makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
+    }
+
+    // Function to generate and download comprehensive Excel report
+    function downloadExcelReport() {
+      try {
+        if (typeof XLSX === 'undefined') {
+          showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Excel library not loaded.');
+          return;
+        }
+
+        const wb = XLSX.utils.book_new();
+        const { t1, t2, t3, t4 } = getFilteredData();
+        const activeMonth = monthNames[selectedMonthIndex] || '';
+        const activeWeek = selectedWeek;
+        const activeDay = currentSelectedDate || 'All Days';
+
+        // 1. Summary Sheet
+        const summaryRows = [
+          ["CUSTOMER SUPPORT - CALLS DASHBOARD REPORT"],
+          ["Month Scope:", activeMonth],
+          ["Week Scope:", activeWeek],
+          ["Active Day:", activeDay],
+          ["Export Timestamp:", new Date().toLocaleString()],
+          [],
+          ["METRIC", "VALUE", "NOTES"],
+          ["Total Answered", document.getElementById('kpi-answered')?.innerText || "0", "Filtered scope"],
+          ["Abnd. Queue", document.getElementById('kpi-abnd-queue')?.innerText || "0", "Filtered scope"],
+          ["Abnd. CSAT", document.getElementById('kpi-abnd-csat')?.innerText || "0", "Filtered scope"],
+          ["Abnd. On Hold", document.getElementById('kpi-abnd-hold')?.innerText || "0", "Filtered scope"],
+          ["Inbound Calls", document.getElementById('kpi-inbound')?.innerText || "0", "Agents + Overflow"],
+          ["Tagged Convs", document.getElementById('kpi-tagged')?.innerText || "0", "Overflow count"]
+        ];
+        const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+        XLSX.utils.book_append_sheet(wb, wsSummary, "Dashboard Summary");
+
+        // 2. Table 1: Calls Per Hour
+        if (t1.length > 0) {
+          const t1Data = t1.map(r => ({
+            "DATE & HOUR": r['DATE & HOUR'] || '',
+            "ABND. IN ROUTING": r['ABND IN ROUTING'] ?? 0,
+            "ANSWERED": r['ANSWERED'] ?? 0,
+            "ABND. IN CSAT RATING": r['ABND IN CSAT RATING'] ?? 0,
+            "ABND. IN QUEUE": r['ABND IN QUEUE'] ?? 0,
+            "ABND. ON HOLD": r['ANBD ON HOLD'] ?? 0
+          }));
+          const wsT1 = XLSX.utils.json_to_sheet(t1Data);
+          XLSX.utils.book_append_sheet(wb, wsT1, "Calls Per Hour");
+        }
+
+        // 3. Table 2: Calls Per Queue
+        if (t2.length > 0) {
+          const t2Data = t2.map(r => ({
+            "TEAM": r['TEAM'] || '',
+            "ANSWERED": r['ANSWERED'] ?? 0,
+            "ABND. IN CSAT RATING": r['ABND IN CSAT RATING'] ?? 0,
+            "ABND. IN QUEUE": r['ABND IN QUEUE'] ?? 0,
+            "ABND. ON HOLD": r['ABND ON HOLD'] ?? 0
+          }));
+          const wsT2 = XLSX.utils.json_to_sheet(t2Data);
+          XLSX.utils.book_append_sheet(wb, wsT2, "Calls Per Queue");
+        }
+
+        // 4. Table 3: Calls Per Agents
+        if (t3.length > 0) {
+          const t3Data = t3.map(r => ({
+            "TEAMMATE": r['TEAMMATE'] || '',
+            "INBOUND CALLS": r['INBOUND CALLS'] ?? 0,
+            "OUTBOUND CALLS": r['OUTBOUND CALLS'] ?? 0,
+            "ABND. INBOUND CALLS": r['ABND INBOUND CALLS'] ?? 0,
+            "ANSWER TIME": r['ANSWER TIME'] || '',
+            "TALK TIME": r['TALK TIME'] || '',
+            "CALL DURATION": r['CALL DURATION'] || '',
+            "AVERAGE HOLD TIME": r['AVERAGE HOLD TIME'] || '',
+            "DAYS ATTENDED": r['DAYS ATTENDED OUT OF 5'] ?? 5
+          }));
+          const wsT3 = XLSX.utils.json_to_sheet(t3Data);
+          XLSX.utils.book_append_sheet(wb, wsT3, "Calls Per Agents");
+        }
+
+        // 5. Table 4: Calls Overflow
+        if (t4.length > 0) {
+          const t4Data = t4.map(r => ({
+            "DATE & HOUR": r['DATE & HOUR'] || '',
+            "INBOUND CALLS": r['INBOUND CALLS'] ?? 0,
+            "TAGGED CONVERSATIONS": r['TAGGED CONVERSATIONS'] ?? 0
+          }));
+          const wsT4 = XLSX.utils.json_to_sheet(t4Data);
+          XLSX.utils.book_append_sheet(wb, wsT4, "Calls Overflow");
+        }
+
+        // 6. Notes & Insights
+        const notesRows = [
+          ["HOURLY OPERATIONAL NOTES (" + (currentSelectedDate || 'General Scope') + ")"],
+          ["Hour", "Operational Note"]
+        ];
+        const dateKey = sanitizeKey(currentSelectedDate || 'general');
+        const savedNotes = (localNotesStore && localNotesStore[dateKey]) || {};
+        for (let h = 0; h < 24; h++) {
+          const hourStr = `${String(h).padStart(2, '0')}:00`;
+          notesRows.push([hourStr, savedNotes[hourStr] || '']);
+        }
+        notesRows.push([]);
+        notesRows.push(["WEEKLY INSIGHTS"]);
+        notesRows.push(["Missing Members / Coverage:", document.getElementById('insights-achievements')?.value || '']);
+        notesRows.push(["Unexpected Events & Outages:", document.getElementById('insights-blockers')?.value || '']);
+        notesRows.push(["Automated SLA Recommendations:", document.getElementById('insights-actions')?.value || '']);
+
+        const wsNotes = XLSX.utils.aoa_to_sheet(notesRows);
+        XLSX.utils.book_append_sheet(wb, wsNotes, "Notes & Insights");
+
+        const fileName = `Calls_Dashboard_Report_${activeMonth}_${activeWeek}_${activeDay}.xlsx`.replace(/\s+/g, '_');
+        XLSX.writeFile(wb, fileName);
+        showToast('<i class="fa-solid fa-file-excel text-emerald-400 mr-2"></i>Excel report downloaded successfully!');
+      } catch (err) {
+        console.error("Excel generation error:", err);
+        showToast('<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Error exporting Excel: ' + err.message);
+      }
     }
   </script>
 </body>
