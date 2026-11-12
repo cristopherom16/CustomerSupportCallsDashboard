@@ -451,7 +451,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t1" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
+                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
@@ -475,7 +475,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t2" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
+                <tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
@@ -503,7 +503,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
+                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
@@ -525,7 +525,7 @@
                 </tr>
               </thead>
               <tbody id="tbody-t4" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available.</td></tr>
+                <tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
@@ -542,7 +542,7 @@
               <i class="fa-solid fa-cloud-arrow-up text-amber-500"></i> Import & Save Daily Tables
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Select the target Date or use the arrows to browse previously uploaded daily tables.
+              Select the target Date or use the arrows to step backward and forward across any day.
             </p>
           </div>
 
@@ -550,11 +550,11 @@
             <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/30">
               <span class="text-xs font-bold text-slate-300">Assign To Date:</span>
               <div class="flex items-center gap-1">
-                <button type="button" onclick="navigateImportDate(-1)" title="Previous Uploaded Date" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
+                <button type="button" onclick="navigateImportDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
                   <i class="fa-solid fa-chevron-left text-xs"></i>
                 </button>
                 <input type="date" id="target-date-select" onchange="onImportDateChanged(this.value)" class="bg-amber-500 text-blue-950 text-xs font-bold px-2 py-1 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
-                <button type="button" onclick="navigateImportDate(1)" title="Next Uploaded Date" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
+                <button type="button" onclick="navigateImportDate(1)" title="Next Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
                   <i class="fa-solid fa-chevron-right text-xs"></i>
                 </button>
               </div>
@@ -634,16 +634,50 @@
         </div>
 
         <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 space-y-4">
-          <div class="flex justify-between items-center border-b border-amber-500/30 pb-3">
+          <div class="flex flex-wrap justify-between items-center gap-2 border-b border-amber-500/30 pb-3">
             <div>
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-lightbulb text-amber-500"></i> Daily Insights
+                <i class="fa-solid fa-lightbulb text-amber-500"></i> Daily & Weekly Insights
               </h3>
-              <p class="text-xs text-slate-400">Scope: <span id="unified-scope-label" class="font-bold text-gold-400">--</span></p>
+              <p class="text-xs text-slate-400">Scope: <span id="unified-scope-label" class="font-bold text-gold-400">General</span></p>
             </div>
             <button onclick="saveWeeklyInsights()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition cursor-pointer">
               <i class="fa-solid fa-check mr-1"></i> Save Insights
             </button>
+          </div>
+
+          <!-- Month & Week Navigation Selectors (Week 1 to Week 5 + General) -->
+          <div class="flex flex-wrap items-center gap-2 bg-slate-950/90 p-2.5 rounded-xl border border-amber-500/30">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] uppercase font-bold text-slate-400">Month:</span>
+              <select id="insights-month-select" onchange="onInsightsScopeChanged()" class="bg-amber-500 text-blue-950 text-xs font-bold px-2 py-1 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
+                <option value="general">General</option>
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] uppercase font-bold text-slate-400">Week:</span>
+              <select id="insights-week-select" onchange="onInsightsScopeChanged()" class="bg-amber-500 text-blue-950 text-xs font-bold px-2 py-1 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
+                <option value="General">General</option>
+                <option value="Week 1">Week 1</option>
+                <option value="Week 2">Week 2</option>
+                <option value="Week 3">Week 3</option>
+                <option value="Week 4">Week 4</option>
+                <option value="Week 5">Week 5</option>
+              </select>
+            </div>
           </div>
 
           <div class="space-y-4">
@@ -662,7 +696,7 @@
                   <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> AI Generated
                 </span>
               </div>
-              <textarea id="insights-actions" rows="5" readonly placeholder="Analyzing data to generate recommendations..." class="w-full bg-slate-950/80 text-xs text-amber-300 font-mono p-3 rounded-xl border border-amber-500/30 focus:outline-none leading-relaxed cursor-not-allowed shadow-inner"></textarea>
+              <textarea id="insights-actions" rows="5" placeholder="No operational data for this selection..." class="w-full bg-slate-950/80 text-xs text-amber-300 font-mono p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400 leading-relaxed shadow-inner"></textarea>
             </div>
           </div>
         </div>
@@ -703,6 +737,7 @@
     let selectedMonthIndex = 9;
     let selectedWeek = 'Week 1';
     let currentSelectedDate = '';
+    let hasUserNavigatedDate = false;
     let chartInstances = {};
 
     const chartDefinitions = [
@@ -884,15 +919,28 @@
       }
     }
 
+    function getTodayStr() {
+      const now = new Date();
+      const yr = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${yr}-${m}-${d}`;
+    }
+
+    function addDaysToDateStr(dateStr, step) {
+      const base = dateStr ? new Date(dateStr + 'T12:00:00') : new Date();
+      base.setDate(base.getDate() + step);
+      const yr = base.getFullYear();
+      const m = String(base.getMonth() + 1).padStart(2, '0');
+      const d = String(base.getDate()).padStart(2, '0');
+      return `${yr}-${m}-${d}`;
+    }
+
     function initControls() {
-      const tdSel = document.getElementById('target-date-select');
-      if (tdSel) {
-        const now = new Date();
-        const yr = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, '0');
-        const d = String(now.getDate()).padStart(2, '0');
-        tdSel.value = currentSelectedDate || `${yr}-${m}-${d}`;
+      if (!currentSelectedDate) {
+        currentSelectedDate = getTodayStr();
       }
+      syncControlsToDate(currentSelectedDate);
     }
 
     function updateCloudStatus(status, text) {
@@ -1099,11 +1147,14 @@
 
     function ensureInitialScopeSync() {
       const dates = getAllGlobalDates();
-      if (dates.length > 0) {
+      if (dates.length > 0 && !hasUserNavigatedDate) {
         if (!currentSelectedDate || !dates.includes(currentSelectedDate)) {
-          currentSelectedDate = dates[dates.length - 1]; // Default to latest
+          currentSelectedDate = dates[dates.length - 1];
           syncControlsToDate(currentSelectedDate);
         }
+      } else if (!currentSelectedDate) {
+        currentSelectedDate = getTodayStr();
+        syncControlsToDate(currentSelectedDate);
       }
     }
 
@@ -1121,17 +1172,15 @@
     }
 
     function onDatePickerChanged(val) {
-      currentSelectedDate = val || '';
+      hasUserNavigatedDate = true;
+      currentSelectedDate = val || getTodayStr();
       syncControlsToDate(currentSelectedDate);
       handleDateNavigationUpdate();
     }
 
     function setToday() {
-      const now = new Date();
-      const yr = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
-      currentSelectedDate = `${yr}-${m}-${d}`;
+      hasUserNavigatedDate = true;
+      currentSelectedDate = getTodayStr();
       syncControlsToDate(currentSelectedDate);
       handleDateNavigationUpdate();
     }
@@ -1145,27 +1194,10 @@
     }
 
     function navigateDate(step) {
-      const dates = getAllGlobalDates();
-      if (dates.length > 0) {
-        let idx = dates.indexOf(currentSelectedDate);
-        if (idx === -1) {
-          idx = step > 0 ? 0 : dates.length - 1;
-        } else {
-          idx += step;
-          if (idx < 0) idx = 0;
-          if (idx >= dates.length) idx = dates.length - 1;
-        }
-        currentSelectedDate = dates[idx];
-        syncControlsToDate(currentSelectedDate);
-      } else {
-        let baseDate = currentSelectedDate ? new Date(currentSelectedDate + 'T00:00:00') : new Date();
-        baseDate.setDate(baseDate.getDate() + step);
-        const yr = baseDate.getFullYear();
-        const m = String(baseDate.getMonth() + 1).padStart(2, '0');
-        const d = String(baseDate.getDate()).padStart(2, '0');
-        currentSelectedDate = `${yr}-${m}-${d}`;
-        syncControlsToDate(currentSelectedDate);
-      }
+      hasUserNavigatedDate = true;
+      const activeDate = currentSelectedDate || getTodayStr();
+      currentSelectedDate = addDaysToDateStr(activeDate, step);
+      syncControlsToDate(currentSelectedDate);
       handleDateNavigationUpdate();
     }
 
@@ -1267,29 +1299,10 @@
     }
 
     function navigateImportDate(step) {
+      hasUserNavigatedDate = true;
       const targetPicker = document.getElementById('target-date-select');
-      const activeImportDate = (targetPicker && targetPicker.value) || currentSelectedDate;
-      const dates = getAllGlobalDates();
-
-      let nextDate = activeImportDate;
-      if (dates.length > 0) {
-        let idx = dates.indexOf(activeImportDate);
-        if (idx === -1) {
-          idx = step > 0 ? 0 : dates.length - 1;
-        } else {
-          idx += step;
-          if (idx < 0) idx = 0;
-          if (idx >= dates.length) idx = dates.length - 1;
-        }
-        nextDate = dates[idx];
-      } else {
-        let baseDate = activeImportDate ? new Date(activeImportDate + 'T00:00:00') : new Date();
-        baseDate.setDate(baseDate.getDate() + step);
-        const yr = baseDate.getFullYear();
-        const m = String(baseDate.getMonth() + 1).padStart(2, '0');
-        const d = String(baseDate.getDate()).padStart(2, '0');
-        nextDate = `${yr}-${m}-${d}`;
-      }
+      const activeImportDate = (targetPicker && targetPicker.value) || currentSelectedDate || getTodayStr();
+      const nextDate = addDaysToDateStr(activeImportDate, step);
 
       currentSelectedDate = nextDate;
       syncControlsToDate(nextDate);
@@ -1299,6 +1312,7 @@
 
     function onImportDateChanged(val) {
       if (!val) return;
+      hasUserNavigatedDate = true;
       currentSelectedDate = val;
       syncControlsToDate(val);
       handleDateNavigationUpdate();
@@ -1397,41 +1411,19 @@
     }
 
     function getFilteredData() {
-      let t1 = appData.table1.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
-      let t4 = appData.table4.filter(r => !currentSelectedDate || !r._date || r._date === currentSelectedDate);
-
-      if (t1.length === 0) {
-        t1 = appData.table1.filter(r => r._monthIndex === selectedMonthIndex);
-      }
-      if (t4.length === 0) {
-        t4 = appData.table4.filter(r => r._monthIndex === selectedMonthIndex);
+      if (!currentSelectedDate) {
+        return { t1: [], t2: [], t3: [], t4: [] };
       }
 
-      let t2 = appData.table2.filter(r => {
-        if (currentSelectedDate && r._date) return r._date === currentSelectedDate;
-        const matchM = r._monthIndex === undefined || r._monthIndex === -1 || r._monthIndex === selectedMonthIndex;
-        const matchW = !r._week || r._week.toLowerCase() === selectedWeek.toLowerCase();
-        return matchM && matchW;
-      });
-
-      let t3 = appData.table3.filter(r => {
-        if (currentSelectedDate && r._date) return r._date === currentSelectedDate;
-        const matchM = r._monthIndex === undefined || r._monthIndex === -1 || r._monthIndex === selectedMonthIndex;
-        const matchW = !r._week || r._week.toLowerCase() === selectedWeek.toLowerCase();
-        return matchM && matchW;
-      });
-
-      if (t2.length === 0) t2 = appData.table2.filter(r => r._monthIndex === selectedMonthIndex);
-      if (t3.length === 0) t3 = appData.table3.filter(r => r._monthIndex === selectedMonthIndex);
-
-      if (t2.length === 0) t2 = appData.table2;
-      if (t3.length === 0) t3 = appData.table3;
+      const t1 = appData.table1.filter(r => r._date === currentSelectedDate);
+      const t2 = appData.table2.filter(r => r._date === currentSelectedDate);
+      const t3 = appData.table3.filter(r => r._date === currentSelectedDate);
+      const t4 = appData.table4.filter(r => r._date === currentSelectedDate);
 
       return { t1, t2, t3, t4 };
     }
 
     function handleDateNavigationUpdate() {
-      const monthLabel = monthNames[selectedMonthIndex] || 'All';
       const dateLabel = currentSelectedDate || 'All Days';
 
       const dBadge = document.getElementById('scope-day-badge');
@@ -1439,9 +1431,6 @@
 
       const uDay = document.getElementById('unified-day-label');
       if (uDay) uDay.innerText = currentSelectedDate || 'General / All Days';
-
-      const uScope = document.getElementById('unified-scope-label');
-      if (uScope) uScope.innerText = currentSelectedDate || monthLabel;
 
       document.querySelectorAll('.table-day-label').forEach(el => el.innerText = currentSelectedDate || 'All Days');
 
@@ -1475,7 +1464,7 @@
       }
       if (tabId === 'import') {
         const targetPicker = document.getElementById('target-date-select');
-        const dateToLoad = currentSelectedDate || (targetPicker && targetPicker.value) || '';
+        const dateToLoad = currentSelectedDate || (targetPicker && targetPicker.value) || getTodayStr();
         if (targetPicker && dateToLoad) targetPicker.value = dateToLoad;
         loadSavedTablesIntoImportInputs(dateToLoad);
       }
@@ -1521,6 +1510,7 @@
 
       if (!localNotesStore) localNotesStore = {};
       localNotesStore[dateKey] = notesObj;
+      safeSetLocal('open_calls_daily_notes', localNotesStore);
 
       if (db) {
         db.ref("open_notes/" + dateKey).set(notesObj);
@@ -1528,37 +1518,77 @@
           .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved successfully!`))
           .catch(err => showToast(`<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Error: ${err.message}`));
       } else {
-        safeSetLocal('open_calls_daily_notes', localNotesStore);
         showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved in local storage!`);
       }
     }
 
-    function getPossibleInsightKeys() {
-      const mShort = monthNamesShort[selectedMonthIndex] || '';
-      const mFull = monthNames[selectedMonthIndex] || '';
-      const wClean = selectedWeek;
-      const wUnder = selectedWeek.replace(/\s+/g, '_');
-      const dClean = currentSelectedDate || 'general';
+    function getInsightsScopeInfo() {
+      const mVal = document.getElementById('insights-month-select')?.value ?? 'general';
+      const wVal = document.getElementById('insights-week-select')?.value ?? 'General';
 
-      return [
-        `insights_Date_${dClean}`,
-        `insights_${mShort}_${wClean}`,
-        `insights_${mShort}_${wUnder}`,
-        `insights_${mFull}_${wClean}`,
-        `insights_${mFull}_${wUnder}`,
-        `${mShort}_${wClean}`,
-        `${mShort}_${wUnder}`,
-        `${mFull}_${wClean}`,
-        `${mFull}_${wUnder}`
-      ];
+      if (mVal === 'general' && wVal === 'General') {
+        return {
+          primaryKey: 'insights_General',
+          label: 'General',
+          candidates: ['insights_General', 'insights_General_General', 'General']
+        };
+      }
+
+      if (mVal === 'general') {
+        const wUnder = wVal.replace(/\s+/g, '_');
+        return {
+          primaryKey: `insights_General_${wVal}`,
+          label: `General - ${wVal}`,
+          candidates: [`insights_General_${wVal}`, `insights_General_${wUnder}`]
+        };
+      }
+
+      const mIdx = parseInt(mVal, 10);
+      const mShort = monthNamesShort[mIdx] || 'Month';
+      const mFull = monthNames[mIdx] || 'Month';
+
+      if (wVal === 'General') {
+        return {
+          primaryKey: `insights_${mShort}_General`,
+          label: `${mFull} - General`,
+          candidates: [
+            `insights_${mShort}_General`,
+            `insights_${mFull}_General`,
+            `${mShort}_General`,
+            `${mFull}_General`
+          ]
+        };
+      }
+
+      const wUnder = wVal.replace(/\s+/g, '_');
+      return {
+        primaryKey: `insights_${mShort}_${wVal}`,
+        label: `${mFull} - ${wVal}`,
+        candidates: [
+          `insights_${mShort}_${wVal}`,
+          `insights_${mShort}_${wUnder}`,
+          `insights_${mFull}_${wVal}`,
+          `insights_${mFull}_${wUnder}`,
+          `${mShort}_${wVal}`,
+          `${mShort}_${wUnder}`,
+          `${mFull}_${wVal}`,
+          `${mFull}_${wUnder}`
+        ]
+      };
+    }
+
+    function onInsightsScopeChanged() {
+      loadSavedWeeklyInsights();
     }
 
     function loadSavedWeeklyInsights() {
-      const candidateKeys = getPossibleInsightKeys();
-      let saved = {};
+      const scopeInfo = getInsightsScopeInfo();
+      const uScope = document.getElementById('unified-scope-label');
+      if (uScope) uScope.innerText = scopeInfo.label;
 
+      let saved = {};
       if (localInsightsStore) {
-        for (const k of candidateKeys) {
+        for (const k of scopeInfo.candidates) {
           if (localInsightsStore[k]) {
             saved = localInsightsStore[k];
             break;
@@ -1573,9 +1603,14 @@
       if (ach) ach.value = saved.achievements || '';
       if (blk) blk.value = saved.blockers || '';
 
+      if (saved.actions !== undefined && saved.actions !== '') {
+        if (act) act.value = saved.actions;
+        return;
+      }
+
       const { t1, t3, t4 } = getFilteredData();
       if (t1.length === 0 && t3.length === 0) {
-        if (act) act.value = "No operational records available for recommendations.";
+        if (act) act.value = '';
         return;
       }
 
@@ -1593,7 +1628,8 @@
     }
 
     function saveWeeklyInsights() {
-      const primaryKey = currentSelectedDate ? `insights_Date_${currentSelectedDate}` : `insights_${monthNamesShort[selectedMonthIndex] || 'Month'}_${selectedWeek}`;
+      const scopeInfo = getInsightsScopeInfo();
+      const primaryKey = scopeInfo.primaryKey;
       const payload = {
         achievements: document.getElementById('insights-achievements')?.value || '',
         blockers: document.getElementById('insights-blockers')?.value || '',
@@ -1603,15 +1639,15 @@
 
       if (!localInsightsStore) localInsightsStore = {};
       localInsightsStore[primaryKey] = payload;
+      safeSetLocal('open_calls_insights', localInsightsStore);
 
       if (db) {
         db.ref("weekly_insights/" + primaryKey).set(payload);
         db.ref("open_insights/" + primaryKey).set(payload)
-          .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved!`))
+          .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved (${scopeInfo.label})!`))
           .catch(err => console.error(err));
       } else {
-        safeSetLocal('open_calls_insights', localInsightsStore);
-        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved locally!`);
+        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Insights saved locally (${scopeInfo.label})!`);
       }
     }
 
@@ -1774,6 +1810,7 @@
           showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Saved locally: <strong>${payload.name}</strong>`);
         }
 
+        hasUserNavigatedDate = true;
         currentSelectedDate = targetDate;
         syncControlsToDate(currentSelectedDate);
 
@@ -1818,7 +1855,7 @@
 
       const tb2 = document.getElementById('tbody-t2');
       if (t2.length === 0) {
-        tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No queue records found for this scope.</td></tr>';
+        tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
       } else {
         tb2.innerHTML = t2.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
@@ -1833,7 +1870,7 @@
 
       const tb3 = document.getElementById('tbody-t3');
       if (t3.length === 0) {
-        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No agent records found for this scope.</td></tr>';
+        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
       } else {
         tb3.innerHTML = t3.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
@@ -1852,7 +1889,7 @@
 
       const tb4 = document.getElementById('tbody-t4');
       if (t4.length === 0) {
-        tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No overflow records found for this day.</td></tr>';
+        tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
       } else {
         tb4.innerHTML = t4.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
@@ -1967,17 +2004,17 @@
 
       const teamLabels = t2.map(r => r['TEAM'] || 'Team');
       makeChart('chart-c5', 'bar', teamLabels.length ? teamLabels : ['No data'], [
-        { label: 'Answered', data: t2.map(r => cleanNum(r['ANSWERED'])), backgroundColor: '#10b981' },
-        { label: 'Abnd CSAT', data: t2.map(r => cleanNum(r['ABND IN CSAT RATING'])), backgroundColor: '#facc15' },
-        { label: 'Abnd Queue', data: t2.map(r => cleanNum(r['ABND IN QUEUE'])), backgroundColor: '#f43f5e' },
-        { label: 'Abnd Hold', data: t2.map(r => cleanNum(r['ABND ON HOLD'])), backgroundColor: '#fb923c' }
+        { label: 'Answered', data: t2.length ? t2.map(r => cleanNum(r['ANSWERED'])) : [0], backgroundColor: '#10b981' },
+        { label: 'Abnd CSAT', data: t2.length ? t2.map(r => cleanNum(r['ABND IN CSAT RATING'])) : [0], backgroundColor: '#facc15' },
+        { label: 'Abnd Queue', data: t2.length ? t2.map(r => cleanNum(r['ABND IN QUEUE'])) : [0], backgroundColor: '#f43f5e' },
+        { label: 'Abnd Hold', data: t2.length ? t2.map(r => cleanNum(r['ABND ON HOLD'])) : [0], backgroundColor: '#fb923c' }
       ]);
 
       const agentLabels = t3.map(r => r['TEAMMATE'] || 'Agent');
-      makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abnd. Inbound Calls', data: t3.map(r => cleanNum(r['ABND INBOUND CALLS'])), backgroundColor: '#f43f5e' }]);
-      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Sec)', data: t3.map(r => parseTimeSeconds(r['ANSWER TIME'])), backgroundColor: '#eab308' }]);
-      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))), backgroundColor: '#06b6d4' }]);
-      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))), backgroundColor: '#a855f7' }]);
+      makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abnd. Inbound Calls', data: t3.length ? t3.map(r => cleanNum(r['ABND INBOUND CALLS'])) : [0], backgroundColor: '#f43f5e' }]);
+      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Sec)', data: t3.length ? t3.map(r => parseTimeSeconds(r['ANSWER TIME'])) : [0], backgroundColor: '#eab308' }]);
+      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))) : [0], backgroundColor: '#06b6d4' }]);
+      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))) : [0], backgroundColor: '#a855f7' }]);
     }
 
     // Function to generate and download Excel workbook WITH embedded charts + package of chart image files
@@ -1999,8 +2036,8 @@
 
         const { t1, t2, t3, t4 } = getFilteredData();
         const activeMonth = monthNames[selectedMonthIndex] || 'All';
-        const activeWeek = selectedWeek || 'Week 1';
         const activeDay = currentSelectedDate || 'All Days';
+        const insightsScope = getInsightsScopeInfo().label;
 
         // 1. Sheet: Summary & KPIs
         const wsSummary = wb.addWorksheet('Summary');
@@ -2012,8 +2049,8 @@
 
         wsSummary.addRow(['CUSTOMER SUPPORT - CALLS DASHBOARD REPORT', '', '']);
         wsSummary.addRow(['Month Scope', activeMonth, '']);
-        wsSummary.addRow(['Week Scope', activeWeek, '']);
         wsSummary.addRow(['Active Day', activeDay, '']);
+        wsSummary.addRow(['Insights Scope', insightsScope, '']);
         wsSummary.addRow(['Export Timestamp', new Date().toLocaleString(), '']);
         wsSummary.addRow(['', '', '']);
         wsSummary.addRow(['METRIC', 'VALUE', 'NOTES']);
@@ -2158,7 +2195,7 @@
           wsNotes.addRow([hourStr, savedNotes[hourStr] || '']);
         }
         wsNotes.addRow(['', '']);
-        wsNotes.addRow(['DAILY INSIGHTS', '']);
+        wsNotes.addRow(['INSIGHTS SCOPE', insightsScope]);
         wsNotes.addRow(['Missing Members / Coverage', document.getElementById('insights-achievements')?.value || '']);
         wsNotes.addRow(['Unexpected Events & Outages', document.getElementById('insights-blockers')?.value || '']);
         wsNotes.addRow(['Automated SLA Recommendations', document.getElementById('insights-actions')?.value || '']);
