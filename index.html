@@ -489,7 +489,7 @@
         <!-- Table 3 Card -->
         <div id="card-table-t3" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
-            <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agent</h3>
+            <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t3-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
@@ -499,15 +499,16 @@
                   <th class="p-2.5 border-r border-amber-500/20 text-center">TEAMMATE</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">INBOUND CALLS</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">OUTBOUND CALLS</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND.</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWER TIME</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">TALK TIME</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">HOLD TIME</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABANDONED INBOUND CALLS</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">MEDIAN CALL ANSWER TIME</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">MEDIAN CALL TALK TIME</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">MEDIAN CALL DURATION</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">AVERAGE CALL HOLD TIME</th>
                   <th class="p-2.5 text-center">CSAT SCORE</th>
                 </tr>
               </thead>
               <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="8" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
+                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
@@ -597,12 +598,12 @@
         <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 flex flex-col justify-between">
           <div class="flex justify-between items-center mb-2">
             <div>
-              <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agent</h3>
-              <p class="text-[11px] text-slate-400">TEAMMATE, INBOUND CALLS, OUTBOUND CALLS, ABND., ANSWER TIME, TALK TIME, HOLD TIME, CSAT SCORE</p>
+              <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
+              <p class="text-[11px] text-slate-400">Teammate, Inbound calls, Outbound calls, Abandoned inbound calls, Median Call answer time, Median Call talk time, Median Call duration, Average Call hold time, CSAT score</p>
             </div>
             <span id="badge-check-t3" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agent..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agents..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 flex flex-col justify-between">
@@ -761,7 +762,7 @@
     const tableDefinitions = [
       { id: 'card-table-t1', label: '1. Calls Per Hour' },
       { id: 'card-table-t2', label: '2. Calls Per Queue' },
-      { id: 'card-table-t3', label: '3. Calls Per Agent' },
+      { id: 'card-table-t3', label: '3. Calls Per Agents' },
       { id: 'card-table-t4', label: '4. Calls Overflow' }
     ];
 
@@ -1065,15 +1066,19 @@
         copy['ABND IN ROUTING'] = cleanNum(getVal(r, ['ABND IN ROUTING', 'ABND. IN ROUTING', 'Abnd Routing']));
       } else if (tableType === 3) {
         copy['TEAMMATE'] = r['TEAMMATE'] || r['Teammate'] || r['Agent'] || r['teammate'] || 'Agent';
-        copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls', 'inbound_calls']));
-        copy['OUTBOUND CALLS'] = cleanNum(getVal(r, ['OUTBOUND CALLS', 'Outbound Calls', 'outbound_calls']));
-        copy['ABND'] = cleanNum(getVal(r, ['ABND', 'ABND.', 'ABND INBOUND CALLS', 'ABND. INBOUND CALLS', 'Abnd Inbound Calls', 'abnd_inbound']));
-        copy['ABND INBOUND CALLS'] = copy['ABND'];
-        copy['ANSWER TIME'] = r['ANSWER TIME'] || r['Answer Time'] || '00:15';
-        copy['TALK TIME'] = r['TALK TIME'] || r['Talk Time'] || '03:30';
-        copy['HOLD TIME'] = r['HOLD TIME'] || r['Hold Time'] || r['AVERAGE HOLD TIME'] || r['Average Hold Time'] || '00:25';
-        copy['AVERAGE HOLD TIME'] = copy['HOLD TIME'];
-        copy['CSAT SCORE'] = cleanNum(getVal(r, ['CSAT SCORE', 'CSAT Score', 'csat_score', 'CSAT', 'DAYS ATTENDED OUT OF 5', 'DAYS ATTENDED', 'Days Attended']));
+        copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound calls', 'Inbound Calls', 'inbound_calls']));
+        copy['OUTBOUND CALLS'] = cleanNum(getVal(r, ['OUTBOUND CALLS', 'Outbound calls', 'Outbound Calls', 'outbound_calls']));
+        copy['ABANDONED INBOUND CALLS'] = cleanNum(getVal(r, ['ABANDONED INBOUND CALLS', 'Abandoned inbound calls', 'ABND INBOUND CALLS', 'ABND. INBOUND CALLS', 'ABND', 'ABND.', 'Abnd Inbound Calls', 'abnd_inbound']));
+        copy['ABND'] = copy['ABANDONED INBOUND CALLS'];
+        copy['MEDIAN CALL ANSWER TIME'] = r['MEDIAN CALL ANSWER TIME'] || r['Median Call answer time'] || r['ANSWER TIME'] || r['Answer Time'] || '00:15';
+        copy['ANSWER TIME'] = copy['MEDIAN CALL ANSWER TIME'];
+        copy['MEDIAN CALL TALK TIME'] = r['MEDIAN CALL TALK TIME'] || r['Median Call talk time'] || r['TALK TIME'] || r['Talk Time'] || '03:30';
+        copy['TALK TIME'] = copy['MEDIAN CALL TALK TIME'];
+        copy['MEDIAN CALL DURATION'] = r['MEDIAN CALL DURATION'] || r['Median Call duration'] || r['CALL DURATION'] || r['Call Duration'] || '04:15';
+        copy['CALL DURATION'] = copy['MEDIAN CALL DURATION'];
+        copy['AVERAGE CALL HOLD TIME'] = r['AVERAGE CALL HOLD TIME'] || r['Average Call hold time'] || r['HOLD TIME'] || r['Hold Time'] || r['AVERAGE HOLD TIME'] || r['Average Hold Time'] || '00:25';
+        copy['HOLD TIME'] = copy['AVERAGE CALL HOLD TIME'];
+        copy['CSAT SCORE'] = cleanNum(getVal(r, ['CSAT SCORE', 'CSAT score', 'CSAT Score', 'csat_score', 'CSAT', 'DAYS ATTENDED OUT OF 5', 'DAYS ATTENDED', 'Days Attended']));
       } else if (tableType === 4) {
         copy['DATE & HOUR'] = r['DATE & HOUR'] || r['Date & Hour'] || r['date_hour'] || '';
         copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls', 'inbound_calls']));
@@ -1292,15 +1297,16 @@
       }
 
       if (rows3.length > 0) {
-        const header3 = ['TEAMMATE', 'INBOUND CALLS', 'OUTBOUND CALLS', 'ABND.', 'ANSWER TIME', 'TALK TIME', 'HOLD TIME', 'CSAT SCORE'].join('\t');
+        const header3 = ['Teammate', 'Inbound calls', 'Outbound calls', 'Abandoned inbound calls', 'Median Call answer time', 'Median Call talk time', 'Median Call duration', 'Average Call hold time', 'CSAT score'].join('\t');
         const body3 = rows3.map(r => [
           r['TEAMMATE'] || '',
           r['INBOUND CALLS'] ?? 0,
           r['OUTBOUND CALLS'] ?? 0,
-          r['ABND'] ?? 0,
-          r['ANSWER TIME'] || '00:15',
-          r['TALK TIME'] || '03:30',
-          r['HOLD TIME'] || '00:25',
+          r['ABANDONED INBOUND CALLS'] ?? 0,
+          r['MEDIAN CALL ANSWER TIME'] || '00:15',
+          r['MEDIAN CALL TALK TIME'] || '03:30',
+          r['MEDIAN CALL DURATION'] || '04:15',
+          r['AVERAGE CALL HOLD TIME'] || '00:25',
           r['CSAT SCORE'] ?? 0
         ].join('\t')).join('\n');
         el3.value = `${header3}\n${body3}`;
@@ -1683,7 +1689,7 @@
 
       const delimiter = rawText.includes('\t') ? '\t' : (rawText.includes(',') ? ',' : ';');
       const firstLineTokens = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
-      const headerKeywords = /^(hour|date|team|teammate|agent|answered|inbound|outbound|abnd|answer|talk|hold|csat|tagged)/i;
+      const headerKeywords = /^(hour|date|team|teammate|agent|answered|inbound|outbound|abnd|abandoned|median|average|answer|talk|duration|hold|csat|tagged)/i;
       const isHeaderRow = firstLineTokens.length > 1 && headerKeywords.test(firstLineTokens[0]) && headerKeywords.test(firstLineTokens[1]);
       
       const startIndex = isHeaderRow ? 1 : 0;
@@ -1801,22 +1807,29 @@
           newT2 = mappedT2;
         }
 
-        // 3. Calls Per Agent: Teammate, Inbound Calls, Outbound Calls, Abnd., Answer Time, Talk Time, Hold Time, CSAT Score
+        // 3. Calls Per Agents: Teammate, Inbound calls, Outbound calls, Abandoned inbound calls, Median Call answer time, Median Call talk time, Median Call duration, Average Call hold time, CSAT score
         if (t3Rows.length > 0) {
           const mappedT3 = t3Rows.map(r => {
             const abnd = cleanNum(r[3]);
-            const holdTime = r[6] || '00:25';
+            const answerTime = r[4] || '00:15';
+            const talkTime = r[5] || '03:30';
+            const duration = r[6] || '04:15';
+            const holdTime = r[7] || '00:25';
             return {
               'TEAMMATE': String(r[0] || 'Agent').trim(),
               'INBOUND CALLS': cleanNum(r[1]),
               'OUTBOUND CALLS': cleanNum(r[2]),
+              'ABANDONED INBOUND CALLS': abnd,
               'ABND': abnd,
-              'ABND INBOUND CALLS': abnd,
-              'ANSWER TIME': r[4] || '00:15',
-              'TALK TIME': r[5] || '03:30',
+              'MEDIAN CALL ANSWER TIME': answerTime,
+              'ANSWER TIME': answerTime,
+              'MEDIAN CALL TALK TIME': talkTime,
+              'TALK TIME': talkTime,
+              'MEDIAN CALL DURATION': duration,
+              'CALL DURATION': duration,
+              'AVERAGE CALL HOLD TIME': holdTime,
               'HOLD TIME': holdTime,
-              'AVERAGE HOLD TIME': holdTime,
-              'CSAT SCORE': cleanNum(r[7]),
+              'CSAT SCORE': cleanNum(r[8]),
               '_date': targetDate
             };
           });
@@ -1923,20 +1936,21 @@
         `).join('');
       }
 
-      // 3. Calls Per Agent: Teammate, Inbound Calls, Outbound Calls, Abnd., Answer Time, Talk Time, Hold Time, CSAT Score
+      // 3. Calls Per Agents: Teammate, Inbound calls, Outbound calls, Abandoned inbound calls, Median Call answer time, Median Call talk time, Median Call duration, Average Call hold time, CSAT score
       const tb3 = document.getElementById('tbody-t3');
       if (t3.length === 0) {
-        tb3.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
+        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
       } else {
         tb3.innerHTML = t3.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
             <td class="p-2.5 font-bold text-slate-200 font-sans border-r border-amber-500/20 text-center">${r['TEAMMATE'] || '--'}</td>
             <td class="p-2.5 text-sky-400 border-r border-amber-500/20 text-center">${r['INBOUND CALLS'] ?? 0}</td>
             <td class="p-2.5 border-r border-amber-500/20 text-center">${r['OUTBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ANSWER TIME'] || '--'}</td>
-            <td class="p-2.5 border-r border-amber-500/20 text-center">${r['TALK TIME'] || '--'}</td>
-            <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['HOLD TIME'] || '--'}</td>
+            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABANDONED INBOUND CALLS'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['MEDIAN CALL ANSWER TIME'] || '--'}</td>
+            <td class="p-2.5 border-r border-amber-500/20 text-center">${r['MEDIAN CALL TALK TIME'] || '--'}</td>
+            <td class="p-2.5 text-sky-300 border-r border-amber-500/20 text-center">${r['MEDIAN CALL DURATION'] || '--'}</td>
+            <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['AVERAGE CALL HOLD TIME'] || '--'}</td>
             <td class="p-2.5 font-bold text-emerald-400 text-center">${r['CSAT SCORE'] ?? 0}</td>
           </tr>
         `).join('');
@@ -2068,10 +2082,10 @@
       ]);
 
       const agentLabels = t3.map(r => r['TEAMMATE'] || 'Agent');
-      makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abnd. Calls', data: t3.length ? t3.map(r => cleanNum(r['ABND'])) : [0], backgroundColor: '#f43f5e' }]);
-      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['ANSWER TIME'])) : [0], backgroundColor: '#eab308' }]);
-      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['TALK TIME'])) : [0], backgroundColor: '#06b6d4' }]);
-      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Hold Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['HOLD TIME'])) : [0], backgroundColor: '#a855f7' }]);
+      makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abandoned Inbound Calls', data: t3.length ? t3.map(r => cleanNum(r['ABANDONED INBOUND CALLS'])) : [0], backgroundColor: '#f43f5e' }]);
+      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['MEDIAN CALL ANSWER TIME'])) : [0], backgroundColor: '#eab308' }]);
+      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['MEDIAN CALL TALK TIME'])) : [0], backgroundColor: '#06b6d4' }]);
+      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Hold Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['AVERAGE CALL HOLD TIME'])) : [0], backgroundColor: '#a855f7' }]);
       makeChart('chart-c11', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'CSAT Score', data: t3.length ? t3.map(r => cleanNum(r['CSAT SCORE'])) : [0], backgroundColor: '#10b981' }]);
     }
 
@@ -2196,28 +2210,30 @@
           });
         });
 
-        // 5. Sheet: Table 3 (Calls Per Agent)
-        const wsT3 = wb.addWorksheet('Calls Per Agent');
+        // 5. Sheet: Table 3 (Calls Per Agents)
+        const wsT3 = wb.addWorksheet('Calls Per Agents');
         wsT3.columns = [
           { header: 'TEAMMATE', key: 'c1', width: 22 },
           { header: 'INBOUND CALLS', key: 'c2', width: 18 },
           { header: 'OUTBOUND CALLS', key: 'c3', width: 18 },
-          { header: 'ABND.', key: 'c4', width: 16 },
-          { header: 'ANSWER TIME', key: 'c5', width: 16 },
-          { header: 'TALK TIME', key: 'c6', width: 16 },
-          { header: 'HOLD TIME', key: 'c7', width: 16 },
-          { header: 'CSAT SCORE', key: 'c8', width: 16 }
+          { header: 'ABANDONED INBOUND CALLS', key: 'c4', width: 26 },
+          { header: 'MEDIAN CALL ANSWER TIME', key: 'c5', width: 26 },
+          { header: 'MEDIAN CALL TALK TIME', key: 'c6', width: 24 },
+          { header: 'MEDIAN CALL DURATION', key: 'c7', width: 24 },
+          { header: 'AVERAGE CALL HOLD TIME', key: 'c8', width: 25 },
+          { header: 'CSAT SCORE', key: 'c9', width: 16 }
         ];
         t3.forEach(r => {
           wsT3.addRow({
             c1: r['TEAMMATE'] || '--',
             c2: r['INBOUND CALLS'] ?? 0,
             c3: r['OUTBOUND CALLS'] ?? 0,
-            c4: r['ABND'] ?? 0,
-            c5: r['ANSWER TIME'] || '--',
-            c6: r['TALK TIME'] || '--',
-            c7: r['HOLD TIME'] || '--',
-            c8: r['CSAT SCORE'] ?? 0
+            c4: r['ABANDONED INBOUND CALLS'] ?? 0,
+            c5: r['MEDIAN CALL ANSWER TIME'] || '--',
+            c6: r['MEDIAN CALL TALK TIME'] || '--',
+            c7: r['MEDIAN CALL DURATION'] || '--',
+            c8: r['AVERAGE CALL HOLD TIME'] || '--',
+            c9: r['CSAT SCORE'] ?? 0
           });
         });
 
