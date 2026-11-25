@@ -331,7 +331,7 @@
             <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-amber-500"></i> Performance Visualizations
             </h2>
-            <p class="text-xs text-slate-400">Charts 1-4 & 10 reflect the active date. Charts 5-9 reflect the active scope.</p>
+            <p class="text-xs text-slate-400">Charts 1-4 & 10 reflect the active date. Charts 5-9 & 11 reflect the active scope.</p>
           </div>
           <div class="text-right">
             <span class="text-xs font-semibold text-slate-400">Active Day:</span>
@@ -419,6 +419,14 @@
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c9"></canvas></div>
           </div>
+
+          <div id="card-chart-c11" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between md:col-span-2 xl:col-span-3">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-bold text-amber-400">11. Teammate vs CSAT Score</span>
+              <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Scope</span>
+            </div>
+            <div class="h-56 w-full relative"><canvas id="chart-c11"></canvas></div>
+          </div>
         </div>
       </div>
 
@@ -495,7 +503,7 @@
                   <th class="p-2.5 border-r border-amber-500/20 text-center">TALK TIME</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">CALL DURATION</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">AVERAGE HOLD TIME</th>
-                  <th class="p-2.5 text-center">DAYS ATTENDED</th>
+                  <th class="p-2.5 text-center">CSAT SCORE</th>
                 </tr>
               </thead>
               <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono text-center">
@@ -590,7 +598,7 @@
           <div class="flex justify-between items-center mb-2">
             <div>
               <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
-              <p class="text-[11px] text-slate-400">TEAMMATE, INBOUND, OUTBOUND, ABND, ANSWER/TALK TIME, DAYS</p>
+              <p class="text-[11px] text-slate-400">TEAMMATE, INBOUND, OUTBOUND, ABND, ANSWER/TALK TIME, CSAT SCORE</p>
             </div>
             <span id="badge-check-t3" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
@@ -746,7 +754,8 @@
       { id: 'chart-c6', cardId: 'card-chart-c6', label: '6. Agent Abnd' },
       { id: 'chart-c7', cardId: 'card-chart-c7', label: '7. Answer Time' },
       { id: 'chart-c8', cardId: 'card-chart-c8', label: '8. Talk Time' },
-      { id: 'chart-c9', cardId: 'card-chart-c9', label: '9. Call Duration' }
+      { id: 'chart-c9', cardId: 'card-chart-c9', label: '9. Call Duration' },
+      { id: 'chart-c11', cardId: 'card-chart-c11', label: '11. CSAT Score' }
     ];
 
     const tableDefinitions = [
@@ -767,7 +776,8 @@
         'chart-c6': true,
         'chart-c7': true,
         'chart-c8': true,
-        'chart-c9': true
+        'chart-c9': true,
+        'chart-c11': true
       },
       tables: {
         'card-table-t1': true,
@@ -1045,7 +1055,7 @@
         copy['TALK TIME'] = r['TALK TIME'] || r['Talk Time'] || '03:30';
         copy['CALL DURATION'] = r['CALL DURATION'] || r['Call Duration'] || '04:15';
         copy['AVERAGE HOLD TIME'] = r['AVERAGE HOLD TIME'] || r['Average Hold Time'] || '00:25';
-        copy['DAYS ATTENDED OUT OF 5'] = cleanNum(getVal(r, ['DAYS ATTENDED OUT OF 5', 'DAYS ATTENDED', 'Days Attended'])) || 5;
+        copy['CSAT SCORE'] = cleanNum(getVal(r, ['CSAT SCORE', 'CSAT Score', 'csat_score', 'CSAT', 'DAYS ATTENDED OUT OF 5', 'DAYS ATTENDED', 'Days Attended']));
       } else if (tableType === 4) {
         copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls', 'inbound_calls']));
         copy['TAGGED CONVERSATIONS'] = cleanNum(getVal(r, ['TAGGED CONVERSATIONS', 'Tagged Conversations', 'tagged_conversations']));
@@ -1262,7 +1272,7 @@
       }
 
       if (rows3.length > 0) {
-        const header3 = ['TEAMMATE', 'INBOUND CALLS', 'OUTBOUND CALLS', 'ABND. INBOUND CALLS', 'ANSWER TIME', 'TALK TIME', 'CALL DURATION', 'AVERAGE HOLD TIME', 'DAYS ATTENDED'].join('\t');
+        const header3 = ['TEAMMATE', 'INBOUND CALLS', 'OUTBOUND CALLS', 'ABND. INBOUND CALLS', 'ANSWER TIME', 'TALK TIME', 'CALL DURATION', 'AVERAGE HOLD TIME', 'CSAT SCORE'].join('\t');
         const body3 = rows3.map(r => [
           r['TEAMMATE'] || '',
           r['INBOUND CALLS'] ?? 0,
@@ -1272,7 +1282,7 @@
           r['TALK TIME'] || '03:30',
           r['CALL DURATION'] || '04:15',
           r['AVERAGE HOLD TIME'] || '00:25',
-          r['DAYS ATTENDED OUT OF 5'] ?? 5
+          r['CSAT SCORE'] ?? 0
         ].join('\t')).join('\n');
         el3.value = `${header3}\n${body3}`;
       } else {
@@ -1762,7 +1772,7 @@
             'TALK TIME': r[5] || '03:30',
             'CALL DURATION': r[6] || '04:15',
             'AVERAGE HOLD TIME': r[7] || '00:25',
-            'DAYS ATTENDED OUT OF 5': cleanNum(r[8]) || 5,
+            'CSAT SCORE': cleanNum(r[8]),
             '_date': targetDate
           }));
           newT3 = mappedT3;
@@ -1878,7 +1888,7 @@
             <td class="p-2.5 border-r border-amber-500/20 text-center">${r['TALK TIME'] || '--'}</td>
             <td class="p-2.5 text-emerald-400 border-r border-amber-500/20 text-center">${r['CALL DURATION'] || '--'}</td>
             <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['AVERAGE HOLD TIME'] || '--'}</td>
-            <td class="p-2.5 font-sans text-center">${r['DAYS ATTENDED OUT OF 5'] ?? 5}</td>
+            <td class="p-2.5 font-bold text-emerald-400 text-center">${r['CSAT SCORE'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -2011,6 +2021,7 @@
       makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Sec)', data: t3.length ? t3.map(r => parseTimeSeconds(r['ANSWER TIME'])) : [0], backgroundColor: '#eab308' }]);
       makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))) : [0], backgroundColor: '#06b6d4' }]);
       makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))) : [0], backgroundColor: '#a855f7' }]);
+      makeChart('chart-c11', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'CSAT Score', data: t3.length ? t3.map(r => cleanNum(r['CSAT SCORE'])) : [0], backgroundColor: '#10b981' }]);
     }
 
     // Function to generate and download Excel workbook WITH embedded charts + package of chart image files
@@ -2057,7 +2068,7 @@
         wsSummary.addRow(['Inbound Calls', document.getElementById('kpi-inbound')?.innerText || "0", 'Agents + Overflow']);
         wsSummary.addRow(['Tagged Convs', document.getElementById('kpi-tagged')?.innerText || "0", 'Overflow count']);
 
-        // 2. Sheet: Visual Charts (Embed all 10 generated charts directly in the Excel file)
+        // 2. Sheet: Visual Charts (Embed all generated charts directly in the Excel file)
         const wsCharts = wb.addWorksheet('Visual Charts');
         wsCharts.columns = [
           { width: 4 },
@@ -2146,7 +2157,7 @@
           { header: 'TALK TIME', key: 'c6', width: 16 },
           { header: 'CALL DURATION', key: 'c7', width: 16 },
           { header: 'AVERAGE HOLD TIME', key: 'c8', width: 20 },
-          { header: 'DAYS ATTENDED', key: 'c9', width: 16 }
+          { header: 'CSAT SCORE', key: 'c9', width: 16 }
         ];
         t3.forEach(r => {
           wsT3.addRow({
@@ -2158,7 +2169,7 @@
             c6: r['TALK TIME'] || '--',
             c7: r['CALL DURATION'] || '--',
             c8: r['AVERAGE HOLD TIME'] || '--',
-            c9: r['DAYS ATTENDED OUT OF 5'] ?? 5
+            c9: r['CSAT SCORE'] ?? 0
           });
         });
 
