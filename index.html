@@ -41,11 +41,12 @@
     }
 
     html {
-      font-size: 18.66px !important; /* Arial 14pt */
+      font-size: 20px !important; /* Arial 15pt */
     }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
+      font-size: 15pt;
       background-color: var(--bg-color);
       color: var(--text-main);
       transition: background-color 0.3s, color 0.3s;
@@ -119,9 +120,29 @@
       border-color: #1e3a8a !important; 
     }
 
-    table, table th, table td {
+    /* Centrado total, letras Arial 15pt y mayor espacio para los números en todas las celdas */
+    table {
+      width: 100%;
+      font-family: Arial, Helvetica, sans-serif !important;
+      font-size: 15pt !important;
       text-align: center !important;
     }
+    table th {
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 14px 18px !important;
+      font-size: 15pt !important;
+      letter-spacing: 0.03em;
+    }
+    table td {
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 16px 20px !important;
+      font-size: 17pt !important;
+      line-height: 1.4 !important;
+      letter-spacing: 0.04em;
+    }
+
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
@@ -242,36 +263,36 @@
         <h2 class="text-lg font-black text-amber-400 mb-3 flex items-center gap-2">
           <i class="fa-solid fa-square-poll-vertical text-amber-500"></i> Daily Metrics Summary
         </h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-center">
-          <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
-            <span class="text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
-            <div id="kpi-answered" class="text-xl font-extrabold text-amber-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Filtered scope</span>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
+          <div class="bg-slate-900/80 border border-amber-500/30 p-5 rounded-2xl flex flex-col items-center justify-center">
+            <span class="text-xs uppercase font-bold text-slate-400">Total Answered</span>
+            <div id="kpi-answered" class="text-3xl font-extrabold text-amber-400 my-2 tracking-wide">0</div>
+            <span class="text-xs text-slate-500">Filtered scope</span>
           </div>
-          <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
-            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. Queue</span>
-            <div id="kpi-abnd-queue" class="text-xl font-extrabold text-rose-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          <div class="bg-slate-900/80 border border-amber-500/30 p-5 rounded-2xl flex flex-col items-center justify-center">
+            <span class="text-xs uppercase font-bold text-slate-400">Abnd. Queue</span>
+            <div id="kpi-abnd-queue" class="text-3xl font-extrabold text-rose-400 my-2 tracking-wide">0</div>
+            <span class="text-xs text-slate-500">Filtered scope</span>
           </div>
-          <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
-            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. CSAT</span>
-            <div id="kpi-abnd-csat" class="text-xl font-extrabold text-amber-300 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          <div class="bg-slate-900/80 border border-amber-500/30 p-5 rounded-2xl flex flex-col items-center justify-center">
+            <span class="text-xs uppercase font-bold text-slate-400">Abnd. CSAT</span>
+            <div id="kpi-abnd-csat" class="text-3xl font-extrabold text-amber-300 my-2 tracking-wide">0</div>
+            <span class="text-xs text-slate-500">Filtered scope</span>
           </div>
-          <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
-            <span class="text-[10px] uppercase font-bold text-slate-400">Abnd. On Hold</span>
-            <div id="kpi-abnd-hold" class="text-xl font-extrabold text-orange-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Filtered scope</span>
+          <div class="bg-slate-900/80 border border-amber-500/30 p-5 rounded-2xl flex flex-col items-center justify-center">
+            <span class="text-xs uppercase font-bold text-slate-400">Abnd. On Hold</span>
+            <div id="kpi-abnd-hold" class="text-3xl font-extrabold text-orange-400 my-2 tracking-wide">0</div>
+            <span class="text-xs text-slate-500">Filtered scope</span>
           </div>
-          <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
-            <span class="text-[10px] uppercase font-bold text-slate-400">Inbound Calls</span>
-            <div id="kpi-inbound" class="text-xl font-extrabold text-sky-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Agents + Overflow</span>
+          <div class="bg-slate-900/80 border border-amber-500/30 p-5 rounded-2xl flex flex-col items-center justify-center">
+            <span class="text-xs uppercase font-bold text-slate-400">Inbound Calls</span>
+            <div id="kpi-inbound" class="text-3xl font-extrabold text-sky-400 my-2 tracking-wide">0</div>
+            <span class="text-xs text-slate-500">Agents + Overflow</span>
           </div>
-          <div class="bg-slate-900/80 border border-amber-500/30 p-3.5 rounded-2xl">
-            <span class="text-[10px] uppercase font-bold text-slate-400">Tagged Convs</span>
-            <div id="kpi-tagged" class="text-xl font-extrabold text-emerald-400 mt-1">0</div>
-            <span class="text-[10px] text-slate-500">Overflow count</span>
+          <div class="bg-slate-900/80 border border-amber-500/30 p-5 rounded-2xl flex flex-col items-center justify-center">
+            <span class="text-xs uppercase font-bold text-slate-400">Tagged Convs</span>
+            <div id="kpi-tagged" class="text-3xl font-extrabold text-emerald-400 my-2 tracking-wide">0</div>
+            <span class="text-xs text-slate-500">Overflow count</span>
           </div>
         </div>
       </div>
@@ -437,100 +458,100 @@
         </h2>
 
         <!-- Table 1 Card -->
-        <div id="card-table-t1" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
-          <div class="flex justify-between items-center mb-3">
+        <div id="card-table-t1" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-5 overflow-hidden">
+          <div class="flex justify-between items-center mb-4">
             <h3 class="text-sm font-bold text-amber-400">1. Calls Per Hour</h3>
-            <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t1-count">0 records</span>
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t1-count">0 records</span>
           </div>
-          <div class="overflow-x-auto max-h-72">
-            <table class="w-full text-center text-xs border-collapse">
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-center border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">HOUR</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWERED</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN QUEUE</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN CSAT</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN ROUTING</th>
-                  <th class="p-2.5 text-center">ABND. ON HOLD</th>
+                  <th class="border-r border-amber-500/20 text-center">HOUR</th>
+                  <th class="border-r border-amber-500/20 text-center">ANSWERED</th>
+                  <th class="border-r border-amber-500/20 text-center">ABND. IN QUEUE</th>
+                  <th class="border-r border-amber-500/20 text-center">ABND. IN CSAT</th>
+                  <th class="border-r border-amber-500/20 text-center">ABND. IN ROUTING</th>
+                  <th class="text-center">ABND. ON HOLD</th>
                 </tr>
               </thead>
-              <tbody id="tbody-t1" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
+              <tbody id="tbody-t1" class="divide-y divide-amber-500/20 text-center">
+                <tr><td colspan="6" class="text-center text-slate-500">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
         <!-- Table 2 Card -->
-        <div id="card-table-t2" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
-          <div class="flex justify-between items-center mb-3">
+        <div id="card-table-t2" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-5 overflow-hidden">
+          <div class="flex justify-between items-center mb-4">
             <h3 class="text-sm font-bold text-amber-400">2. Calls Per Queue</h3>
-            <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t2-count">0 records</span>
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t2-count">0 records</span>
           </div>
-          <div class="overflow-x-auto max-h-72">
-            <table class="w-full text-center text-xs border-collapse">
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-center border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">TEAM</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWERED</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN QUEUE</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN CSAT</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. ON HOLD</th>
-                  <th class="p-2.5 text-center">ABND. IN ROUTING</th>
+                  <th class="border-r border-amber-500/20 text-center">TEAM</th>
+                  <th class="border-r border-amber-500/20 text-center">ANSWERED</th>
+                  <th class="border-r border-amber-500/20 text-center">ABND. IN QUEUE</th>
+                  <th class="border-r border-amber-500/20 text-center">ABND. IN CSAT</th>
+                  <th class="border-r border-amber-500/20 text-center">ABND. ON HOLD</th>
+                  <th class="text-center">ABND. IN ROUTING</th>
                 </tr>
               </thead>
-              <tbody id="tbody-t2" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
+              <tbody id="tbody-t2" class="divide-y divide-amber-500/20 text-center">
+                <tr><td colspan="6" class="text-center text-slate-500">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
         <!-- Table 3 Card -->
-        <div id="card-table-t3" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
-          <div class="flex justify-between items-center mb-3">
+        <div id="card-table-t3" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-5 overflow-hidden">
+          <div class="flex justify-between items-center mb-4">
             <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
-            <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t3-count">0 records</span>
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t3-count">0 records</span>
           </div>
-          <div class="overflow-x-auto max-h-72">
-            <table class="w-full text-center text-xs border-collapse">
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-center border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">TEAMMATE</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">INBOUND CALLS</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">OUTBOUND CALLS</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABANDONED INBOUND CALLS</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">MEDIAN CALL ANSWER TIME</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">MEDIAN CALL TALK TIME</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">MEDIAN CALL DURATION</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">AVERAGE CALL HOLD TIME</th>
-                  <th class="p-2.5 text-center">CSAT SCORE</th>
+                  <th class="border-r border-amber-500/20 text-center">TEAMMATE</th>
+                  <th class="border-r border-amber-500/20 text-center">INBOUND CALLS</th>
+                  <th class="border-r border-amber-500/20 text-center">OUTBOUND CALLS</th>
+                  <th class="border-r border-amber-500/20 text-center">ABANDONED INBOUND CALLS</th>
+                  <th class="border-r border-amber-500/20 text-center">MEDIAN CALL ANSWER TIME</th>
+                  <th class="border-r border-amber-500/20 text-center">MEDIAN CALL TALK TIME</th>
+                  <th class="border-r border-amber-500/20 text-center">MEDIAN CALL DURATION</th>
+                  <th class="border-r border-amber-500/20 text-center">AVERAGE CALL HOLD TIME</th>
+                  <th class="text-center">CSAT SCORE</th>
                 </tr>
               </thead>
-              <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
+              <tbody id="tbody-t3" class="divide-y divide-amber-500/20 text-center">
+                <tr><td colspan="9" class="text-center text-slate-500">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
         <!-- Table 4 Card -->
-        <div id="card-table-t4" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
-          <div class="flex justify-between items-center mb-3">
+        <div id="card-table-t4" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-5 overflow-hidden">
+          <div class="flex justify-between items-center mb-4">
             <h3 class="text-sm font-bold text-amber-400">4. Calls Overflow</h3>
-            <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t4-count">0 records</span>
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t4-count">0 records</span>
           </div>
-          <div class="overflow-x-auto max-h-72">
-            <table class="w-full text-center text-xs border-collapse">
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-center border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">DATE & HOUR</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">INBOUND CALLS</th>
-                  <th class="p-2.5 text-center">TAGGED CONVERSATIONS</th>
+                  <th class="border-r border-amber-500/20 text-center">DATE & HOUR</th>
+                  <th class="border-r border-amber-500/20 text-center">INBOUND CALLS</th>
+                  <th class="text-center">TAGGED CONVERSATIONS</th>
                 </tr>
               </thead>
-              <tbody id="tbody-t4" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
+              <tbody id="tbody-t4" class="divide-y divide-amber-500/20 text-center">
+                <tr><td colspan="3" class="text-center text-slate-500">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
@@ -1902,70 +1923,70 @@
       document.getElementById('badge-t3-count').innerText = `${t3.length} records`;
       document.getElementById('badge-t4-count').innerText = `${t4.length} records`;
 
-      // 1. Calls Per Hour: Hour, Answered, Abnd. in Queue, Abnd. In CSAT, Abnd. in Routing, Abnd. on Hold
+      // 1. Calls Per Hour
       const tb1 = document.getElementById('tbody-t1');
       if (t1.length === 0) {
-        tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
+        tb1.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500">No data available for this day.</td></tr>';
       } else {
         tb1.innerHTML = t1.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['HOUR'] || r['DATE & HOUR'] || '--'}</td>
-            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT'] ?? 0}</td>
-            <td class="p-2.5 border-r border-amber-500/20 text-center">${r['ABND IN ROUTING'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400 text-center">${r['ABND ON HOLD'] ?? 0}</td>
+            <td class="text-amber-300 border-r border-amber-500/20 text-center">${r['HOUR'] || r['DATE & HOUR'] || '--'}</td>
+            <td class="text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
+            <td class="text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT'] ?? 0}</td>
+            <td class="border-r border-amber-500/20 text-center">${r['ABND IN ROUTING'] ?? 0}</td>
+            <td class="text-orange-400 text-center">${r['ABND ON HOLD'] ?? 0}</td>
           </tr>
         `).join('');
       }
 
-      // 2. Calls Per Queue: Team, Answered, Abnd. in Queue, Abnd. In CSAT, Abnd. on Hold, Abnd. in Routing
+      // 2. Calls Per Queue
       const tb2 = document.getElementById('tbody-t2');
       if (t2.length === 0) {
-        tb2.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
+        tb2.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500">No data available for this day.</td></tr>';
       } else {
         tb2.innerHTML = t2.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
-            <td class="p-2.5 font-bold text-amber-300 font-sans border-r border-amber-500/20 text-center">${r['TEAM'] || '--'}</td>
-            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['ABND ON HOLD'] ?? 0}</td>
-            <td class="p-2.5 text-center">${r['ABND IN ROUTING'] ?? 0}</td>
+            <td class="font-bold text-amber-300 border-r border-amber-500/20 text-center">${r['TEAM'] || '--'}</td>
+            <td class="text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
+            <td class="text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT'] ?? 0}</td>
+            <td class="text-orange-400 border-r border-amber-500/20 text-center">${r['ABND ON HOLD'] ?? 0}</td>
+            <td class="text-center">${r['ABND IN ROUTING'] ?? 0}</td>
           </tr>
         `).join('');
       }
 
-      // 3. Calls Per Agents: Teammate, Inbound calls, Outbound calls, Abandoned inbound calls, Median Call answer time, Median Call talk time, Median Call duration, Average Call hold time, CSAT score
+      // 3. Calls Per Agents
       const tb3 = document.getElementById('tbody-t3');
       if (t3.length === 0) {
-        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
+        tb3.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500">No data available for this day.</td></tr>';
       } else {
         tb3.innerHTML = t3.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
-            <td class="p-2.5 font-bold text-slate-200 font-sans border-r border-amber-500/20 text-center">${r['TEAMMATE'] || '--'}</td>
-            <td class="p-2.5 text-sky-400 border-r border-amber-500/20 text-center">${r['INBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 border-r border-amber-500/20 text-center">${r['OUTBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABANDONED INBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['MEDIAN CALL ANSWER TIME'] || '--'}</td>
-            <td class="p-2.5 border-r border-amber-500/20 text-center">${r['MEDIAN CALL TALK TIME'] || '--'}</td>
-            <td class="p-2.5 text-sky-300 border-r border-amber-500/20 text-center">${r['MEDIAN CALL DURATION'] || '--'}</td>
-            <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['AVERAGE CALL HOLD TIME'] || '--'}</td>
-            <td class="p-2.5 font-bold text-emerald-400 text-center">${r['CSAT SCORE'] ?? 0}</td>
+            <td class="font-bold text-slate-200 border-r border-amber-500/20 text-center">${r['TEAMMATE'] || '--'}</td>
+            <td class="text-sky-400 border-r border-amber-500/20 text-center">${r['INBOUND CALLS'] ?? 0}</td>
+            <td class="border-r border-amber-500/20 text-center">${r['OUTBOUND CALLS'] ?? 0}</td>
+            <td class="text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABANDONED INBOUND CALLS'] ?? 0}</td>
+            <td class="text-amber-300 border-r border-amber-500/20 text-center">${r['MEDIAN CALL ANSWER TIME'] || '--'}</td>
+            <td class="border-r border-amber-500/20 text-center">${r['MEDIAN CALL TALK TIME'] || '--'}</td>
+            <td class="text-sky-300 border-r border-amber-500/20 text-center">${r['MEDIAN CALL DURATION'] || '--'}</td>
+            <td class="text-orange-400 border-r border-amber-500/20 text-center">${r['AVERAGE CALL HOLD TIME'] || '--'}</td>
+            <td class="font-bold text-emerald-400 text-center">${r['CSAT SCORE'] ?? 0}</td>
           </tr>
         `).join('');
       }
 
-      // 4. Calls Overflow: Date & Hour, Inbound Calls, Tagged Conversations
+      // 4. Calls Overflow
       const tb4 = document.getElementById('tbody-t4');
       if (t4.length === 0) {
-        tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
+        tb4.innerHTML = '<tr><td colspan="3" class="text-center text-slate-500">No data available for this day.</td></tr>';
       } else {
         tb4.innerHTML = t4.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['DATE & HOUR'] || '--'}</td>
-            <td class="p-2.5 text-sky-400 font-bold border-r border-amber-500/20 text-center">${r['INBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-emerald-400 font-bold text-center">${r['TAGGED CONVERSATIONS'] ?? 0}</td>
+            <td class="text-amber-300 border-r border-amber-500/20 text-center">${r['DATE & HOUR'] || '--'}</td>
+            <td class="text-sky-400 font-bold border-r border-amber-500/20 text-center">${r['INBOUND CALLS'] ?? 0}</td>
+            <td class="text-emerald-400 font-bold text-center">${r['TAGGED CONVERSATIONS'] ?? 0}</td>
           </tr>
         `).join('');
       }
@@ -2043,20 +2064,20 @@
             maintainAspectRatio: false,
             animation: false,
             plugins: {
-              legend: { labels: { color: tickColor, font: { size: 11, family: 'Arial', weight: 'bold' } } },
+              legend: { labels: { color: tickColor, font: { size: 12, family: 'Arial', weight: 'bold' } } },
               tooltip: {
                 backgroundColor: isLight ? '#fcd34d' : '#0f172a',
                 bodyColor: isLight ? '#1e3a8a' : '#f8fafc',
                 titleColor: isLight ? '#1e3a8a' : '#f8fafc',
                 borderColor: isLight ? '#1e3a8a' : '#f59e0b',
                 borderWidth: 1,
-                bodyFont: { family: 'Arial' },
-                titleFont: { family: 'Arial', weight: 'bold' }
+                bodyFont: { family: 'Arial', size: 13 },
+                titleFont: { family: 'Arial', weight: 'bold', size: 13 }
               }
             },
             scales: {
-              x: { ticks: { color: tickColor, font: { size: 10, family: 'Arial' } }, grid: { color: gridColor } },
-              y: { beginAtZero: true, ticks: { color: tickColor, font: { size: 10, family: 'Arial' } }, grid: { color: gridColor } }
+              x: { ticks: { color: tickColor, font: { size: 11, family: 'Arial' } }, grid: { color: gridColor } },
+              y: { beginAtZero: true, ticks: { color: tickColor, font: { size: 11, family: 'Arial' } }, grid: { color: gridColor } }
             },
             ...extraOpts
           }
@@ -2114,9 +2135,9 @@
         // 1. Sheet: Summary & KPIs
         const wsSummary = wb.addWorksheet('Summary');
         wsSummary.columns = [
-          { header: 'Scope / Metric', key: 'c1', width: 30 },
-          { header: 'Value', key: 'c2', width: 22 },
-          { header: 'Notes', key: 'c3', width: 32 }
+          { header: 'Scope / Metric', key: 'c1', width: 32 },
+          { header: 'Value', key: 'c2', width: 24 },
+          { header: 'Notes', key: 'c3', width: 34 }
         ];
 
         wsSummary.addRow(['CUSTOMER SUPPORT - CALLS DASHBOARD REPORT', '', '']);
@@ -2133,7 +2154,7 @@
         wsSummary.addRow(['Inbound Calls', document.getElementById('kpi-inbound')?.innerText || "0", 'Agents + Overflow']);
         wsSummary.addRow(['Tagged Convs', document.getElementById('kpi-tagged')?.innerText || "0", 'Overflow count']);
 
-        // 2. Sheet: Visual Charts (Embed all generated charts directly in the Excel file)
+        // 2. Sheet: Visual Charts
         const wsCharts = wb.addWorksheet('Visual Charts');
         wsCharts.columns = [
           { width: 4 },
@@ -2148,7 +2169,7 @@
 
             const cell = wsCharts.getCell(`B${chartRowOffset}`);
             cell.value = `${def.label}`;
-            cell.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FF1E3A8A' } };
+            cell.font = { name: 'Arial', size: 15, bold: true, color: { argb: 'FF1E3A8A' } };
 
             const imageId = wb.addImage({
               base64: dataUrl,
@@ -2171,12 +2192,12 @@
         // 3. Sheet: Table 1 (Calls Per Hour)
         const wsT1 = wb.addWorksheet('Calls Per Hour');
         wsT1.columns = [
-          { header: 'HOUR', key: 'c1', width: 22 },
-          { header: 'ANSWERED', key: 'c2', width: 16 },
-          { header: 'ABND. IN QUEUE', key: 'c3', width: 18 },
-          { header: 'ABND. IN CSAT', key: 'c4', width: 18 },
-          { header: 'ABND. IN ROUTING', key: 'c5', width: 20 },
-          { header: 'ABND. ON HOLD', key: 'c6', width: 18 }
+          { header: 'HOUR', key: 'c1', width: 24 },
+          { header: 'ANSWERED', key: 'c2', width: 18 },
+          { header: 'ABND. IN QUEUE', key: 'c3', width: 20 },
+          { header: 'ABND. IN CSAT', key: 'c4', width: 20 },
+          { header: 'ABND. IN ROUTING', key: 'c5', width: 22 },
+          { header: 'ABND. ON HOLD', key: 'c6', width: 20 }
         ];
         t1.forEach(r => {
           wsT1.addRow({
@@ -2192,12 +2213,12 @@
         // 4. Sheet: Table 2 (Calls Per Queue)
         const wsT2 = wb.addWorksheet('Calls Per Queue');
         wsT2.columns = [
-          { header: 'TEAM', key: 'c1', width: 25 },
-          { header: 'ANSWERED', key: 'c2', width: 18 },
-          { header: 'ABND. IN QUEUE', key: 'c3', width: 18 },
-          { header: 'ABND. IN CSAT', key: 'c4', width: 18 },
-          { header: 'ABND. ON HOLD', key: 'c5', width: 18 },
-          { header: 'ABND. IN ROUTING', key: 'c6', width: 20 }
+          { header: 'TEAM', key: 'c1', width: 28 },
+          { header: 'ANSWERED', key: 'c2', width: 20 },
+          { header: 'ABND. IN QUEUE', key: 'c3', width: 20 },
+          { header: 'ABND. IN CSAT', key: 'c4', width: 20 },
+          { header: 'ABND. ON HOLD', key: 'c5', width: 20 },
+          { header: 'ABND. IN ROUTING', key: 'c6', width: 22 }
         ];
         t2.forEach(r => {
           wsT2.addRow({
@@ -2213,15 +2234,15 @@
         // 5. Sheet: Table 3 (Calls Per Agents)
         const wsT3 = wb.addWorksheet('Calls Per Agents');
         wsT3.columns = [
-          { header: 'TEAMMATE', key: 'c1', width: 22 },
-          { header: 'INBOUND CALLS', key: 'c2', width: 18 },
-          { header: 'OUTBOUND CALLS', key: 'c3', width: 18 },
-          { header: 'ABANDONED INBOUND CALLS', key: 'c4', width: 26 },
-          { header: 'MEDIAN CALL ANSWER TIME', key: 'c5', width: 26 },
-          { header: 'MEDIAN CALL TALK TIME', key: 'c6', width: 24 },
-          { header: 'MEDIAN CALL DURATION', key: 'c7', width: 24 },
-          { header: 'AVERAGE CALL HOLD TIME', key: 'c8', width: 25 },
-          { header: 'CSAT SCORE', key: 'c9', width: 16 }
+          { header: 'TEAMMATE', key: 'c1', width: 24 },
+          { header: 'INBOUND CALLS', key: 'c2', width: 20 },
+          { header: 'OUTBOUND CALLS', key: 'c3', width: 20 },
+          { header: 'ABANDONED INBOUND CALLS', key: 'c4', width: 28 },
+          { header: 'MEDIAN CALL ANSWER TIME', key: 'c5', width: 28 },
+          { header: 'MEDIAN CALL TALK TIME', key: 'c6', width: 26 },
+          { header: 'MEDIAN CALL DURATION', key: 'c7', width: 26 },
+          { header: 'AVERAGE CALL HOLD TIME', key: 'c8', width: 27 },
+          { header: 'CSAT SCORE', key: 'c9', width: 18 }
         ];
         t3.forEach(r => {
           wsT3.addRow({
@@ -2240,9 +2261,9 @@
         // 6. Sheet: Table 4 (Calls Overflow)
         const wsT4 = wb.addWorksheet('Calls Overflow');
         wsT4.columns = [
-          { header: 'DATE & HOUR', key: 'c1', width: 22 },
-          { header: 'INBOUND CALLS', key: 'c2', width: 18 },
-          { header: 'TAGGED CONVERSATIONS', key: 'c3', width: 24 }
+          { header: 'DATE & HOUR', key: 'c1', width: 24 },
+          { header: 'INBOUND CALLS', key: 'c2', width: 20 },
+          { header: 'TAGGED CONVERSATIONS', key: 'c3', width: 26 }
         ];
         t4.forEach(r => {
           wsT4.addRow({
@@ -2255,8 +2276,8 @@
         // 7. Sheet: Notes & Insights
         const wsNotes = wb.addWorksheet('Notes & Insights');
         wsNotes.columns = [
-          { header: 'Scope / Time', key: 'c1', width: 25 },
-          { header: 'Details / Operational Note', key: 'c2', width: 75 }
+          { header: 'Scope / Time', key: 'c1', width: 28 },
+          { header: 'Details / Operational Note', key: 'c2', width: 78 }
         ];
         wsNotes.addRow(['HOURLY OPERATIONAL NOTES', activeDay]);
         const dateKey = sanitizeKey(currentSelectedDate || 'general');
@@ -2271,13 +2292,12 @@
         wsNotes.addRow(['Unexpected Events & Outages', document.getElementById('insights-blockers')?.value || '']);
         wsNotes.addRow(['Automated SLA Recommendations', document.getElementById('insights-actions')?.value || '']);
 
-        // Align all tables center
+        // Align all tables center & Arial 15pt
         [wsSummary, wsT1, wsT2, wsT3, wsT4, wsNotes].forEach(ws => {
           ws.eachRow((row, rowNumber) => {
+            row.height = 28;
             row.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-            if (rowNumber === 1 && ws !== wsSummary && ws !== wsNotes) {
-              row.font = { name: 'Arial', size: 11, bold: true };
-            }
+            row.font = { name: 'Arial', size: 15, bold: rowNumber === 1 };
           });
         });
 
