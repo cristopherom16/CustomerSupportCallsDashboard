@@ -398,7 +398,7 @@
 
           <div id="card-chart-c7" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">7. Teammate vs Answer Time (Sec)</span>
+              <span class="text-xs font-bold text-amber-400">7. Teammate vs Answer Time (Minutes)</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Scope</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c7"></canvas></div>
@@ -414,7 +414,7 @@
 
           <div id="card-chart-c9" class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 flex flex-col justify-between md:col-span-2 xl:col-span-3">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-amber-400">9. Teammate vs Call Duration (Minutes)</span>
+              <span class="text-xs font-bold text-amber-400">9. Teammate vs Hold Time (Minutes)</span>
               <span class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded font-mono font-bold border border-amber-500/30">Scope</span>
             </div>
             <div class="h-56 w-full relative"><canvas id="chart-c9"></canvas></div>
@@ -446,12 +446,12 @@
             <table class="w-full text-center text-xs border-collapse">
               <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-amber-500/40">
                 <tr>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">DATE & HOUR</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN ROUTING</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">HOUR</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWERED</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN CSAT RATING</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN QUEUE</th>
-                  <th class="p-2.5 text-center">ANBD. ON HOLD</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN CSAT</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN ROUTING</th>
+                  <th class="p-2.5 text-center">ABND. ON HOLD</th>
                 </tr>
               </thead>
               <tbody id="tbody-t1" class="divide-y divide-amber-500/20 font-mono text-center">
@@ -473,13 +473,14 @@
                 <tr>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">TEAM</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWERED</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN CSAT RATING</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN QUEUE</th>
-                  <th class="p-2.5 text-center">ABND. ON HOLD</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. IN CSAT</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. ON HOLD</th>
+                  <th class="p-2.5 text-center">ABND. IN ROUTING</th>
                 </tr>
               </thead>
               <tbody id="tbody-t2" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
+                <tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
@@ -488,7 +489,7 @@
         <!-- Table 3 Card -->
         <div id="card-table-t3" class="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 overflow-hidden">
           <div class="flex justify-between items-center mb-3">
-            <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
+            <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agent</h3>
             <span class="text-xs font-mono font-bold px-2 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/30" id="badge-t3-count">0 records</span>
           </div>
           <div class="overflow-x-auto max-h-72">
@@ -498,16 +499,15 @@
                   <th class="p-2.5 border-r border-amber-500/20 text-center">TEAMMATE</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">INBOUND CALLS</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">OUTBOUND CALLS</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND. INBOUND CALLS</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">ABND.</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">ANSWER TIME</th>
                   <th class="p-2.5 border-r border-amber-500/20 text-center">TALK TIME</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">CALL DURATION</th>
-                  <th class="p-2.5 border-r border-amber-500/20 text-center">AVERAGE HOLD TIME</th>
+                  <th class="p-2.5 border-r border-amber-500/20 text-center">HOLD TIME</th>
                   <th class="p-2.5 text-center">CSAT SCORE</th>
                 </tr>
               </thead>
               <tbody id="tbody-t3" class="divide-y divide-amber-500/20 font-mono text-center">
-                <tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
+                <tr><td colspan="8" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>
               </tbody>
             </table>
           </div>
@@ -576,7 +576,7 @@
           <div class="flex justify-between items-center mb-2">
             <div>
               <h3 class="text-sm font-bold text-amber-400">1. Calls Per Hour</h3>
-              <p class="text-[11px] text-slate-400">DATE & HOUR, ABND. ROUTING, ANSWERED, CSAT, QUEUE, HOLD</p>
+              <p class="text-[11px] text-slate-400">HOUR, ANSWERED, ABND. IN QUEUE, ABND. IN CSAT, ABND. IN ROUTING, ABND. ON HOLD</p>
             </div>
             <span id="badge-check-t1" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
@@ -587,7 +587,7 @@
           <div class="flex justify-between items-center mb-2">
             <div>
               <h3 class="text-sm font-bold text-amber-400">2. Calls Per Queue</h3>
-              <p class="text-[11px] text-slate-400">TEAM, ANSWERED, ABND. CSAT, ABND. QUEUE, ABND. HOLD</p>
+              <p class="text-[11px] text-slate-400">TEAM, ANSWERED, ABND. IN QUEUE, ABND. IN CSAT, ABND. ON HOLD, ABND. IN ROUTING</p>
             </div>
             <span id="badge-check-t2" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
@@ -597,12 +597,12 @@
         <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 flex flex-col justify-between">
           <div class="flex justify-between items-center mb-2">
             <div>
-              <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agents</h3>
-              <p class="text-[11px] text-slate-400">TEAMMATE, INBOUND, OUTBOUND, ABND, ANSWER/TALK TIME, CSAT SCORE</p>
+              <h3 class="text-sm font-bold text-amber-400">3. Calls Per Agent</h3>
+              <p class="text-[11px] text-slate-400">TEAMMATE, INBOUND CALLS, OUTBOUND CALLS, ABND., ANSWER TIME, TALK TIME, HOLD TIME, CSAT SCORE</p>
             </div>
             <span id="badge-check-t3" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">Empty</span>
           </div>
-          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agents..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
+          <textarea id="paste-input-t3" oninput="checkAllFourTablesReady()" rows="7" placeholder="Paste Calls Per Agent..." class="w-full bg-slate-950 font-mono text-xs text-slate-300 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
         </div>
 
         <div class="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 flex flex-col justify-between">
@@ -752,16 +752,16 @@
       { id: 'chart-c10', cardId: 'card-chart-c10', label: '10. Inbound vs Tagged' },
       { id: 'chart-c5', cardId: 'card-chart-c5', label: '5. Team Answered' },
       { id: 'chart-c6', cardId: 'card-chart-c6', label: '6. Agent Abnd' },
-      { id: 'chart-c7', cardId: 'card-chart-c7', label: '7. Answer Time' },
-      { id: 'chart-c8', cardId: 'card-chart-c8', label: '8. Talk Time' },
-      { id: 'chart-c9', cardId: 'card-chart-c9', label: '9. Call Duration' },
+      { id: 'chart-c7', cardId: 'card-chart-c7', label: '7. Answer Time (Min)' },
+      { id: 'chart-c8', cardId: 'card-chart-c8', label: '8. Talk Time (Min)' },
+      { id: 'chart-c9', cardId: 'card-chart-c9', label: '9. Hold Time (Min)' },
       { id: 'chart-c11', cardId: 'card-chart-c11', label: '11. CSAT Score' }
     ];
 
     const tableDefinitions = [
       { id: 'card-table-t1', label: '1. Calls Per Hour' },
       { id: 'card-table-t2', label: '2. Calls Per Queue' },
-      { id: 'card-table-t3', label: '3. Calls Per Agents' },
+      { id: 'card-table-t3', label: '3. Calls Per Agent' },
       { id: 'card-table-t4', label: '4. Calls Overflow' }
     ];
 
@@ -1035,28 +1035,36 @@
     function normalizeRowFields(r, tableType) {
       const copy = { ...r };
       if (tableType === 1) {
+        copy['HOUR'] = r['HOUR'] || r['Hour'] || r['DATE & HOUR'] || r['Date & Hour'] || r['date_hour'] || '';
+        copy['DATE & HOUR'] = copy['HOUR'];
         copy['ANSWERED'] = cleanNum(getVal(r, ['ANSWERED', 'Answered', 'answered', 'Answered Calls']));
         copy['ABND IN QUEUE'] = cleanNum(getVal(r, ['ABND IN QUEUE', 'ABND. IN QUEUE', 'Abnd Queue', 'abnd_queue', 'Abandoned In Queue']));
-        copy['ABND IN CSAT RATING'] = cleanNum(getVal(r, ['ABND IN CSAT RATING', 'ABND. IN CSAT RATING', 'Abnd CSAT', 'abnd_csat']));
-        copy['ANBD ON HOLD'] = cleanNum(getVal(r, ['ANBD ON HOLD', 'ABND ON HOLD', 'ABND. ON HOLD', 'Abnd Hold', 'abnd_hold', 'Abandoned On Hold']));
+        copy['ABND IN CSAT'] = cleanNum(getVal(r, ['ABND IN CSAT', 'ABND. IN CSAT', 'ABND IN CSAT RATING', 'ABND. IN CSAT RATING', 'Abnd CSAT', 'abnd_csat']));
+        copy['ABND IN CSAT RATING'] = copy['ABND IN CSAT'];
         copy['ABND IN ROUTING'] = cleanNum(getVal(r, ['ABND IN ROUTING', 'ABND. IN ROUTING', 'Abnd Routing']));
+        copy['ABND ON HOLD'] = cleanNum(getVal(r, ['ABND ON HOLD', 'ABND. ON HOLD', 'ANBD ON HOLD', 'Abnd Hold', 'abnd_hold', 'Abandoned On Hold']));
+        copy['ANBD ON HOLD'] = copy['ABND ON HOLD'];
       } else if (tableType === 2) {
         copy['TEAM'] = r['TEAM'] || r['Team'] || r['team'] || 'Team';
         copy['ANSWERED'] = cleanNum(getVal(r, ['ANSWERED', 'Answered', 'answered']));
         copy['ABND IN QUEUE'] = cleanNum(getVal(r, ['ABND IN QUEUE', 'ABND. IN QUEUE', 'Abnd Queue']));
-        copy['ABND IN CSAT RATING'] = cleanNum(getVal(r, ['ABND IN CSAT RATING', 'ABND. IN CSAT RATING', 'Abnd CSAT']));
+        copy['ABND IN CSAT'] = cleanNum(getVal(r, ['ABND IN CSAT', 'ABND. IN CSAT', 'ABND IN CSAT RATING', 'ABND. IN CSAT RATING', 'Abnd CSAT']));
+        copy['ABND IN CSAT RATING'] = copy['ABND IN CSAT'];
         copy['ABND ON HOLD'] = cleanNum(getVal(r, ['ABND ON HOLD', 'ANBD ON HOLD', 'ABND. ON HOLD', 'Abnd Hold']));
+        copy['ABND IN ROUTING'] = cleanNum(getVal(r, ['ABND IN ROUTING', 'ABND. IN ROUTING', 'Abnd Routing']));
       } else if (tableType === 3) {
         copy['TEAMMATE'] = r['TEAMMATE'] || r['Teammate'] || r['Agent'] || r['teammate'] || 'Agent';
         copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls', 'inbound_calls']));
         copy['OUTBOUND CALLS'] = cleanNum(getVal(r, ['OUTBOUND CALLS', 'Outbound Calls', 'outbound_calls']));
-        copy['ABND INBOUND CALLS'] = cleanNum(getVal(r, ['ABND INBOUND CALLS', 'Abnd Inbound Calls', 'abnd_inbound']));
+        copy['ABND'] = cleanNum(getVal(r, ['ABND', 'ABND.', 'ABND INBOUND CALLS', 'ABND. INBOUND CALLS', 'Abnd Inbound Calls', 'abnd_inbound']));
+        copy['ABND INBOUND CALLS'] = copy['ABND'];
         copy['ANSWER TIME'] = r['ANSWER TIME'] || r['Answer Time'] || '00:15';
         copy['TALK TIME'] = r['TALK TIME'] || r['Talk Time'] || '03:30';
-        copy['CALL DURATION'] = r['CALL DURATION'] || r['Call Duration'] || '04:15';
-        copy['AVERAGE HOLD TIME'] = r['AVERAGE HOLD TIME'] || r['Average Hold Time'] || '00:25';
+        copy['HOLD TIME'] = r['HOLD TIME'] || r['Hold Time'] || r['AVERAGE HOLD TIME'] || r['Average Hold Time'] || '00:25';
+        copy['AVERAGE HOLD TIME'] = copy['HOLD TIME'];
         copy['CSAT SCORE'] = cleanNum(getVal(r, ['CSAT SCORE', 'CSAT Score', 'csat_score', 'CSAT', 'DAYS ATTENDED OUT OF 5', 'DAYS ATTENDED', 'Days Attended']));
       } else if (tableType === 4) {
+        copy['DATE & HOUR'] = r['DATE & HOUR'] || r['Date & Hour'] || r['date_hour'] || '';
         copy['INBOUND CALLS'] = cleanNum(getVal(r, ['INBOUND CALLS', 'Inbound Calls', 'inbound_calls']));
         copy['TAGGED CONVERSATIONS'] = cleanNum(getVal(r, ['TAGGED CONVERSATIONS', 'Tagged Conversations', 'tagged_conversations']));
       }
@@ -1113,7 +1121,7 @@
             let rowCopy = normalizeRowFields(r, tType);
             rowCopy._scope = key;
 
-            const dateHourStr = rowCopy['DATE & HOUR'] || rowCopy['Date & Hour'] || rowCopy['date_hour'] || '';
+            const dateHourStr = rowCopy['HOUR'] || rowCopy['DATE & HOUR'] || rowCopy['Date & Hour'] || rowCopy['date_hour'] || '';
             
             if (entryDate) {
               rowCopy._date = rowCopy._date || extractDatePart(dateHourStr) || entryDate;
@@ -1243,14 +1251,14 @@
         : appData.table4.filter(r => r._date === dateStr);
 
       if (rows1.length > 0) {
-        const header1 = ['DATE & HOUR', 'ABND. IN ROUTING', 'ANSWERED', 'ABND. IN CSAT RATING', 'ABND. IN QUEUE', 'ANBD. ON HOLD'].join('\t');
+        const header1 = ['HOUR', 'ANSWERED', 'ABND. IN QUEUE', 'ABND. IN CSAT', 'ABND. IN ROUTING', 'ABND. ON HOLD'].join('\t');
         const body1 = rows1.map(r => [
-          r['DATE & HOUR'] || '',
-          r['ABND IN ROUTING'] ?? 0,
+          r['HOUR'] || r['DATE & HOUR'] || '',
           r['ANSWERED'] ?? 0,
-          r['ABND IN CSAT RATING'] ?? 0,
           r['ABND IN QUEUE'] ?? 0,
-          r['ANBD ON HOLD'] ?? 0
+          r['ABND IN CSAT'] ?? 0,
+          r['ABND IN ROUTING'] ?? 0,
+          r['ABND ON HOLD'] ?? 0
         ].join('\t')).join('\n');
         el1.value = `${header1}\n${body1}`;
       } else {
@@ -1258,13 +1266,14 @@
       }
 
       if (rows2.length > 0) {
-        const header2 = ['TEAM', 'ANSWERED', 'ABND. IN CSAT RATING', 'ABND. IN QUEUE', 'ABND. ON HOLD'].join('\t');
+        const header2 = ['TEAM', 'ANSWERED', 'ABND. IN QUEUE', 'ABND. IN CSAT', 'ABND. ON HOLD', 'ABND. IN ROUTING'].join('\t');
         const body2 = rows2.map(r => [
           r['TEAM'] || '',
           r['ANSWERED'] ?? 0,
-          r['ABND IN CSAT RATING'] ?? 0,
           r['ABND IN QUEUE'] ?? 0,
-          r['ABND ON HOLD'] ?? 0
+          r['ABND IN CSAT'] ?? 0,
+          r['ABND ON HOLD'] ?? 0,
+          r['ABND IN ROUTING'] ?? 0
         ].join('\t')).join('\n');
         el2.value = `${header2}\n${body2}`;
       } else {
@@ -1272,16 +1281,15 @@
       }
 
       if (rows3.length > 0) {
-        const header3 = ['TEAMMATE', 'INBOUND CALLS', 'OUTBOUND CALLS', 'ABND. INBOUND CALLS', 'ANSWER TIME', 'TALK TIME', 'CALL DURATION', 'AVERAGE HOLD TIME', 'CSAT SCORE'].join('\t');
+        const header3 = ['TEAMMATE', 'INBOUND CALLS', 'OUTBOUND CALLS', 'ABND.', 'ANSWER TIME', 'TALK TIME', 'HOLD TIME', 'CSAT SCORE'].join('\t');
         const body3 = rows3.map(r => [
           r['TEAMMATE'] || '',
           r['INBOUND CALLS'] ?? 0,
           r['OUTBOUND CALLS'] ?? 0,
-          r['ABND INBOUND CALLS'] ?? 0,
+          r['ABND'] ?? 0,
           r['ANSWER TIME'] || '00:15',
           r['TALK TIME'] || '03:30',
-          r['CALL DURATION'] || '04:15',
-          r['AVERAGE HOLD TIME'] || '00:25',
+          r['HOLD TIME'] || '00:25',
           r['CSAT SCORE'] ?? 0
         ].join('\t')).join('\n');
         el3.value = `${header3}\n${body3}`;
@@ -1622,7 +1630,7 @@
 
       const totalAnswered = t1.reduce((sum, r) => sum + cleanNum(r['ANSWERED']), 0);
       const totalAbndQueue = t1.reduce((sum, r) => sum + cleanNum(r['ABND IN QUEUE']), 0);
-      const totalAbndCsat = t1.reduce((sum, r) => sum + cleanNum(r['ABND IN CSAT RATING']), 0);
+      const totalAbndCsat = t1.reduce((sum, r) => sum + cleanNum(r['ABND IN CSAT']), 0);
       const totalCalls = totalAnswered + totalAbndQueue + totalAbndCsat;
       const abandonRate = totalCalls > 0 ? ((totalAbndQueue + totalAbndCsat) / totalCalls) * 100 : 0;
 
@@ -1731,18 +1739,27 @@
         let newT3 = toPureArray(existing.table3);
         let newT4 = toPureArray(existing.table4);
 
+        // 1. Calls Per Hour: Hour, Answered, Abnd. in Queue, Abnd. In CSAT, Abnd. in Routing, Abnd. on Hold
         if (t1Rows.length > 0) {
           const mappedT1 = t1Rows.map(r => {
-            const dateStr = r[0] || '';
-            const dPart = extractDatePart(dateStr);
-            const hourNum = extractHourNumber(dateStr);
+            const hourStr = r[0] || '';
+            const dPart = extractDatePart(hourStr);
+            const hourNum = extractHourNumber(hourStr);
+            const answered = cleanNum(r[1]);
+            const abndQueue = cleanNum(r[2]);
+            const abndCsat = cleanNum(r[3]);
+            const abndRouting = cleanNum(r[4]);
+            const abndHold = cleanNum(r[5]);
             return {
-              'DATE & HOUR': dateStr,
-              'ABND IN ROUTING': cleanNum(r[1]),
-              'ANSWERED': cleanNum(r[2]),
-              'ABND IN CSAT RATING': cleanNum(r[3]),
-              'ABND IN QUEUE': cleanNum(r[4]),
-              'ANBD ON HOLD': cleanNum(r[5]),
+              'HOUR': hourStr,
+              'DATE & HOUR': hourStr,
+              'ANSWERED': answered,
+              'ABND IN QUEUE': abndQueue,
+              'ABND IN CSAT': abndCsat,
+              'ABND IN CSAT RATING': abndCsat,
+              'ABND IN ROUTING': abndRouting,
+              'ABND ON HOLD': abndHold,
+              'ANBD ON HOLD': abndHold,
               '_date': dPart || targetDate,
               '_hour': hourNum >= 0 ? hourNum : 0
             };
@@ -1750,34 +1767,51 @@
           newT1 = mappedT1;
         }
 
+        // 2. Calls Per Queue: Team, Answered, Abnd. in Queue, Abnd. In CSAT, Abnd. on Hold, Abnd. in Routing
         if (t2Rows.length > 0) {
-          const mappedT2 = t2Rows.map(r => ({
-            'TEAM': String(r[0] || 'Team').trim(),
-            'ANSWERED': cleanNum(r[1]),
-            'ABND IN CSAT RATING': cleanNum(r[2]),
-            'ABND IN QUEUE': cleanNum(r[3]),
-            'ABND ON HOLD': cleanNum(r[4]),
-            '_date': targetDate
-          }));
+          const mappedT2 = t2Rows.map(r => {
+            const answered = cleanNum(r[1]);
+            const abndQueue = cleanNum(r[2]);
+            const abndCsat = cleanNum(r[3]);
+            const abndHold = cleanNum(r[4]);
+            const abndRouting = cleanNum(r[5]);
+            return {
+              'TEAM': String(r[0] || 'Team').trim(),
+              'ANSWERED': answered,
+              'ABND IN QUEUE': abndQueue,
+              'ABND IN CSAT': abndCsat,
+              'ABND IN CSAT RATING': abndCsat,
+              'ABND ON HOLD': abndHold,
+              'ABND IN ROUTING': abndRouting,
+              '_date': targetDate
+            };
+          });
           newT2 = mappedT2;
         }
 
+        // 3. Calls Per Agent: Teammate, Inbound Calls, Outbound Calls, Abnd., Answer Time, Talk Time, Hold Time, CSAT Score
         if (t3Rows.length > 0) {
-          const mappedT3 = t3Rows.map(r => ({
-            'TEAMMATE': String(r[0] || 'Agent').trim(),
-            'INBOUND CALLS': cleanNum(r[1]),
-            'OUTBOUND CALLS': cleanNum(r[2]),
-            'ABND INBOUND CALLS': cleanNum(r[3]),
-            'ANSWER TIME': r[4] || '00:15',
-            'TALK TIME': r[5] || '03:30',
-            'CALL DURATION': r[6] || '04:15',
-            'AVERAGE HOLD TIME': r[7] || '00:25',
-            'CSAT SCORE': cleanNum(r[8]),
-            '_date': targetDate
-          }));
+          const mappedT3 = t3Rows.map(r => {
+            const abnd = cleanNum(r[3]);
+            const holdTime = r[6] || '00:25';
+            return {
+              'TEAMMATE': String(r[0] || 'Agent').trim(),
+              'INBOUND CALLS': cleanNum(r[1]),
+              'OUTBOUND CALLS': cleanNum(r[2]),
+              'ABND': abnd,
+              'ABND INBOUND CALLS': abnd,
+              'ANSWER TIME': r[4] || '00:15',
+              'TALK TIME': r[5] || '03:30',
+              'HOLD TIME': holdTime,
+              'AVERAGE HOLD TIME': holdTime,
+              'CSAT SCORE': cleanNum(r[7]),
+              '_date': targetDate
+            };
+          });
           newT3 = mappedT3;
         }
 
+        // 4. Calls Overflow: Date & Hour, Inbound Calls, Tagged Conversations
         if (t4Rows.length > 0) {
           const mappedT4 = t4Rows.map(r => {
             const dateStr = r[0] || '';
@@ -1843,56 +1877,60 @@
       document.getElementById('badge-t3-count').innerText = `${t3.length} records`;
       document.getElementById('badge-t4-count').innerText = `${t4.length} records`;
 
+      // 1. Calls Per Hour: Hour, Answered, Abnd. in Queue, Abnd. In CSAT, Abnd. in Routing, Abnd. on Hold
       const tb1 = document.getElementById('tbody-t1');
       if (t1.length === 0) {
         tb1.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
       } else {
         tb1.innerHTML = t1.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['DATE & HOUR'] || '--'}</td>
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['HOUR'] || r['DATE & HOUR'] || '--'}</td>
+            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT'] ?? 0}</td>
             <td class="p-2.5 border-r border-amber-500/20 text-center">${r['ABND IN ROUTING'] ?? 0}</td>
-            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT RATING'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
-            <td class="p-2.5 text-orange-400 text-center">${r['ANBD ON HOLD'] ?? 0}</td>
-          </tr>
-        `).join('');
-      }
-
-      const tb2 = document.getElementById('tbody-t2');
-      if (t2.length === 0) {
-        tb2.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
-      } else {
-        tb2.innerHTML = t2.map(r => `
-          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
-            <td class="p-2.5 font-bold text-amber-300 font-sans border-r border-amber-500/20 text-center">${r['TEAM'] || '--'}</td>
-            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
-            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT RATING'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
             <td class="p-2.5 text-orange-400 text-center">${r['ABND ON HOLD'] ?? 0}</td>
           </tr>
         `).join('');
       }
 
+      // 2. Calls Per Queue: Team, Answered, Abnd. in Queue, Abnd. In CSAT, Abnd. on Hold, Abnd. in Routing
+      const tb2 = document.getElementById('tbody-t2');
+      if (t2.length === 0) {
+        tb2.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
+      } else {
+        tb2.innerHTML = t2.map(r => `
+          <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
+            <td class="p-2.5 font-bold text-amber-300 font-sans border-r border-amber-500/20 text-center">${r['TEAM'] || '--'}</td>
+            <td class="p-2.5 text-emerald-400 font-bold border-r border-amber-500/20 text-center">${r['ANSWERED'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND IN QUEUE'] ?? 0}</td>
+            <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ABND IN CSAT'] ?? 0}</td>
+            <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['ABND ON HOLD'] ?? 0}</td>
+            <td class="p-2.5 text-center">${r['ABND IN ROUTING'] ?? 0}</td>
+          </tr>
+        `).join('');
+      }
+
+      // 3. Calls Per Agent: Teammate, Inbound Calls, Outbound Calls, Abnd., Answer Time, Talk Time, Hold Time, CSAT Score
       const tb3 = document.getElementById('tbody-t3');
       if (t3.length === 0) {
-        tb3.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
+        tb3.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
       } else {
         tb3.innerHTML = t3.map(r => `
           <tr class="hover:bg-slate-800/40 border-b border-amber-500/10 text-center">
             <td class="p-2.5 font-bold text-slate-200 font-sans border-r border-amber-500/20 text-center">${r['TEAMMATE'] || '--'}</td>
             <td class="p-2.5 text-sky-400 border-r border-amber-500/20 text-center">${r['INBOUND CALLS'] ?? 0}</td>
             <td class="p-2.5 border-r border-amber-500/20 text-center">${r['OUTBOUND CALLS'] ?? 0}</td>
-            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND INBOUND CALLS'] ?? 0}</td>
+            <td class="p-2.5 text-rose-400 font-bold border-r border-amber-500/20 text-center">${r['ABND'] ?? 0}</td>
             <td class="p-2.5 text-amber-300 border-r border-amber-500/20 text-center">${r['ANSWER TIME'] || '--'}</td>
             <td class="p-2.5 border-r border-amber-500/20 text-center">${r['TALK TIME'] || '--'}</td>
-            <td class="p-2.5 text-emerald-400 border-r border-amber-500/20 text-center">${r['CALL DURATION'] || '--'}</td>
-            <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['AVERAGE HOLD TIME'] || '--'}</td>
+            <td class="p-2.5 text-orange-400 border-r border-amber-500/20 text-center">${r['HOLD TIME'] || '--'}</td>
             <td class="p-2.5 font-bold text-emerald-400 text-center">${r['CSAT SCORE'] ?? 0}</td>
           </tr>
         `).join('');
       }
 
+      // 4. Calls Overflow: Date & Hour, Inbound Calls, Tagged Conversations
       const tb4 = document.getElementById('tbody-t4');
       if (t4.length === 0) {
         tb4.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 font-sans">No data available for this day.</td></tr>';
@@ -1908,8 +1946,8 @@
 
       const sumAnswered = t1.reduce((acc, r) => acc + cleanNum(r['ANSWERED']), 0);
       const sumAbndQueue = t1.reduce((acc, r) => acc + cleanNum(r['ABND IN QUEUE']), 0);
-      const sumAbndCsat = t1.reduce((acc, r) => acc + cleanNum(r['ABND IN CSAT RATING']), 0);
-      const sumAbndHold = t1.reduce((acc, r) => acc + cleanNum(r['ANBD ON HOLD']), 0);
+      const sumAbndCsat = t1.reduce((acc, r) => acc + cleanNum(r['ABND IN CSAT']), 0);
+      const sumAbndHold = t1.reduce((acc, r) => acc + cleanNum(r['ABND ON HOLD']), 0);
       const sumInbound = t3.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0) + t4.reduce((acc, r) => acc + cleanNum(r['INBOUND CALLS']), 0);
       const sumTagged = t4.reduce((acc, r) => acc + cleanNum(r['TAGGED CONVERSATIONS']), 0);
 
@@ -1931,12 +1969,12 @@
       const holdByHour = new Array(24).fill(0);
 
       t1.forEach(r => {
-        const h = r._hour !== undefined && r._hour >= 0 && r._hour < 24 ? r._hour : extractHourNumber(r['DATE & HOUR']);
+        const h = r._hour !== undefined && r._hour >= 0 && r._hour < 24 ? r._hour : extractHourNumber(r['HOUR'] || r['DATE & HOUR']);
         if (h >= 0 && h < 24) {
           answeredByHour[h] += cleanNum(r['ANSWERED']);
-          csatByHour[h] += cleanNum(r['ABND IN CSAT RATING']);
+          csatByHour[h] += cleanNum(r['ABND IN CSAT']);
           queueByHour[h] += cleanNum(r['ABND IN QUEUE']);
-          holdByHour[h] += cleanNum(r['ANBD ON HOLD']);
+          holdByHour[h] += cleanNum(r['ABND ON HOLD']);
         }
       });
 
@@ -2011,16 +2049,17 @@
       const teamLabels = t2.map(r => r['TEAM'] || 'Team');
       makeChart('chart-c5', 'bar', teamLabels.length ? teamLabels : ['No data'], [
         { label: 'Answered', data: t2.length ? t2.map(r => cleanNum(r['ANSWERED'])) : [0], backgroundColor: '#10b981' },
-        { label: 'Abnd CSAT', data: t2.length ? t2.map(r => cleanNum(r['ABND IN CSAT RATING'])) : [0], backgroundColor: '#facc15' },
         { label: 'Abnd Queue', data: t2.length ? t2.map(r => cleanNum(r['ABND IN QUEUE'])) : [0], backgroundColor: '#f43f5e' },
-        { label: 'Abnd Hold', data: t2.length ? t2.map(r => cleanNum(r['ABND ON HOLD'])) : [0], backgroundColor: '#fb923c' }
+        { label: 'Abnd CSAT', data: t2.length ? t2.map(r => cleanNum(r['ABND IN CSAT'])) : [0], backgroundColor: '#facc15' },
+        { label: 'Abnd Hold', data: t2.length ? t2.map(r => cleanNum(r['ABND ON HOLD'])) : [0], backgroundColor: '#fb923c' },
+        { label: 'Abnd Routing', data: t2.length ? t2.map(r => cleanNum(r['ABND IN ROUTING'])) : [0], backgroundColor: '#38bdf8' }
       ]);
 
       const agentLabels = t3.map(r => r['TEAMMATE'] || 'Agent');
-      makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abnd. Inbound Calls', data: t3.length ? t3.map(r => cleanNum(r['ABND INBOUND CALLS'])) : [0], backgroundColor: '#f43f5e' }]);
-      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Sec)', data: t3.length ? t3.map(r => parseTimeSeconds(r['ANSWER TIME'])) : [0], backgroundColor: '#eab308' }]);
-      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(1))) : [0], backgroundColor: '#06b6d4' }]);
-      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Call Duration (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['CALL DURATION']) / 60).toFixed(1))) : [0], backgroundColor: '#a855f7' }]);
+      makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abnd. Calls', data: t3.length ? t3.map(r => cleanNum(r['ABND'])) : [0], backgroundColor: '#f43f5e' }]);
+      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['ANSWER TIME']) / 60).toFixed(2))) : [0], backgroundColor: '#eab308' }]);
+      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(2))) : [0], backgroundColor: '#06b6d4' }]);
+      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Hold Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['HOLD TIME']) / 60).toFixed(2))) : [0], backgroundColor: '#a855f7' }]);
       makeChart('chart-c11', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'CSAT Score', data: t3.length ? t3.map(r => cleanNum(r['CSAT SCORE'])) : [0], backgroundColor: '#10b981' }]);
     }
 
@@ -2109,21 +2148,21 @@
         // 3. Sheet: Table 1 (Calls Per Hour)
         const wsT1 = wb.addWorksheet('Calls Per Hour');
         wsT1.columns = [
-          { header: 'DATE & HOUR', key: 'c1', width: 22 },
-          { header: 'ABND. IN ROUTING', key: 'c2', width: 20 },
-          { header: 'ANSWERED', key: 'c3', width: 16 },
-          { header: 'ABND. IN CSAT RATING', key: 'c4', width: 24 },
-          { header: 'ABND. IN QUEUE', key: 'c5', width: 18 },
-          { header: 'ANBD. ON HOLD', key: 'c6', width: 18 }
+          { header: 'HOUR', key: 'c1', width: 22 },
+          { header: 'ANSWERED', key: 'c2', width: 16 },
+          { header: 'ABND. IN QUEUE', key: 'c3', width: 18 },
+          { header: 'ABND. IN CSAT', key: 'c4', width: 18 },
+          { header: 'ABND. IN ROUTING', key: 'c5', width: 20 },
+          { header: 'ABND. ON HOLD', key: 'c6', width: 18 }
         ];
         t1.forEach(r => {
           wsT1.addRow({
-            c1: r['DATE & HOUR'] || '--',
-            c2: r['ABND IN ROUTING'] ?? 0,
-            c3: r['ANSWERED'] ?? 0,
-            c4: r['ABND IN CSAT RATING'] ?? 0,
-            c5: r['ABND IN QUEUE'] ?? 0,
-            c6: r['ANBD ON HOLD'] ?? 0
+            c1: r['HOUR'] || r['DATE & HOUR'] || '--',
+            c2: r['ANSWERED'] ?? 0,
+            c3: r['ABND IN QUEUE'] ?? 0,
+            c4: r['ABND IN CSAT'] ?? 0,
+            c5: r['ABND IN ROUTING'] ?? 0,
+            c6: r['ABND ON HOLD'] ?? 0
           });
         });
 
@@ -2132,44 +2171,44 @@
         wsT2.columns = [
           { header: 'TEAM', key: 'c1', width: 25 },
           { header: 'ANSWERED', key: 'c2', width: 18 },
-          { header: 'ABND. IN CSAT RATING', key: 'c3', width: 24 },
-          { header: 'ABND. IN QUEUE', key: 'c4', width: 18 },
-          { header: 'ABND. ON HOLD', key: 'c5', width: 18 }
+          { header: 'ABND. IN QUEUE', key: 'c3', width: 18 },
+          { header: 'ABND. IN CSAT', key: 'c4', width: 18 },
+          { header: 'ABND. ON HOLD', key: 'c5', width: 18 },
+          { header: 'ABND. IN ROUTING', key: 'c6', width: 20 }
         ];
         t2.forEach(r => {
           wsT2.addRow({
             c1: r['TEAM'] || '--',
             c2: r['ANSWERED'] ?? 0,
-            c3: r['ABND IN CSAT RATING'] ?? 0,
-            c4: r['ABND IN QUEUE'] ?? 0,
-            c5: r['ABND ON HOLD'] ?? 0
+            c3: r['ABND IN QUEUE'] ?? 0,
+            c4: r['ABND IN CSAT'] ?? 0,
+            c5: r['ABND ON HOLD'] ?? 0,
+            c6: r['ABND IN ROUTING'] ?? 0
           });
         });
 
-        // 5. Sheet: Table 3 (Calls Per Agents)
-        const wsT3 = wb.addWorksheet('Calls Per Agents');
+        // 5. Sheet: Table 3 (Calls Per Agent)
+        const wsT3 = wb.addWorksheet('Calls Per Agent');
         wsT3.columns = [
           { header: 'TEAMMATE', key: 'c1', width: 22 },
           { header: 'INBOUND CALLS', key: 'c2', width: 18 },
           { header: 'OUTBOUND CALLS', key: 'c3', width: 18 },
-          { header: 'ABND. INBOUND CALLS', key: 'c4', width: 24 },
+          { header: 'ABND.', key: 'c4', width: 16 },
           { header: 'ANSWER TIME', key: 'c5', width: 16 },
           { header: 'TALK TIME', key: 'c6', width: 16 },
-          { header: 'CALL DURATION', key: 'c7', width: 16 },
-          { header: 'AVERAGE HOLD TIME', key: 'c8', width: 20 },
-          { header: 'CSAT SCORE', key: 'c9', width: 16 }
+          { header: 'HOLD TIME', key: 'c7', width: 16 },
+          { header: 'CSAT SCORE', key: 'c8', width: 16 }
         ];
         t3.forEach(r => {
           wsT3.addRow({
             c1: r['TEAMMATE'] || '--',
             c2: r['INBOUND CALLS'] ?? 0,
             c3: r['OUTBOUND CALLS'] ?? 0,
-            c4: r['ABND INBOUND CALLS'] ?? 0,
+            c4: r['ABND'] ?? 0,
             c5: r['ANSWER TIME'] || '--',
             c6: r['TALK TIME'] || '--',
-            c7: r['CALL DURATION'] || '--',
-            c8: r['AVERAGE HOLD TIME'] || '--',
-            c9: r['CSAT SCORE'] ?? 0
+            c7: r['HOLD TIME'] || '--',
+            c8: r['CSAT SCORE'] ?? 0
           });
         });
 
