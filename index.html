@@ -981,15 +981,19 @@
       return isNaN(num) ? 0 : num;
     }
 
-    function parseTimeSeconds(timeStr) {
+    function parseTimeMinutes(timeStr) {
       if (!timeStr) return 0;
-      if (typeof timeStr === 'number') return timeStr;
+      if (typeof timeStr === 'number') return parseFloat(timeStr.toFixed(2));
       const str = String(timeStr).trim();
       const parts = str.split(':').map(Number);
-      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) return (parts[0] * 60) + parts[1];
-      if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
-      const parsed = parseFloat(str);
-      return isNaN(parsed) ? 0 : parsed;
+      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return parseFloat((parts[0] + (parts[1] / 60)).toFixed(2));
+      }
+      if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+        return parseFloat(((parts[0] * 60) + parts[1] + (parts[2] / 60)).toFixed(2));
+      }
+      const parsed = parseFloat(str.replace(/[^0-9.-]/g, ''));
+      return isNaN(parsed) ? 0 : parseFloat(parsed.toFixed(2));
     }
 
     function extractDatePart(str) {
@@ -2065,9 +2069,9 @@
 
       const agentLabels = t3.map(r => r['TEAMMATE'] || 'Agent');
       makeChart('chart-c6', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Abnd. Calls', data: t3.length ? t3.map(r => cleanNum(r['ABND'])) : [0], backgroundColor: '#f43f5e' }]);
-      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['ANSWER TIME']) / 60).toFixed(2))) : [0], backgroundColor: '#eab308' }]);
-      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['TALK TIME']) / 60).toFixed(2))) : [0], backgroundColor: '#06b6d4' }]);
-      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Hold Time (Min)', data: t3.length ? t3.map(r => parseFloat((parseTimeSeconds(r['HOLD TIME']) / 60).toFixed(2))) : [0], backgroundColor: '#a855f7' }]);
+      makeChart('chart-c7', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Answer Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['ANSWER TIME'])) : [0], backgroundColor: '#eab308' }]);
+      makeChart('chart-c8', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Talk Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['TALK TIME'])) : [0], backgroundColor: '#06b6d4' }]);
+      makeChart('chart-c9', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'Hold Time (Min)', data: t3.length ? t3.map(r => parseTimeMinutes(r['HOLD TIME'])) : [0], backgroundColor: '#a855f7' }]);
       makeChart('chart-c11', 'bar', agentLabels.length ? agentLabels : ['No data'], [{ label: 'CSAT Score', data: t3.length ? t3.map(r => cleanNum(r['CSAT SCORE'])) : [0], backgroundColor: '#10b981' }]);
     }
 
