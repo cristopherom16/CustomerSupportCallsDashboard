@@ -831,7 +831,7 @@
     }
 
     function setAllChartsVisibility(show) {
-      Object.keys(visibilityState.charts).forEach(k => visibilityState.charts[k] = show);
+      Object.keys(visibilityState.charts).forEach(k => { visibilityState.charts[k] = show; });
       saveVisibilityState();
       renderVisibilityPills();
       applyVisibilityDOM();
@@ -839,7 +839,7 @@
     }
 
     function setAllTablesVisibility(show) {
-      Object.keys(visibilityState.tables).forEach(k => visibilityState.tables[k] = show);
+      Object.keys(visibilityState.tables).forEach(k => { visibilityState.tables[k] = show; });
       saveVisibilityState();
       renderVisibilityPills();
       applyVisibilityDOM();
@@ -965,6 +965,7 @@
       try {
         localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val));
       } catch (e) {
+        console.warn("LocalStorage warning:", e);
       }
     }
 
@@ -1007,14 +1008,15 @@
 
     function extractHourNumber(str) {
       if (!str) return -1;
-      const timeMatch = String(str).match(/\b(\d{1,2}):(\d{2})\b/);
+      const cleanStr = String(str).trim();
+      const timeMatch = cleanStr.match(/\b(\d{1,2}):(\d{2})\b/);
       if (timeMatch) {
         let hour = parseInt(timeMatch[1], 10);
-        if (/pm\b/i.test(str) && hour < 12) hour += 12;
-        if (/am\b/i.test(str) && hour === 12) hour = 0;
+        if (/pm\b/i.test(cleanStr) && hour < 12) hour += 12;
+        if (/am\b/i.test(cleanStr) && hour === 12) hour = 0;
         return hour >= 0 && hour <= 23 ? hour : -1;
       }
-      const singleHour = String(str).match(/\b(\d{1,2})\s*(am|pm)\b/i);
+      const singleHour = cleanStr.match(/\b(\d{1,2})\s*(am|pm)\b/i);
       if (singleHour) {
         let hour = parseInt(singleHour[1], 10);
         const meridian = singleHour[2].toLowerCase();
@@ -1022,10 +1024,15 @@
         if (meridian === 'am' && hour === 12) hour = 0;
         return hour >= 0 && hour <= 23 ? hour : -1;
       }
+      if (/^\d{1,2}$/.test(cleanStr)) {
+        const hour = parseInt(cleanStr, 10);
+        return hour >= 0 && hour <= 23 ? hour : -1;
+      }
       return -1;
     }
 
     function getVal(row, possibleKeys) {
+      if (!row || typeof row !== 'object') return 0;
       for (const k of possibleKeys) {
         if (row[k] !== undefined && row[k] !== null && row[k] !== '') return row[k];
       }
@@ -1033,7 +1040,7 @@
     }
 
     function normalizeRowFields(r, tableType) {
-      const copy = { ...r };
+      const copy = { ...(r || {}) };
       if (tableType === 1) {
         copy['HOUR'] = r['HOUR'] || r['Hour'] || r['DATE & HOUR'] || r['Date & Hour'] || r['date_hour'] || '';
         copy['DATE & HOUR'] = copy['HOUR'];
@@ -1090,8 +1097,8 @@
 
     function toPureArray(val) {
       if (!val) return [];
-      if (Array.isArray(val)) return val;
-      if (typeof val === 'object') return Object.values(val);
+      if (Array.isArray(val)) return val.filter(Boolean);
+      if (typeof val === 'object') return Object.values(val).filter(Boolean);
       return [];
     }
 
@@ -1129,7 +1136,7 @@
               rowCopy._date = extractDatePart(dateHourStr) || '';
             }
 
-            if (dateHourStr && rowCopy._hour === undefined) {
+            if (dateHourStr && (rowCopy._hour === undefined || rowCopy._hour === -1)) {
               rowCopy._hour = extractHourNumber(dateHourStr);
             }
 
@@ -1446,7 +1453,7 @@
       const uDay = document.getElementById('unified-day-label');
       if (uDay) uDay.innerText = currentSelectedDate || 'General / All Days';
 
-      document.querySelectorAll('.table-day-label').forEach(el => el.innerText = currentSelectedDate || 'All Days');
+      document.querySelectorAll('.table-day-label').forEach(el => { el.innerText = currentSelectedDate || 'All Days'; });
 
       renderAllTables();
       applyVisibilityDOM();
@@ -1672,7 +1679,8 @@
 
       const delimiter = rawText.includes('\t') ? '\t' : (rawText.includes(',') ? ',' : ';');
       const firstLineTokens = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, ''));
-      const isHeaderRow = isNaN(parseFloat(firstLineTokens[1])) && isNaN(parseFloat(firstLineTokens[firstLineTokens.length - 1]));
+      const headerKeywords = /^(hour|date|team|teammate|agent|answered|inbound|outbound|abnd|answer|talk|hold|csat|tagged)/i;
+      const isHeaderRow = firstLineTokens.length > 1 && headerKeywords.test(firstLineTokens[0]) && headerKeywords.test(firstLineTokens[1]);
       
       const startIndex = isHeaderRow ? 1 : 0;
       const parsedRows = [];
@@ -2120,12 +2128,10 @@
           if (canvas) {
             const dataUrl = canvas.toDataURL('image/png');
 
-            // Set Title cell
             const cell = wsCharts.getCell(`B${chartRowOffset}`);
             cell.value = `${def.label}`;
             cell.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FF1E3A8A' } };
 
-            // Embed into worksheet
             const imageId = wb.addImage({
               base64: dataUrl,
               extension: 'png'
@@ -2138,7 +2144,6 @@
 
             chartRowOffset += 18;
 
-            // Also add high-res PNG to ZIP package
             const cleanFileName = `${String(index + 1).padStart(2, '0')}_${def.label.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
             const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
             chartsFolder.file(cleanFileName, base64Data, { base64: true });
