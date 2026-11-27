@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customer Support - Calls Dashboard</title>
+  <title>Highway Calls Dashboard - Customer Support</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- ExcelJS, JSZip & FileSaver for full Excel + Charts bundle download -->
@@ -196,18 +196,13 @@
         <div class="hidden sm:flex w-12 h-12 rounded-xl bg-slate-900/95 border border-amber-500/40 items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <i class="fa-solid fa-gauge-high text-2xl text-amber-400"></i>
         </div>
-        <div class="flex flex-col items-center text-center gap-1.5">
-          <h1 class="comic-title text-4xl sm:text-5xl font-black tracking-wider text-amber-400 uppercase leading-none underline decoration-amber-500 underline-offset-8">
-            CUSTOMER SUPPORT
+        <div class="flex items-center justify-center gap-3 text-center">
+          <h1 class="comic-title text-3xl sm:text-4xl font-black tracking-wider text-amber-400 uppercase leading-none underline decoration-amber-500 underline-offset-8">
+            HIGHWAY CALLS DASHBOARD - CUSTOMER SUPPORT
           </h1>
-          <div class="flex items-center gap-2 mt-1">
-            <span class="text-xs font-semibold text-slate-400 tracking-widest uppercase">
-              CALLS DASHBOARD (CLOUD STORAGE UNLIMITED)
-            </span>
-            <span id="cloud-status-badge" class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              Connecting...
-            </span>
-          </div>
+          <span id="cloud-status-badge" class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+            Connecting...
+          </span>
         </div>
       </div>
 
@@ -260,7 +255,7 @@
     <button onclick="document.getElementById('toast-banner').classList.add('hidden')" class="text-slate-400 hover:text-white ml-2 text-sm">&times;</button>
   </div>
 
-  <main id="main-content-wrapper" class="flex-1 w-full pb-24 space-y-8" style="padding-left: 67px; padding-right: 10mm; padding-top: 175px;">
+  <main id="main-content-wrapper" class="flex-1 w-full pb-24 space-y-8" style="padding-left: 67px; padding-right: 10mm; padding-top: 165px;">
 
     <!-- TAB 1: OVERVIEW -->
     <div id="view-overview" class="space-y-8">
@@ -663,7 +658,7 @@
             </button>
           </div>
 
-          <!-- Hour Selector + Single Note Input Box -->
+          <!-- Hour Selector (6 AM to 7 PM) + Single Note Input Box -->
           <div class="bg-slate-950 p-4 rounded-xl border border-amber-500/30 space-y-4">
             <div class="flex flex-wrap items-center gap-3">
               <label for="hourly-note-select" class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
@@ -840,6 +835,13 @@
         'card-table-t4': true
       }
     };
+
+    function formatDisplayHour(h) {
+      const hour24 = `${String(h).padStart(2, '0')}:00`;
+      const period = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      return `${hour24} (${h12}:00 ${period})`;
+    }
 
     function adjustMainPaddingForHeader() {
       const header = document.getElementById('main-fixed-header');
@@ -1577,13 +1579,16 @@
       const summaryEl = document.getElementById('daily-notes-summary-box');
       if (!selectEl || !inputEl || !summaryEl) return;
 
-      const previousHour = selectEl.value || '00:00';
+      const previousHour = selectEl.value || '06:00';
       if (selectEl.options.length === 0) {
-        for (let h = 0; h < 24; h++) {
+        // Solo de 6:00 AM (6) a 7:00 PM (19) sin texto adicional en paréntesis
+        for (let h = 6; h <= 19; h++) {
           const hourStr = `${String(h).padStart(2, '0')}:00`;
+          const period = h >= 12 ? 'PM' : 'AM';
+          const h12 = h % 12 === 0 ? 12 : h % 12;
           const opt = document.createElement('option');
           opt.value = hourStr;
-          opt.textContent = `${hourStr} (Hour ${h})`;
+          opt.textContent = `${h12}:00 ${period}`;
           selectEl.appendChild(opt);
         }
         selectEl.value = previousHour;
@@ -1611,10 +1616,12 @@
       if (!summaryEl) return;
 
       const lines = [];
-      for (let h = 0; h < 24; h++) {
+      for (let h = 6; h <= 19; h++) {
         const hourStr = `${String(h).padStart(2, '0')}:00`;
         if (savedNotes[hourStr] && savedNotes[hourStr].trim()) {
-          lines.push(`${hourStr}  —  ${savedNotes[hourStr].trim()}`);
+          const period = h >= 12 ? 'PM' : 'AM';
+          const h12 = h % 12 === 0 ? 12 : h % 12;
+          lines.push(`${h12}:00 ${period}  —  ${savedNotes[hourStr].trim()}`);
         }
       }
       summaryEl.value = lines.length > 0 ? lines.join('\n\n') : '';
@@ -1627,6 +1634,7 @@
 
       const dateKey = sanitizeKey(currentSelectedDate || 'general');
       const hour = selectEl.value;
+      const selectedLabel = selectEl.options[selectEl.selectedIndex]?.text || hour;
       const text = inputEl.value.trim();
 
       if (!localNotesStore) localNotesStore = {};
@@ -1645,10 +1653,10 @@
       if (db) {
         db.ref("open_notes/" + dateKey).set(notesObj);
         db.ref("daily_notes/" + dateKey).set(notesObj)
-          .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Note for ${hour} saved successfully!`))
+          .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Note for ${selectedLabel} saved successfully!`))
           .catch(err => showToast(`<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Error: ${err.message}`));
       } else {
-        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Note for ${hour} saved in local storage!`);
+        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Note for ${selectedLabel} saved in local storage!`);
       }
     }
 
@@ -2199,7 +2207,7 @@
         }
 
         const wb = new ExcelJS.Workbook();
-        wb.creator = 'Customer Support Calls Dashboard';
+        wb.creator = 'Highway Calls Dashboard - Customer Support';
         wb.created = new Date();
 
         const zip = new JSZip();
@@ -2218,7 +2226,7 @@
           { header: 'Notes', key: 'c3', width: 34 }
         ];
 
-        wsSummary.addRow(['CUSTOMER SUPPORT - CALLS DASHBOARD REPORT', '', '']);
+        wsSummary.addRow(['HIGHWAY CALLS DASHBOARD - CUSTOMER SUPPORT', '', '']);
         wsSummary.addRow(['Month Scope', activeMonth, '']);
         wsSummary.addRow(['Active Day', activeDay, '']);
         wsSummary.addRow(['Insights Scope', insightsScope, '']);
@@ -2360,9 +2368,11 @@
         wsNotes.addRow(['HOURLY OPERATIONAL NOTES', activeDay]);
         const dateKey = sanitizeKey(currentSelectedDate || 'general');
         const savedNotes = (localNotesStore && localNotesStore[dateKey]) || {};
-        for (let h = 0; h < 24; h++) {
+        for (let h = 6; h <= 19; h++) {
           const hourStr = `${String(h).padStart(2, '0')}:00`;
-          wsNotes.addRow([hourStr, savedNotes[hourStr] || '']);
+          const period = h >= 12 ? 'PM' : 'AM';
+          const h12 = h % 12 === 0 ? 12 : h % 12;
+          wsNotes.addRow([`${h12}:00 ${period}`, savedNotes[hourStr] || '']);
         }
         wsNotes.addRow(['', '']);
         wsNotes.addRow(['INSIGHTS SCOPE', insightsScope]);
@@ -2379,7 +2389,7 @@
           });
         });
 
-        const fileBase = `Calls_Dashboard_Report_${activeDay}`.replace(/[\s\/-]+/g, '_');
+        const fileBase = `Highway_Calls_Dashboard_Report_${activeDay}`.replace(/[\s\/-]+/g, '_');
 
         // Write Excel buffer
         const excelBuffer = await wb.xlsx.writeBuffer();
