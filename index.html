@@ -52,6 +52,11 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
+    /* Estilo Comic Sans para el título principal */
+    .comic-title {
+      font-family: 'Comic Sans MS', 'Comic Sans', cursive !important;
+    }
+
     /* Light Theme Settings - Light Yellow background, Amber cards, Dark Blue borders & text */
     body.light-mode {
       --bg-color: #fef3c7; /* Light yellow background */
@@ -63,6 +68,7 @@
     }
     
     body.light-mode header,
+    body.light-mode .bg-slate-900\/95,
     body.light-mode .bg-slate-900\/90,
     body.light-mode .bg-slate-900\/80,
     body.light-mode .bg-slate-900,
@@ -182,16 +188,16 @@
     <i id="themeIcon" class="fa-solid fa-sun text-lg"></i>
   </button>
 
-  <header class="bg-slate-900/90 border-b border-amber-500/40 backdrop-blur sticky top-0 z-50 py-4 transition-all" style="padding-left: 67px; padding-right: 10mm;">
-    <div class="w-full flex flex-col items-center justify-center gap-4">
+  <header id="main-fixed-header" class="bg-slate-900/95 border-b border-amber-500/40 backdrop-blur fixed top-0 left-0 right-0 w-full z-50 py-3.5 shadow-xl" style="padding-left: 16px; padding-right: 10mm;">
+    <div class="w-full flex flex-col items-center justify-center gap-3">
       
-      <!-- Underlined and Centered Dashboard Title -->
+      <!-- Underlined and Centered Dashboard Title in Comic Sans -->
       <div class="flex items-center justify-center gap-4">
         <div class="hidden sm:flex w-12 h-12 rounded-xl bg-slate-900/95 border border-amber-500/40 items-center justify-center p-1.5 shadow-md shadow-amber-500/10">
           <i class="fa-solid fa-gauge-high text-2xl text-amber-400"></i>
         </div>
         <div class="flex flex-col items-center text-center gap-1.5">
-          <h1 class="text-3xl sm:text-4xl font-black tracking-widest text-amber-400 uppercase leading-none underline decoration-amber-500 underline-offset-8">
+          <h1 class="comic-title text-4xl sm:text-5xl font-black tracking-wider text-amber-400 uppercase leading-none underline decoration-amber-500 underline-offset-8">
             CUSTOMER SUPPORT
           </h1>
           <div class="flex items-center gap-2 mt-1">
@@ -205,39 +211,40 @@
         </div>
       </div>
 
-      <!-- Header Controls: Date Navigation & Today Button -->
-      <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-slate-950/80 px-4 py-2 rounded-2xl border border-amber-500/30 shadow-inner">
-        <!-- Date Back/Forward Controls -->
-        <div class="flex items-center gap-1">
-          <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
+      <!-- Fila de Controles: Botones pegados al margen izquierdo a la misma altura que el selector de fecha -->
+      <div class="w-full relative flex flex-wrap items-center justify-center gap-3 min-h-[44px]">
+        
+        <!-- Navigation Tabs pegados al margen izquierdo -->
+        <div class="xl:absolute xl:left-0 flex flex-wrap items-center justify-start gap-2">
+          <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2.5 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer">
+            <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
           </button>
-          <input type="date" id="date-picker" onchange="onDatePickerChanged(this.value)" class="bg-amber-500 text-blue-950 text-xs font-bold px-2 py-1 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
-          <button onclick="navigateDate(1)" title="Next Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
-            <i class="fa-solid fa-chevron-right text-xs"></i>
+          <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2.5 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer">
+            <i class="fa-solid fa-book-open text-sm"></i> Notes & Insights
           </button>
         </div>
 
-        <button onclick="setToday()" class="text-[11px] font-extrabold bg-amber-500 text-blue-950 hover:bg-amber-400 px-3 py-1 rounded-md border border-amber-600 transition-all cursor-pointer">
-          Today
-        </button>
-      </div>
+        <!-- Date Navigation, Today Button & Scope Badge centrados a la misma altura -->
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-slate-950/80 px-4 py-1.5 rounded-2xl border border-amber-500/30 shadow-inner">
+          <div class="flex items-center gap-1">
+            <button onclick="navigateDate(-1)" title="Previous Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <input type="date" id="date-picker" onchange="onDatePickerChanged(this.value)" class="bg-amber-500 text-blue-950 text-xs font-bold px-2 py-1 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
+            <button onclick="navigateDate(1)" title="Next Day" class="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500 text-blue-950 font-bold hover:bg-amber-400 transition border border-amber-600 cursor-pointer">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+          </div>
 
-      <!-- Navigation Tabs (Sticky & Centered below Date Controls) -->
-      <div class="flex flex-wrap items-center justify-center gap-2">
-        <button id="tab-btn-overview" onclick="switchTab('overview')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-3 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer">
-          <i class="fa-solid fa-chart-pie text-sm"></i> Overview & Charts
-        </button>
-        <button id="tab-btn-notes" onclick="switchTab('notes')" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-3 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer">
-          <i class="fa-solid fa-book-open text-sm"></i> Notes & Insights
-        </button>
-      </div>
+          <button onclick="setToday()" class="text-[11px] font-extrabold bg-amber-500 text-blue-950 hover:bg-amber-400 px-3 py-1 rounded-md border border-amber-600 transition-all cursor-pointer">
+            Today
+          </button>
 
-      <!-- Scope Badge -->
-      <div class="flex items-center justify-center gap-2">
-        <span id="scope-day-badge" class="text-xs font-bold text-amber-300 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/40">
-          Day: --
-        </span>
+          <span id="scope-day-badge" class="text-xs font-bold text-amber-300 bg-slate-900 px-3 py-1 rounded-xl border border-amber-500/40">
+            Day: --
+          </span>
+        </div>
+
       </div>
 
       <div id="week-days-pills" class="hidden"></div>
@@ -253,7 +260,7 @@
     <button onclick="document.getElementById('toast-banner').classList.add('hidden')" class="text-slate-400 hover:text-white ml-2 text-sm">&times;</button>
   </div>
 
-  <main class="flex-1 w-full py-8 space-y-8 pb-24" style="padding-left: 67px; padding-right: 10mm;">
+  <main id="main-content-wrapper" class="flex-1 w-full pb-24 space-y-8" style="padding-left: 67px; padding-right: 10mm; padding-top: 175px;">
 
     <!-- TAB 1: OVERVIEW -->
     <div id="view-overview" class="space-y-8">
@@ -643,19 +650,44 @@
     <!-- TAB 3: NOTES -->
     <div id="view-notes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 space-y-4">
-          <div class="flex justify-between items-center border-b border-amber-500/30 pb-3">
+        <div class="lg:col-span-2 bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 space-y-5">
+          <div class="flex flex-wrap justify-between items-center gap-2 border-b border-amber-500/30 pb-3">
             <div>
               <h3 class="text-sm font-black text-amber-400 flex items-center gap-2">
                 <i class="fa-solid fa-clock text-amber-500"></i> Hourly Operational Notes
               </h3>
               <p class="text-xs text-slate-400">Target Date: <span id="unified-day-label" class="font-bold text-amber-300">--</span></p>
             </div>
-            <button onclick="saveAllHourlyNotes()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition cursor-pointer">
-              <i class="fa-solid fa-floppy-disk mr-1"></i> Save Day Notes
+            <button onclick="saveSingleHourlyNote()" class="text-xs font-bold px-4 py-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md shadow-amber-500/20 transition cursor-pointer">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Save Note
             </button>
           </div>
-          <div id="unified-hourly-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[580px] overflow-y-auto pr-1">
+
+          <!-- Hour Selector + Single Note Input Box -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-amber-500/30 space-y-4">
+            <div class="flex flex-wrap items-center gap-3">
+              <label for="hourly-note-select" class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                <i class="fa-regular fa-clock text-amber-500"></i> Select Hour:
+              </label>
+              <select id="hourly-note-select" onchange="onHourlyNoteSelectChange()" class="bg-amber-500 text-blue-950 text-xs font-bold px-3 py-1.5 rounded-lg border border-amber-600 focus:outline-none cursor-pointer">
+              </select>
+            </div>
+
+            <div>
+              <label for="hourly-single-note-input" class="block text-xs font-bold text-slate-300 mb-1.5">Operational Note:</label>
+              <textarea id="hourly-single-note-input" rows="3" placeholder="Write operational note for the selected hour..." class="w-full bg-slate-900 text-xs text-slate-200 p-3 rounded-xl border border-amber-500/30 focus:outline-none focus:border-amber-400"></textarea>
+            </div>
+          </div>
+
+          <!-- Daily Notes Breakdown Box -->
+          <div class="space-y-2 pt-1">
+            <div class="flex items-center justify-between">
+              <label for="daily-notes-summary-box" class="text-xs font-black text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-amber-500"></i> Daily Notes
+              </label>
+              <span class="text-[11px] text-slate-400">Saved hours & notes</span>
+            </div>
+            <textarea id="daily-notes-summary-box" rows="8" readonly placeholder="No operational notes saved for this day yet..." class="w-full bg-slate-950/90 text-xs text-slate-200 p-3.5 rounded-xl border border-amber-500/30 focus:outline-none leading-relaxed"></textarea>
           </div>
         </div>
 
@@ -809,6 +841,16 @@
       }
     };
 
+    function adjustMainPaddingForHeader() {
+      const header = document.getElementById('main-fixed-header');
+      const main = document.getElementById('main-content-wrapper');
+      if (header && main) {
+        main.style.paddingTop = (header.offsetHeight + 24) + 'px';
+      }
+    }
+
+    window.addEventListener('resize', adjustMainPaddingForHeader);
+
     window.onload = function () {
       initTheme();
       initControls();
@@ -818,6 +860,7 @@
       checkAllFourTablesReady();
       renderVisibilityPills();
       applyVisibilityDOM();
+      adjustMainPaddingForHeader();
     };
 
     function loadVisibilityState() {
@@ -1491,6 +1534,7 @@
       renderAllCharts();
       initUnifiedHourlyGrid();
       loadSavedWeeklyInsights();
+      adjustMainPaddingForHeader();
     }
 
     function switchTab(tabId) {
@@ -1499,7 +1543,7 @@
         const btn = document.getElementById(`tab-btn-${t}`);
         if (view) view.classList.add('hidden');
         if (btn && t !== 'import') {
-          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-3 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer';
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2.5 text-slate-300 hover:text-blue-950 hover:bg-amber-400 border border-amber-500/20 transition cursor-pointer';
         }
       });
 
@@ -1507,7 +1551,7 @@
       const activeBtn = document.getElementById(`tab-btn-${tabId}`);
       if (activeView) activeView.classList.remove('hidden');
       if (activeBtn && tabId !== 'import') {
-        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-3 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
+        activeBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2.5 bg-amber-500 text-blue-950 shadow-md shadow-amber-500/20 transition cursor-pointer';
       }
 
       if (tabId === 'overview') {
@@ -1524,53 +1568,87 @@
         initUnifiedHourlyGrid();
         loadSavedWeeklyInsights();
       }
+      adjustMainPaddingForHeader();
     }
 
     function initUnifiedHourlyGrid() {
-      const grid = document.getElementById('unified-hourly-grid');
-      if (!grid) return;
+      const selectEl = document.getElementById('hourly-note-select');
+      const inputEl = document.getElementById('hourly-single-note-input');
+      const summaryEl = document.getElementById('daily-notes-summary-box');
+      if (!selectEl || !inputEl || !summaryEl) return;
+
+      const previousHour = selectEl.value || '00:00';
+      if (selectEl.options.length === 0) {
+        for (let h = 0; h < 24; h++) {
+          const hourStr = `${String(h).padStart(2, '0')}:00`;
+          const opt = document.createElement('option');
+          opt.value = hourStr;
+          opt.textContent = `${hourStr} (Hour ${h})`;
+          selectEl.appendChild(opt);
+        }
+        selectEl.value = previousHour;
+      }
 
       const dateKey = sanitizeKey(currentSelectedDate || 'general');
       const savedNotes = (localNotesStore && localNotesStore[dateKey]) || {};
 
-      grid.innerHTML = '';
-      for (let h = 0; h < 24; h++) {
-        const hourStr = `${String(h).padStart(2, '0')}:00`;
-        const noteText = savedNotes[hourStr] || '';
-
-        const item = document.createElement('div');
-        item.className = 'bg-slate-950 p-2.5 rounded-xl border border-amber-500/30 space-y-1 text-center';
-        item.innerHTML = `
-          <div class="flex justify-between items-center text-[11px] font-bold text-amber-400">
-            <span><i class="fa-regular fa-clock mr-1 text-amber-500/70"></i>${hourStr}</span>
-            <span class="text-[10px] text-slate-500 font-mono">Hour ${h}</span>
-          </div>
-          <input type="text" data-hour="${hourStr}" value="${noteText.replace(/"/g, '&quot;')}" placeholder="Operational note..." class="hourly-note-input w-full bg-slate-900 text-xs text-slate-200 px-2.5 py-1.5 rounded-lg border border-amber-500/30 focus:outline-none focus:border-amber-400 text-center">
-        `;
-        grid.appendChild(item);
-      }
+      inputEl.value = savedNotes[selectEl.value] || '';
+      renderDailyNotesBreakdown(savedNotes);
     }
 
-    function saveAllHourlyNotes() {
-      const dateKey = sanitizeKey(currentSelectedDate || 'general');
-      const notesObj = {};
+    function onHourlyNoteSelectChange() {
+      const selectEl = document.getElementById('hourly-note-select');
+      const inputEl = document.getElementById('hourly-single-note-input');
+      if (!selectEl || !inputEl) return;
 
-      document.querySelectorAll('.hourly-note-input').forEach(input => {
-        const hour = input.getAttribute('data-hour');
-        if (hour && input.value.trim()) notesObj[hour] = input.value.trim();
-      });
+      const dateKey = sanitizeKey(currentSelectedDate || 'general');
+      const savedNotes = (localNotesStore && localNotesStore[dateKey]) || {};
+      inputEl.value = savedNotes[selectEl.value] || '';
+    }
+
+    function renderDailyNotesBreakdown(savedNotes) {
+      const summaryEl = document.getElementById('daily-notes-summary-box');
+      if (!summaryEl) return;
+
+      const lines = [];
+      for (let h = 0; h < 24; h++) {
+        const hourStr = `${String(h).padStart(2, '0')}:00`;
+        if (savedNotes[hourStr] && savedNotes[hourStr].trim()) {
+          lines.push(`${hourStr}  —  ${savedNotes[hourStr].trim()}`);
+        }
+      }
+      summaryEl.value = lines.length > 0 ? lines.join('\n\n') : '';
+    }
+
+    function saveSingleHourlyNote() {
+      const selectEl = document.getElementById('hourly-note-select');
+      const inputEl = document.getElementById('hourly-single-note-input');
+      if (!selectEl || !inputEl) return;
+
+      const dateKey = sanitizeKey(currentSelectedDate || 'general');
+      const hour = selectEl.value;
+      const text = inputEl.value.trim();
 
       if (!localNotesStore) localNotesStore = {};
-      localNotesStore[dateKey] = notesObj;
+      if (!localNotesStore[dateKey]) localNotesStore[dateKey] = {};
+
+      if (text) {
+        localNotesStore[dateKey][hour] = text;
+      } else {
+        delete localNotesStore[dateKey][hour];
+      }
+
+      const notesObj = localNotesStore[dateKey];
       safeSetLocal('open_calls_daily_notes', localNotesStore);
+      renderDailyNotesBreakdown(notesObj);
 
       if (db) {
         db.ref("open_notes/" + dateKey).set(notesObj);
         db.ref("daily_notes/" + dateKey).set(notesObj)
-          .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved successfully!`))
+          .then(() => showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Note for ${hour} saved successfully!`))
           .catch(err => showToast(`<i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Error: ${err.message}`));
       } else {
-        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Notes saved in local storage!`);
+        showToast(`<i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>Note for ${hour} saved in local storage!`);
       }
     }
 
